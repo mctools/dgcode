@@ -1,0 +1,10 @@
+package()
+
+Geant4-compatible units and constants, copied and modified slightly so they can
+be accessed without Geant4 available. In C++ they are available in namespaces
+(respectively Units and Constants), and they are available in Python modules as
+well. Since this is based on code copied from Geant4, code in this package is
+distributed under the Geant4 license.
+
+
+Despite the name, this package will never have any external dependencies.

@@ -1,0 +1,42 @@
+#ignore emacs backup and lock files:
+*~
+\#*\#
+.\#*
+
+#Also needed for vi:
+.*.sw?
+
+#for visual studio code
+.vscode
+
+#ignore any build output and user files:
+/install/
+/.bld/
+/.system/depfix/bld/
+*.orig
+
+#Extra protection against adding in build output created by custom user commands:
+*.so
+*.dylib
+*.o
+*.a
+*.pyc
+*.pyo
+*.exe
+*.gch
+*.out
+__pycache__/
+
+#latex build leftovers:
+*.aux
+*.blg
+*.bbl
+*.dvi
+#OK in dgcode: *.log
+*.spl
+*.bak
+*.toc
+
+#Miscellaneous:
+.DS_Store
+vgcore.*

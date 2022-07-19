@@ -1,0 +1,14 @@
+package(EXTRA_COMPILE_FLAGS -Wno-shadow -Wno-error -Wno-extra -Wno-all -Wno-pedantic)
+
+######################################################################
+
+This packages includes the few source files extracted from Boost, needed for the
+purposes of our python-C++ bindings. For obvious reasons, these files are
+therefore distributed under the boost license.
+
+The lenient compilation flags in this case are there to make sure no-one gets
+nasty surprises from the boost code in libsrc/ (which is anyway not ours).
+
+This package will never have any external dependencies.
+
+Primary author: thomas.kittelmann@ess.eu

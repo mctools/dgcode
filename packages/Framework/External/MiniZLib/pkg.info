@@ -1,0 +1,48 @@
+package()
+
+###############################################################################
+
+A local version of ZLib, so we don't have to rely on its presence on a system,
+nor ask people to install it. We try to avoid any include path or lib symbol
+clashes with system libz.
+
+Maintainer: Thomas.Kittelmann@ess.eu
+
+Import notes for version v. 1.2.8
+
+* wget http://zlib.net/zlib-1.2.8.tar.gz, untar
+* copy all .h and .c files from the root dir to our libsrc/
+
+Try if it compiles. Probably we need to add some stuff
+
+Add three includes to the top of gzguts.h:
+
+#include <sys/types.h>//ADDED BY TK
+#include <unistd.h>//ADDED BY TK
+#include <fcntl.h>//ADDED BY TK
+
+Next, move zlib.h and zlib.c to libinc and rename all files in libsrc to
+mz_<name> (with "for i in *; do mv $i mz_$i; done" in libsrc). Edit zlib.h and
+zlib.c to add a MiniZLib_ in front of the defines for the include guard. Fix the
+include statements by these three commands:
+
+sed -i 's#include "#include "mz_#' libinc/*h libsrc/*h libsrc/*c app_test/*c
+sed -i 's#mz_zlib.h#MiniZLib/zlib.h#' libinc/*h libsrc/*h libsrc/*c app_test/*c
+sed -i 's#mz_zconf.h#MiniZLib/zconf.h#' libinc/*h libsrc/*h libsrc/*c app_test/*c
+
+#fix symbols:
+
+sed -i 's/#ifdef Z_PREFIX/#if 1/' libinc/zconf.h
+
+Replace the string in zconf.h " z_" with " minizlib_", but only in the long
+symbol list at the beginning ~152 lines.
+
+Check compilation!
+
+However, this still leaves many symbols to fix, investigate with:
+
+nm -p $ESS_LIB_DIR/libPKG__MiniZLib.so|grep -v minizlib_|grep -v U|grep -v '\.'
+
+Anything between frame init and frame end should be fixed. For 1.2.8 we had to
+add extra defines to zconf.h (check the /* extras added by TK */ section)!
+

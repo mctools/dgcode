@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+# Make sure the system mods directory is first in the python path and import the frontend module.
+from os import path
+import sys
+sys.path=[path.realpath(path.join(path.dirname(__file__),'..','mods'))]+sys.path
+import frontend
+#Alternatively replace the import statement with the following to profile:
+#import cProfile,pstats
+#cProfile.run('import frontend','cprofile')
+#pstats.Stats('cprofile').sort_stats('tottime').print_stats(20)

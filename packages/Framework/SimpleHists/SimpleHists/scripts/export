@@ -1,0 +1,2 @@
+#!/usr/bin/env python3
+raise SystemExit('ERROR: The ess_simplehists_export script has been renamed as ess_simplehistscontrib_shist2npz (enable the SimpleHistsContrib package to use it - for instance by adding it as a dependency in your own pkg.info)')

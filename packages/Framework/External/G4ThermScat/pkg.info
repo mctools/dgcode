@@ -1,0 +1,17 @@
+package(USEEXT Geant4)
+
+######################################################################
+
+Classes and utilities used to enable the thermal scattering physics shipped with
+Geant4, due to Tatsumi Koi (probably not very well supported going forward since
+he left Geant4 before v10.5.0 was released).
+
+Note that the class G4HadronElasticPhysicsHP_TS is basically a cut and paste of
+the G4HadronElasticPhysicsHP class from Geant4. Only changes are the name, and a
+few lines in the .cc, needed to enable the thermal scattering physics.
+
+From time to time we will have to track upstream changes to
+G4HadronElasticPhysicsHP, and adapt them as well, to stay in synch.
+
+primary authors: thomas.kittelmann@ess.eu, Xiao Xiao Cai <caixx@ihep.ac.cn>, douglas.dijulio@esss.se
+

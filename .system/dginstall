@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+raise SystemExit('ERROR: The dginstall command is currently not working properly and has therefore been disabled')
+import os,sys
+path=os.path
+join=path.join
+from optparse import OptionParser,OptionGroup#FIXME: deprecated, use argparse instead!
+
+def isemptydir(path):
+    if not os.path.isdir(path):
+        return False
+    for f in os.listdir(path):
+        return False
+    return True
+
+def parse_args():
+    parser = OptionParser(usage='%prog <destination>',
+                          description='Install a completely self-contained copy of the build into <destination>')
+    parser.add_option("-q", "--quiet",
+                      action='store_true', dest="quiet", default=False,
+                      help="Be quiet")
+
+    (opt, args) = parser.parse_args()
+    errtext='Please supply non-existing or empty directory'
+    if len(args)!=1:
+        parser.error(errtext)
+    target=path.realpath(path.expanduser(args[0]))
+    needscreate=True
+    if path.isdir(target):
+        if isemptydir(target):
+            needscreate=False
+        else:
+            parser.error(errtext)
+    else:
+        if path.exists(target) or not path.isdir(path.dirname(target)):
+            parser.error(errtext)
+    if needscreate:
+        os.makedirs(target)
+    opt.target=target
+    return opt
+
+opt = parse_args()
+assert isemptydir(opt.target)
+
+source = path.realpath(join(path.dirname(__file__),'..'))
+assert path.exists(join(source,'setup.sh'))
+
+import errno
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+def ignore(f):
+    return f[0]=='.' or f[-1]=='~' or f.endswith('.pyc')
+
+def get_rel_subdirs(d):
+    #find all subdirs relative to d, does not delve into symbolic links
+    for f in os.listdir(d):
+        if path.isdir(join(d,f)) and not ignore(f):
+            yield f
+            if path.islink(join(d,f)):
+                continue
+            for sd in get_rel_subdirs(join(d,f)):
+                yield join(f,sd)
+
+reldirs=set(get_rel_subdirs(source))
+reldirs.update('.')#target dir itself
+
+import shutil
+def copy_preservelinks(src, dst):
+    if os.path.islink(src):
+        linkto = os.readlink(src)
+        os.symlink(linkto, dst)
+    else:
+        shutil.copy(src,dst)
+
+def copy_breaklinks(src,dst):
+    #Copies without preserving links (e.g. creating copies of all data in symlinked files):
+    shutil.copy(src,dst)
+
+def copy_contents(src,trg,reldir):
+    for f in os.listdir(src):
+        if not path.isdir(join(src,f)) and not ignore(f):
+            if src.split(path.sep)[-1:]==['sysbin'] or src.split(path.sep)[-2:]==['lib','links']:
+                copy_preservelinks(join(src,f),join(trg,f))
+            else:
+                copy_breaklinks(join(src,f),join(trg,f))
+
+for sd in reldirs:
+    mkdir_p(join(opt.target,sd))
+    copy_contents(join(source,sd),join(opt.target,sd),sd)
+
+if not opt.quiet:
+    print("Installation completed in %s"%opt.target)

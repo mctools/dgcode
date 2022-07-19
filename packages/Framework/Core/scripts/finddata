@@ -1,0 +1,24 @@
+#!/bin/bash
+if [ "x$ESS_DATA_DIR" == "x" ]; then
+    echo "ERROR: ESS_DATA_DIR variable not set."
+    exit 2
+fi
+if [ ! -d "$ESS_DATA_DIR" ]; then
+    echo "ERROR: ESS_DATA_DIR=$ESS_DATA_DIR does not exists"
+    exit 2
+fi
+if [ $# != 2 ]; then
+    echo "Usage:"
+    echo `basename $0|sed 's#^_##'`' <PackageName> <DataFileName>'
+    exit 2
+fi
+PKG="$1"
+FN="$2"
+FILE=$ESS_DATA_DIR/$PKG/$FN
+if [ ! -f $FILE ]; then
+    echo "ERROR: File $FILE not found."
+    echo ""
+    echo "Either there is no package $PKG providing a data file named $FN or you need to rebuild."
+    exit 1
+fi
+echo $FILE

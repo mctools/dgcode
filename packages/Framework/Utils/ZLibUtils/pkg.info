@@ -1,0 +1,7 @@
+package(USEPKG MiniZLib)
+
+######################################################################
+
+Package providing ZLib related utilities.
+
+Primary author: thomas.kittelmann@ess.eu

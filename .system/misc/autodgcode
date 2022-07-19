@@ -1,0 +1,179 @@
+#!/bin/bash
+
+PROGNAME=`basename $0`
+if [ $# == 0 ]; then
+    echo "Usage:"
+    echo $PROGNAME <testname> [args-for-dgbuild]
+    exit 1
+fi
+
+TESTNAME=$1
+WORKDIR=/afs/cern.ch/work/t/tkittel/public/autodgcode/test_$TESTNAME
+REPO="ssh://git@bitbucket.org/europeanspallationsource/dg_dgcode"
+BRANCH=master
+shift 1
+ARGS="$@"
+TESTCMD=". bootstrap.sh && dgbuild -t --testexcerpts=50 $*"
+RETRYN=3
+RETRYSLEEP=1200
+
+MAILSUBJECT="[dgskynet] Automatic build detected possible problems in dgcode"
+EXPERTEMAILS="thomas.kittelmann@cern.ch thomas.kittelmann@esss.se kalliopi.kanaki@esss.se"
+
+##############################################################
+
+#acquire lock:
+
+if [ -f $WORKDIR/lock ]; then
+    LOCKISOLD=$(( (`date +%s` - `stat -L --format %Y $WORKDIR/lock`) > (24*3600) ))
+    if [ "x$LOCKISOLD" == "x1" ]; then
+        echo "::: WARNING: Removing lock-file older than 24 hours: $WORKDIR/lock"
+        echo "::: WARNING: Also removing repo/.bld/ and repo/.bld.lock to be safe."
+        rm -f $WORKDIR/lock
+        rm -rf $WORKDIR/repo/.bld/
+        rm -f $WORKDIR/repo/.bld.lock
+    else
+        echo "::: ERROR: Lock-file indicating conflicting invocation: $WORKDIR/lock"
+        exit 1
+    fi
+fi
+
+mkdir -p $WORKDIR && touch $WORKDIR/lock && cd $WORKDIR
+if [ $? != 0 -o ! -f $WORKDIR/lock ]; then
+    echo "::: ERROR: Problems acquiring lock. Incomplete permissions?"
+    exit 1
+fi
+
+UNLOCK="rm -f $WORKDIR/lock"
+
+#if repo does not exist, we should clone it:
+
+if [ ! -d $WORKDIR/repo/.git/ ]; then
+    #we clone only the first revision (to trigger hg incoming below, even on first clone).
+    echo "::: Cloning repo $REPO"
+    git clone --single-branch --branch $BRANCH --depth=2 $REPO $WORKDIR/repo && cd $WORKDIR/repo
+    if [ $? != 0 -o ! -d $WORKDIR/repo/.git/ ]; then
+        echo "::: ERROR: Error cloning repo"
+        $UNLOCK
+        exit 1
+    fi
+    #Initial clone, step one commit back, so we always trigger an initial test build after cloning.
+    git reset --hard HEAD^
+fi
+
+cd $WORKDIR/repo
+
+GITCMD="git --git-dir=$WORKDIR/repo/.git --work-tree=$WORKDIR/repo"
+$GITCMD cat-file -p HEAD > $WORKDIR/head.txt
+if [ $? != 0 ]; then
+    echo "::: ERROR: Could not do basic functionality test ('git cat-file -p HEAD') in repo."
+    $UNLOCK
+    exit 1
+fi
+
+$GITCMD fetch >& log_fetch.txt
+if [ $? != 0 ]; then
+    cat log_fetch.txt
+    echo "::: ERROR: Could not do 'git fetch' in repo."
+    $UNLOCK
+    exit 1
+fi
+
+OLDHEAD="$($GITCMD rev-parse HEAD)"
+NEWHEAD="$($GITCMD rev-parse FETCH_HEAD)"
+if [ x"$OLDHEAD" == x"$NEWHEAD" ]; then
+    #No incoming changes. Exit silently.
+    $UNLOCK
+    exit 0
+fi
+
+$GITCMD  log --graph --abbrev-commit --format=format:'%h - %aD%d - %an%n Commit message: %s'  --stat  --color=never "${OLDHEAD}..${NEWHEAD}" > $WORKDIR/incoming_log.txt
+if [ $? != 0 ]; then
+    echo "::: ERROR: Could not run 'git log <snip> HEAD..FETCH_HEAD' to extract recent activity log."
+    $UNLOCK
+    exit 1
+fi
+suspectemails=$($GITCMD log --format=format:'%ce%n%ae' --color=never "${OLDHEAD}..${NEWHEAD}"|sort)
+if [ $? != 0 ]; then
+    echo "ERROR: COULD NOT RUN git log TO LIST CHANGES!!!"
+    echo "::: ERROR: Could not run 'git log <snip> HEAD..FETCH_HEAD' to extract suspect emails."
+    $UNLOCK
+    exit 1
+fi
+
+$GITCMD merge FETCH_HEAD --ff-only >& log_merge.txt
+if [ $? != 0 ]; then
+    cat log_merge.txt
+    echo "::: ERROR: Could not update after fetch ('git merge FETCH_HEAD --ff-only') in repo."
+    $UNLOCK
+    exit 1
+fi
+
+#Ok, incoming changes detected!! Let us invoke the test command!
+LOGFILE=$WORKDIR/output.log
+echo "::: Running test named '$TESTNAME'" > ${LOGFILE}
+echo ":::" >> ${LOGFILE}
+echo "::: Invoking : $PROGNAME $ARGS" >> ${LOGFILE}
+echo ":::" >> ${LOGFILE}
+echo "::: Incoming changes detected:" >> ${LOGFILE}
+cat $WORKDIR/incoming_log.txt >> ${LOGFILE}
+
+for i in `seq $RETRYN`; do
+    if [ ! -f $WORKDIR/lock ]; then
+        echo "::: ERROR: Lock file disappeared! Aborting."
+        exit 1
+    fi
+    if [ ! -d $WORKDIR/repo ]; then
+        echo "::: ERROR: Repo disappeared! Aborting."
+        #unlock, although i guess there is a chance this is not our lock
+        $UNLOCK
+        exit 1
+    fi
+    echo "::: Invoking command (try $i): $TESTCMD" >> ${LOGFILE}
+    bash -c "$TESTCMD" >> ${LOGFILE} 2>&1
+    EC=$?
+    if [ $EC == 0 ]; then
+        echo "::: Command was successful after $i tries!" >> ${LOGFILE}
+        $UNLOCK
+        exit 0
+    fi
+    echo "::: Something failed!" >> ${LOGFILE}
+    if [ $i == $RETRYN ]; then
+        echo "::: Giving up!" >> ${LOGFILE}
+        #Clean out escape chars etc. from logfile before mailing:
+        tr -cd '\11\12\15\40-\176' < ${LOGFILE} > ${LOGFILE}.formail
+        #Mail to experts:
+        mail -s "${MAILSUBJECT} [EXPERT-BCC]" $EXPERTEMAILS < ${LOGFILE}.formail
+        MAILEC=$?
+        #Mail to suspects:
+        if [ $MAILEC == 0 ]; then
+            echo "::: You are receiving this since a dgcode test build failed and you are among the committers." > ${LOGFILE}.formailsuspects 
+            echo ":::" >> ${LOGFILE}.formailsuspects
+            cat ${LOGFILE}.formail >>  ${LOGFILE}.formailsuspects
+            EEC=`echo $EXPERTEMAILS|tr ' ' ','`
+            mail -s "${MAILSUBJECT}" -c "$EEC" $suspectemails < ${LOGFILE}.formailsuspects
+            MAILEC=$?
+            if [ $MAILEC != 0 ]; then
+                echo "ERROR during second mailing (to suspects)"
+            fi
+        fi
+        if [ $MAILEC != 0 ]; then
+            echo "ERROR: Could not send failure email"
+            echo
+            echo "Message contents follows:"
+            echo
+            cat ${LOGFILE}
+            $UNLOCK
+            exit 1
+        fi
+        $UNLOCK
+        exit 0
+    else
+        echo "::: Sleeping $RETRYSLEEP seconds and trying again." >> ${LOGFILE}
+        sleep $RETRYSLEEP
+    fi
+done
+
+echo "THIS SHOULD NEVER HAPPEN"
+$UNLOCK
+exit 1

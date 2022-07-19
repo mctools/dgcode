@@ -1,0 +1,17 @@
+#!/bin/bash
+if [ "x$#" == "x0" ]; then
+    thisprog=`basename $0`
+    echo "Usage:"
+    echo
+    echo "$thisprog <program> [args]"
+    echo
+    echo "Runs <program> within the dgcode runtime environment. Note that if you wish"
+    echo "to make sure the codebase has been built first (with dgbuild) you should"
+    echo "use dgrun rather than dgenv"
+    exit 1
+fi
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/../setup.sh
+prog=$1
+shift 1
+$prog "$@"
