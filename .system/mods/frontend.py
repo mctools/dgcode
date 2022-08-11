@@ -41,7 +41,7 @@ if not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in [dirs.fmwk
                *['                         : %s'%str(d) for d in dirs.pkgsearchpath[1:]], '',
                'and must only be invoked in those directories or their subdirs.'])
 
-proj_pkg_selection_enabled = os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','')
+proj_pkg_selection_enabled = os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','').lower() in ['true', '1']
 
 def parse_args():
 
@@ -329,14 +329,13 @@ for k,v in old_cfgvars.items():
     if not k in new_cfgvars:
         cfgvars[k]=v
 
-#Make sure that if nothing is specified, we compile ALL packages, 
-# or just Framework packages if project package selection is enabled:
+#Make sure that if nothing is specified, we compile ALL packages,
+#or just Framework packages if project package selection is enabled:
 if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
   if not proj_pkg_selection_enabled:
     cfgvars['ONLY'] = '*'
   elif not opt.project and not opt.enableall:
-    cfgvars['NOT'] = 'Projects::*'
-
+    cfgvars['ONLY'] = 'Framework::*'
 
 #Old check, we try to allow both variables now:
 #if 'ONLY' in cfgvars and 'NOT' in cfgvars:
