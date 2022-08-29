@@ -1,5 +1,5 @@
 
-__all__ = ['math','os','sys','pathlib','numpy', 'scipy', 'matplotlib', 'np', 'sp', 'mpl', 'plt','Core','Units','ColourDashesHelper','lighten_colour','darken_colour','rainbow_colour','dgextras']
+__all__ = ['math','os','sys','pathlib','numpy', 'matplotlib', 'np', 'mpl', 'plt','Core','Units','ColourDashesHelper','lighten_colour','darken_colour','rainbow_colour','dgextras']
 
 #1) Fix matplotlib backend:
 import os
@@ -23,15 +23,15 @@ import sys
 import pathlib
 import numpy
 import warnings
-try:
-    import scipy
-except ImportError:
-    warnings.warn('scipy not available')
-    scipy=None
+# try:
+#     import scipy
+# except ImportError:
+#     warnings.warn('scipy not available')
+#     scipy=None
 #import matplotlib (already imported above)
 import matplotlib.pyplot
 np = numpy
-sp = scipy
+# sp = scipy
 mpl = matplotlib
 plt = matplotlib.pyplot
 import Core.Units
