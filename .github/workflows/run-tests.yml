@@ -1,0 +1,16 @@
+name: Call test workflow
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '30 23 * * 0'  # 23:30 every Sunday
+  workflow_dispatch:
+
+jobs:
+  validations:
+    uses: mctools/dgcode_actions/.github/workflows/run_validation_tests.yml@main
+
+  userTests:
+    uses:  mctools/dgcode_actions/.github/workflows/run_user_tests.yml@main
+  
