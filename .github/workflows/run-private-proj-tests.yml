@@ -11,6 +11,6 @@ jobs:
   privateProjects:
     uses:  mctools/dgcode_actions/.github/workflows/run_private_projects_tests.yml@main
     secrets:
-      LEGACY_REPO_URL: ${{ secrets.LEGACY_REPO_URL }}
-      LEGACY_REPO_PAT: ${{ secrets.LEGACY_REPO_PAT }}
+      PRIVATE_PROJ_REPO_URL: ${{ secrets.PRIVATE_PROJ_REPO_URL }}
+      PRIVATE_PROJ_REPO_PAT: ${{ secrets.PRIVATE_PROJ_REPO_PAT }}
   
