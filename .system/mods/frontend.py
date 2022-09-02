@@ -34,11 +34,15 @@ rel_blddir=os.path.relpath(dirs.blddir)
 rel_instdir=os.path.relpath(dirs.installdir)
 rel_testdir=os.path.relpath(dirs.testdir)
 
-if not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in [dirs.fmwkdir.parent.parent, *dirs.pkgsearchpath]]):
+pkg_path = [d for d in dirs.pkgsearchpath if d not in [dirs.fmwkdir, dirs.projdir]]
+dgcode_invoke_dirs = [dirs.fmwkdir.parent.parent, dirs.projdir, *pkg_path]
+
+if not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in dgcode_invoke_dirs]):
     utils.err(['This instance of %s is associated with'%progname,'',
-               '      dgcode dir:  %s'%dirs.fmwkdir.parent.parent,
-               '      package search path: %s'%str(dirs.pkgsearchpath[0]),
-               *['                         : %s'%str(d) for d in dirs.pkgsearchpath[1:]], '',
+               '      Framework dir : %s'%dirs.fmwkdir.parent.parent,
+               '      Projects dir  : %s'%dirs.projdir,
+             *['      Package path  : %s'%str(d) for d in pkg_path[0:1]],
+             *['                      %s'%str(d) for d in pkg_path[1:]],'',
                'and must only be invoked in those directories or their subdirs.'])
 
 proj_pkg_selection_enabled = os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','').lower() in ['true', '1']
@@ -115,7 +119,7 @@ def parse_args():
                            help="Print information about package PKG")
     group_query.add_option("--incinfo",
                            action="store", dest="incinfo", default='',metavar='CFILE',
-                           help="Show inclusion relationships for the chosen CFILE. CFILE must be a C++ or C file in the framework. Optionally multiple files can be specified using comma-separation and wildcards (\"*\').")
+                           help="Show inclusion relationships for the chosen CFILE. CFILE must be a C++ or C file in the package search path. Optionally multiple files can be specified using comma-separation and wildcards (\"*\').")
     group_query.add_option("--pkggraph",
                            action="store_true", dest="pkggraph", default=False,
                            help="Create graph of package dependencies")
@@ -247,13 +251,13 @@ def parse_args():
     if query_mode_withpathzoom_n > 0:
         for a in args_unused:
             qp=os.path.abspath(os.path.realpath(a))
-            if not any([qp.startswith(str(d)) for d in dirs.pkgsearchpath]):
-                parser.error("grep/find/replace/... can only work on directories below %s"%dirs.pkgsearchpath) #TODO ' '.join(pkgsearchpath) might look nicer
+            if not any([qp.startswith(str(d)) for d in dgcode_invoke_dirs]):
+                parser.error("grep/find/replace/... can only work on directories below %s"%dgcode_invoke_dirs) #TODO ' '.join(dgcode_invoke_dirs) might look nicer
             gps=[d for d in glob.glob(qp) if os.path.isdir(d)]
             if not gps:
                 parser.error("no directory matches for '%s'"%a)
             for d in sorted(gps):
-              opt._querypaths+=['%s/'%os.path.relpath(d,codedir) for codedir in dirs.pkgsearchpath if d.startswith(codedir)]
+              opt._querypaths+=['%s/'%os.path.relpath(d,str(codedir)) for codedir in dgcode_invoke_dirs if d.startswith(str(codedir))]
         args_unused=[]
 
     if args_unused:
@@ -331,11 +335,9 @@ for k,v in old_cfgvars.items():
 
 #Make sure that if nothing is specified, we compile ALL packages,
 #or just Framework packages if project package selection is enabled:
+pkg_selection_default = "Framework::*" if proj_pkg_selection_enabled else "*"
 if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
-  if not proj_pkg_selection_enabled:
-    cfgvars['ONLY'] = '*'
-  elif not opt.project and not opt.enableall:
-    cfgvars['ONLY'] = 'Framework::*'
+    cfgvars['ONLY'] = pkg_selection_default
 
 #Old check, we try to allow both variables now:
 #if 'ONLY' in cfgvars and 'NOT' in cfgvars:
@@ -394,7 +396,7 @@ if opt.show:
         print ('%s  - set variable by supplying VAR=VAL arguments to %s'%(prefix,progname))
         print ('%s  - unset a variable by setting it to nothing (VAR=)'%(prefix))
         print ('%s  - unset all variables by running %s with --forget (but note that'%(prefix,progname))
-        print ('%s    the ONLY variable is special and defaults to "Framework::*")'%prefix)
+        print ('%s    the ONLY variable is special and defaults to "%s")'%(prefix,pkg_selection_default))
         print (prefix)
         print ('%sThese are the variables with special support in %s'%(prefix,progname))
         print (prefix)
@@ -564,9 +566,9 @@ if opt.incinfo:
         if isdir(fn):
             parser.error("Not a file: %s"%fn)
         fn=os.path.abspath(os.path.realpath(fn))
-        if not any([fn.startswith(d) for d in dirs.pkgsearchpath]):
+        if not any([fn.startswith(str(d)) for d in dgcode_invoke_dirs]):
         #if not fn.startswith(os.path.abspath(dirs.codedir)):#TODO: This currently fails for dynamic packages!
-            parser.error("File must be located under %s"%dirs.pkgsearchpath)
+            parser.error("File must be located under %s"%dgcode_invoke_dirs)
         return [fn]#expands to a single file
     import incinfo
     fnsraw = opt.incinfo.split(',') if ',' in opt.incinfo else [opt.incinfo]
@@ -764,7 +766,7 @@ if opt.install:
 if not opt.quiet:
     if cfgvars.get('ONLY','')=='Framework::*' and not 'NOT' in cfgvars:
         import col
-        print (prefix+"%sNote that only Framework/ packages were enabled by default:%s"%(col.bldmsg_notallselectwarn,col.end))
+        print (prefix+"%sNote that only Framework packages were enabled by default:%s"%(col.bldmsg_notallselectwarn,col.end))
         print (prefix)
         print (prefix+"%s  - To enable pkgs for a given project do: dgbuild -p<projectname>%s"%(col.bldmsg_notallselectwarn,col.end))
         print (prefix+"%s  - To enable all pkgs do: dgbuild -a%s"%(col.bldmsg_notallselectwarn,col.end))
