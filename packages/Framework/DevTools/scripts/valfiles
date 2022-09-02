@@ -10,16 +10,6 @@ pkgs = cfg.pkgs
 topdirs = cfg.dirs.pkgsearchpath
 normpath = lambda p : pathlib.Path(p).resolve().absolute()
 
-def all_files():
-    for td in topdirs:
-        for p in td.rglob("*"):
-            if file_should_be_ignored(p):
-                continue
-            yield normpath(p)
-
-#for f in all_files():
-#    print(f)
-
 all_pkgdirs = set(normpath(p['dirname']) for _,p in pkgs.items())
 
 
@@ -34,10 +24,18 @@ def file_should_be_ignored(f):
     return ( f in ignore_dirs
              or any(fp in ignore_dirs for fp in f.parents) )
 
+def all_files():
+    for td in topdirs:
+        for p in td.rglob("*"):
+            if file_should_be_ignored(p):
+                continue
+            yield normpath(p)
+
+#for f in all_files():
+#    print(f)
+
 
 for f in all_files():
-    #if file_should_be_ignored(f):
-    #    continue
     if f.is_dir():
         if f in all_pkgdirs:
             continue
@@ -46,7 +44,7 @@ for f in all_files():
         if not any( (f in p.parents) for p in all_pkgdirs):
             raise SystemExit(f'ERROR: Forbidden directory: {f}')
     else:
-        if f == cfg.dirs.projdir/'bootstrap.sh':
+        if hasattr(cfg.dirs,'projdir') and f == cfg.dirs.projdir/'bootstrap.sh':
           continue
         if f.name == 'LICENSE':
             #must be in pkg directory or in non-pkg dir under a dir named 'External':

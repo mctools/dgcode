@@ -556,7 +556,7 @@ def probe_system_versions():
             except RuntimeError:
                 pass
             else:
-                sysinfo[depkey] = DG.swversions[depkey]['recommended']
+                sysinfo[depkey] = DG.swversions[depkey].get('recommended',None)
 
     #Sanity check that we checked the correct dependencies:
     l0,l1=sorted(list(DG.swversions.keys())),sorted(list(sysinfo.keys()))
@@ -590,10 +590,11 @@ def version_tuple(s):
 def version_issue(depkey,version):
     """returns None in case of no issues, otherwise returns a non-empty string explaining the issue. If passed in version is None, it is supposed to be missing"""
     if version is None:
-        return 'is missing (recommended version is %s)'%DG.swversions[depkey]['recommended']
+        _=DG.swversions[depkey].get('recommended',None)
+        return 'is missing (recommended version is %s)'%_ if _ else 'is missing'
     v = version_tuple(version)
     newest = DG.swversions[depkey].get('newest',None)
-    oldest = DG.swversions[depkey]['oldest'] or DG.swversions[depkey]['recommended']#oldest defaults to recommended
+    oldest = DG.swversions[depkey].get('oldest',None) or DG.swversions[depkey].get('recommended',None)#oldest defaults to recommended
     if oldest and (v<version_tuple(oldest)):
         return 'is too old (%s < %s)'%(version,oldest)
     if newest and (v>version_tuple(newest)):

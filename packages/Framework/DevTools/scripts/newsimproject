@@ -10,8 +10,13 @@ import copy
 import dgbuild.cfg as cfg
 
 normpath_or_none = lambda p : (PU.normpath(p) if p else None)
+legacy_mode = not hasattr(cfg.dirs,'projdir')
 
-default_projdir = PU.normpath(cfg.dirs.projdir)
+if not legacy_mode:
+  default_projdir = PU.normpath(cfg.dirs.projdir)
+else:
+  default_projdir = PU.normpath(os.environ['DGCODE_DIR']) / 'packages/Projects'
+
 assert default_projdir.is_dir()
 def get_target_dir(target_dir, project_name):
   return target_dir if target_dir else default_projdir / project_name
@@ -91,16 +96,21 @@ Now you can go through them and replace their contents as needed for your projec
 Do not forget to update documentation in comments and pkg.info files!
 """
 is_std_loc = target_dir.parent == default_projdir
-proj_pkg_selection_enabled = os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','')
-if not any([target_dir.is_relative_to(d) for d in cfg.dirs.pkgsearchpath]):
+proj_pkg_selection_enabled = legacy_mode or bool(os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG',''))
+
+maybe_tell_about_minusp = True
+
+if not legacy_mode and not any([target_dir.is_relative_to(d) for d in cfg.dirs.pkgsearchpath]):
+  maybe_tell_about_minusp = False
   text+=f"""
 The path of the directory chosen for the new simulation project is not in the package search path.
 Consider adding it to the $DGCODE_PKG_PATH environment variable to be able to build the new project packages!
 """
-elif is_std_loc and proj_pkg_selection_enabled:
+
+if maybe_tell_about_minusp and is_std_loc and proj_pkg_selection_enabled:
   text+=f"""
 The Projects package selection option is turned on. Do not forget to enable the new sim project
-when using dgbuild by the --project flag (e.g., "dgbuild -p{args.project_name}") or by the ONLY variable! 
+when using dgbuild by the --project flag (e.g., "dgbuild -p{args.project_name}") or by the ONLY variable!
 """
 
 flag='p%s'%args.project_name if (is_std_loc and proj_pkg_selection_enabled) else 'a'

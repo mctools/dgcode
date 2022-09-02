@@ -15,13 +15,14 @@ class CMakeInstaller(DevTools._installutils.stdinstaller):
         return p,m
     def _tarbase_name(self,version):
         p,m=self._detect_platform()
-        return 'cmake-%s-%s-%s'%(version,p,m)
+        return 'cmake-%s-%s-%s'%(version,p.lower(),m)
     def name(self): return 'CMake'
     def default_version(self): return '3.18.4'
     def download_command(self,version):
         vmajor,vminor,vpatch=version.split('.')
         return ['ess_devtools_wget',
-                'https://cmake.org/files/v%s.%s/%s.tar.gz'%(vmajor,vminor,self._tarbase_name(version))]
+                'https://github.com/Kitware/CMake/releases/download/v%s/%s.tar.gz'%(version,self._tarbase_name(version))]
+                #'https://cmake.org/files/v%s.%s/%s.tar.gz'%(vmajor,vminor,self._tarbase_name(version))]
     def unpack_command(self,version):
         assert version
         return ['tar','xf','%s.tar.gz'%self._tarbase_name(version)]

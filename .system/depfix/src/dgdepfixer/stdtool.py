@@ -125,7 +125,10 @@ def parse_cmdline():
         return Opts()
 
 
-    _pymods_for_pip = ['%s==%s'%(k[6:],v['recommended']) for k,v in sorted(DG.swversions.items()) if k.startswith('pymod:')]
+    fmt_recommended = lambda v : ( '==%s'%v if v else '' )
+    _pymods_for_pip = ['%s%s'%(k[6:],fmt_recommended(v.get('recommended',None))) for k,v in sorted(DG.swversions.items()) if k.startswith('pymod:')]
+
+
     if args.bleedingedge:
         _pymods_for_pip=[m.split('==')[0] for m in _pymods_for_pip]
     _extrasw = list(e.strip().lower() for e in args.extralist.strip().split(','))
