@@ -11,7 +11,9 @@ if do_normalise:
 do_logy = '--logy' in args
 if do_logy:
     args.remove('--logy')
-
+do_pdf = '--pdf' in args
+if do_pdf:
+    args.remove('--pdf')
 
 files=[]
 labels=[]
@@ -63,4 +65,10 @@ for key in common_keys:
         for i in range(len(histlist)):
             histlist[i].plot(show='almost')
             plt.suptitle(labels[i+1])
+    if do_pdf:
+        fn=f'histcmp_{key}.pdf'
+        plt.savefig(fn)
+        print(f'Wrote {fn}')
+        plt.cla()
+    else:
         plt.show()

@@ -1143,7 +1143,7 @@ def overlay(hists,labels,colors=None,
             xmin=None,xmax=None,ymin=None,ymax=None,
             logx=False,logy=False,
             legend=True,legend_title=None,cmap=None,
-            clip_for_log=False):
+            clip_for_log=False,plotargs=None):
     """Take a list of Hist1D instances and an associated list of legend labels and produce a comparison plot.
     Annotations will be taken from the first histogram if not specified.
     Due to a matplotlib bug it might be necessary to set clip_for_log=True when doing log plots"""
@@ -1172,13 +1172,25 @@ def overlay(hists,labels,colors=None,
 
     lines=[]
     proxy_artists=[]
+    import copy
     for i,(hist,legkey) in enumerate(zip(hists,labels)):
         col=colors[i] if (colors is not None) else _col(cmap,i,len(hists))
+        extra_args = {} if not plotargs else copy.deepcopy(plotargs[i])
+        alpha_errors = 0.2
+        if 'alpha' in extra_args and isinstance(extra_args['alpha'],float):
+            alpha_errors *= extra_args['alpha']
+        zorder_errors = None
+        if 'zorder' in extra_args and (isinstance(extra_args['zorder'],float) or isinstance(extra_args['zorder'],int)):
+            zorder_errors = extra_args['zorder']-0.01
+        if not 'color' in extra_args:
+            extra_args['color']=col
+        else:
+            col = extra_args['color']
         x,y=hist.curve()
-        lines+=[ax.plot(x,y,color=col,label=legkey)]#,picker=False)]#picker as integer means pick radius
+        lines+=[ax.plot(x,y,label=legkey,**extra_args)]#,picker=False)]#picker as integer means pick radius
         if errors:
             x,errlow,errhigh=hist.errorband(ndev=errors,clip_for_log=clip_for_log)
-            p=_fill_between(x,errlow,errhigh, ax=ax, color=col,alpha=0.2)
+            p=_fill_between(x,errlow,errhigh, ax=ax, color=col,alpha=alpha_errors,zorder=zorder_errors)
             proxy_artists+=[(p,legkey)]
 
     #ax.set_xlim(0.0,2000.0)

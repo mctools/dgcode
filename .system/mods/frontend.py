@@ -667,7 +667,7 @@ if not opt.quiet:
                 out += '\n%s                                     %s%s%s'%(prefix,colbegin,s,colend)
         return out
         return ' '.join(l)
-    
+
     pkd_src_info = []
     for basedir in dirs.pkgsearchpath:
       pkg_nr = len([p.name for p in pkgloader.pkgs if p.dirname.startswith(str(basedir))])
