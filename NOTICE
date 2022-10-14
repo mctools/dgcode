@@ -7,11 +7,13 @@ and the Technical University of Denmark (DTU). This work was supported in part
 by the European Union's Horizon 2020 research and innovation programme under
 grant agreement No 676548 (the BrightnESS project).
 
-With the exception of some third-party code in the packages/Framework/External 
-and .system/include/dgboost directories, all DGCode files are distributed under 
-the GNU Lesser General Public License v3.0, available in the COPYING.LESSER file 
-or at https://www.gnu.org/licenses/lgpl-3.0.txt. This license is a set of 
-additional permissions on top of the GNU General Public License, available in 
-the COPYING file or at https://www.gnu.org/licenses/gpl-3.0.txt. For the 
-licenses of the aforementioned third-party code, look in their respective directories 
-under the packages/Framework/External and .system/include/dgboost directories.
+With the exception of some third-party code in the packages/Framework/External,
+.system/include/dgboost, and .system/publicmods/dgbuild directories, all DGCode
+files are distributed under the GNU Lesser General Public License v3.0,
+available in the COPYING.LESSER file or at
+https://www.gnu.org/licenses/lgpl-3.0.txt. This license is a set of additional
+permissions on top of the GNU General Public License, available in the COPYING
+file or at https://www.gnu.org/licenses/gpl-3.0.txt. For the licenses of the
+aforementioned third-party code, look in their respective directories under the
+packages/Framework/External and .system/include/dgboost directories, and the
+header of the .system/publicmods/dgbuild/junit_xml.py file.
