@@ -425,7 +425,7 @@ namespace PerfUtils {
 inline void PerfUtils::get_vmem_rss_kb(double&vmem,double&rss,bool vmemonly) {
   vmem=rss=0.0;
 #ifndef __linux
-  vmemonly=false;//avoid compile warning
+  (void)vmemonly;//avoid compile warning
   return;
 #else
   //It would be a lot faster without this open call...
