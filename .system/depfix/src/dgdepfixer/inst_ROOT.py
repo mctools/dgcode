@@ -6,7 +6,7 @@ class RootInstaller(DG.installutils.stdinstaller):
     _extraopt_nogui, _extraopt_nogdml = None,None#For pylint
 
     def name(self): return 'ROOT'
-    def default_version(self): return '6.24.02'
+    def default_version(self): return '6.26.06'
     def download_url(self,version): return 'https://root.cern.ch/download/root_v%s.source.tar.gz'%version
     def unpack_command(self,version):
         assert version

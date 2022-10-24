@@ -233,8 +233,6 @@ def locate_existing_installs(complete_search=False):
             yielded.add(f)
             yield f
 
-
-
     #Now search home dir for other installations:
     home=SafeResolvedAbsPath(pathlib.Path.home())
 
@@ -462,13 +460,11 @@ def do_intro_mode():
             print(":::")
             print(":::          (if you already did this, you can of course ignore this warning)\n")
         print("::: No lingering system issues found! Congratulations!\n")
-        if os.environ.get('DGCODE_DIR',None) or pathlib.Path('.system/mods/frontend.py').exists():
-            print("::: To continue, you can now source the bootstrap.sh file in a local clone of dg_dgcode and start working.")
-        else:
-            print("::: To continue, source the bootstrap.sh file in a local clone of dg_dgcode.")
-            print("::: If you haven't checked out such a clone already, you can do so with the following command:\n:::")
-            print(":::   git clone https://MYUSERNAME@bitbucket.org/europeanspallationsource/dg_dgcode\n:::")
-            print("::: (remember to change MYUSERNAME to your actual bitbucket username)")
+        print(":::\n")
+        print("::: To continue, you must now (re)activate a local dgcode setup with framework and")
+        print("::: project directories as relevant for your work. If you are following the checklist")
+        print("::: on https://confluence.esss.lu.se/display/DGCODE/CodingFramework you should now")
+        print("::: proceed to step number 2 in those instructions.")
         return 0
 
     assert issues
@@ -963,12 +959,12 @@ def emit_final_msg(instdir,extras_installed=None):
     else:
         print("::: Note: As you used a custom installation location, dgcode's bootstrap.sh will NOT pick it up automatically.\n")
 
-    print("::: Once you are done running %s and %s --instsw=XXX commands, you"%(progname,progname))
-    print("::: can source the bootstrap.sh file again in a local dg_dgcode repo clone.")
-    if not (os.environ.get('DGCODE_DIR',None) or pathlib.Path('.system/mods/frontend.py').exists()):
-        print(":::\n::: If you haven't checked one out already, you can do so with the following command:\n")
-        print(":::    git clone https://MYUSERNAME@bitbucket.org/europeanspallationsource/dg_dgcode\n")
-        print("::: (remember to change MYUSERNAME to your actual bitbucket username)")
+    print("::: Once you are done running %s and %s --instsw=XXX commands, you can proceed."%(progname,progname))
+    print(":::\n.")
+    print("::: To continue, you must now (re)activate a local dgcode setup with framework and")
+    print("::: project directories as relevant for your work. If you are following the checklist")
+    print("::: on https://confluence.esss.lu.se/display/DGCODE/CodingFramework you should now")
+    print("::: proceed to step number 2 in those instructions.")
 
 def main(tempdir):
 

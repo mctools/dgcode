@@ -6,7 +6,7 @@ class GarfieldPPInstaller(DG.installutils.stdinstaller):
     def name(self): return 'GarfieldPP'
     def default_version(self):
         #NB: Version can be branch name, tag name or commit sha value.
-        return '3.0'
+        return '4.0'
     def download_url(self,version):
         #NB: Version can be branch name, tag name or commit sha value.
         return 'https://gitlab.cern.ch/garfield/garfieldpp/-/archive/%s/garfieldpp-%s.tar.bz2'%(version,version)
