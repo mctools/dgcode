@@ -104,7 +104,7 @@ if not legacy_mode and not any([target_dir.is_relative_to(d) for d in cfg.dirs.p
   maybe_tell_about_minusp = False
   text+=f"""
 The path of the directory chosen for the new simulation project is not in the package search path.
-Consider adding it to the $DGCODE_PKG_PATH environment variable to be able to build the new project packages!
+Consider adding it to the $DGCODE_EXTRA_PKG_PATH environment variable to be able to build the new project packages!
 """
 
 if maybe_tell_about_minusp and is_std_loc and proj_pkg_selection_enabled:

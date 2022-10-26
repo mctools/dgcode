@@ -278,10 +278,11 @@ if [ "x$DGCODE_BOOTSTRAP_QUIET" != "x1" ]; then
     echo
     echo "You now have the command 'dgbuild' available which you can run from any"
     echo "directory below the following list of directories to build the software."
+    echo
     echo "    Framework dir: $DGCODE_DIR"
     echo "    Projects dir:  $DGCODE_PROJECTS_DIR"
-    if [[ -n "${DGCODE_PKG_PATH}" ]]; then
-        echo "    Package path:  $DGCODE_PKG_PATH"
+    if [[ -n "${DGCODE_EXTRA_PKG_PATH}" ]]; then
+        echo "    Extra package path:  ${DGCODE_EXTRA_PKG_PATH:-<none>}"
     fi
     echo
     echo "For more info run: dgbuild --help"

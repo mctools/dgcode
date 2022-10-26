@@ -45,7 +45,7 @@ def uninstall_package(d,pn):
     #a few sanity checks since we are about to use rm -rf:
     import utils
     assert d and not ' ' in d
-    
+
     check_install_dir_indicator(d)
     #FIXME: ess_foo_bar_blah might be script Blah from package Foo_Bar or script
     #Bar_Blah from package Foo. We should check that the symlinks goes to the
@@ -76,7 +76,7 @@ def projects_dir():
 
 def pkg_search_path(system_dir):
   dirs=[framework_dir(system_dir),projects_dir()]
-  pkg_path_env = os.environ.get('DGCODE_PKG_PATH', None)
+  pkg_path_env = os.environ.get('DGCODE_EXTRA_PKG_PATH', None)
   if pkg_path_env:
     dirs.extend([Path(p.strip()).resolve() for p in pkg_path_env.split(':') if p.strip()])
   return dirs
@@ -91,7 +91,7 @@ def build_dir():
     return build_dir_real
 
 def install_dir():
-    install_dir = os.environ.get('DGCODE_INSTALL_DIR_RESOLVED', None)     
+    install_dir = os.environ.get('DGCODE_INSTALL_DIR_RESOLVED', None)
     if not install_dir:
       raise SystemExit('ERROR: The DGCODE_INSTALL_DIR_RESOLVED environment variable is not set. Please source the bootstrap.sh file in the Projects directory once again!')
     install_dir_real = Path(install_dir).resolve()
@@ -121,7 +121,7 @@ def check_install_dir_indicator(inst_dir):
   if Path(inst_dir).exists() and not Path(install_dir_indicator(inst_dir)).exists():
      raise SystemExit('Missing install directory indicator in %s suggests possible problem with the DGCODE_INSTALL_DIR environment variable. Make sure you really want to delete the folder, and do it by hand!'%inst_dir)
   return True
-    
+
 
 def target_factories_for_patterns():
     import tfact_symlink as tfs

@@ -35,7 +35,7 @@ def perform_configuration(cmakeargs=[],
                                 load_all=load_all_pkgs)
 
 
-    volatile_misc = ['DGCODE_PROJECTS_DIR', 'DGCODE_INSTALL_DIR_RESOLVED','DGCODE_BUILD_DIR_RESOLVED', 'DGCODE_PKG_PATH', 'DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG'] 
+    volatile_misc = ['DGCODE_PROJECTS_DIR', 'DGCODE_INSTALL_DIR_RESOLVED','DGCODE_BUILD_DIR_RESOLVED', 'DGCODE_EXTRA_PKG_PATH', 'DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG']
 
     #Inspect environment via cmake (caching the result of previous runs).
 

@@ -101,9 +101,8 @@ def parse_args():
     if proj_pkg_selection_enabled:
       group_pkgselect.add_option("-p","--project",
                              action='store', dest="project", default='',metavar='PROJ',
-                             help='Enable packages in selected projects (under packages/ '
-                             ' or folders defined by the DGCODE_PKG_PATH environment variable).'
-                             ' The selection can use wildcards and comma separation.')
+                             help=('Enable packages in selected projects under $DGCODE_PROJECTS_DIR'
+                                   +' (defined by the name of their top-level directory under $DGCODE_PROJECTS_DIR).'))
 #    group_pkgselect.add_option("-k","--pkg",
 #                             action='store', dest="pkgs", default='',metavar='PKG',
 #                             help='Enable these packages in addition to those selected by'
