@@ -8,6 +8,8 @@ import os,sys,shutil,datetime
 import dgbuild.cfg as cfg
 legacy_mode = not hasattr(cfg.dirs,'projdir')
 
+import pathlib
+AbsPath = lambda p : pathlib.Path(p).expanduser().resolve().absolute()
 
 class ExportMgr:
     def __init__(self,projectname,args=None):
@@ -306,24 +308,39 @@ class ExportMgr:
         print("Created %i files, now querying git for version info (takes a few seconds)."%len(self.__files_written))
 
         official_version=None
+        def extract_version_sha(topdir,files_quoted):
+            with Sys.changedir(topdir):
+                return Sys.system_throw(' '.join(['TZ=UTC ','git','log',Sys.quote('--pretty=format:%aI / %H'),
+                                                  '--max-count=1']+files_quoted),True).decode()
+
         if self.skip_git:
             print("WARNING: requested to skip git version check!!")
             version_string='VERSION-INFO-SKIPPED / CUSTOM-DEV-VERSION'
         else:
             files_read = [self._normalisepath(f) for f in self.__files_read if
                           any([self._normalisepath(f).startswith(str(d)) for d in self.pkgdirs])]
-            files_quoted=[Sys.quote(f) for f in files_read]
-            read_are_dirty = bool(list(Utils.GitUtils.git_status_iter(files_read)))
-
-            date=None
+            read_are_dirty = False
+            topdirs_and_files_quoted_for_export_sha = []
+            for topdir in cfg.dirs.pkgsearchpath:
+                files_read_below_topdir = [ AbsPath(f) for f in files_read if AbsPath(topdir) in AbsPath(f).parents ]
+                files_quoted_below_topdir = [Sys.quote(f) for f in files_read_below_topdir]
+                ignore_for_export_sha = ( len(files_read_below_topdir) == 1 and
+                                          files_read_below_topdir[0].parts[-3:]==('ExportUtils','python','__init__.py') )
+                with Sys.changedir(topdir):
+                    if list(Utils.GitUtils.git_status_iter(files_read_below_topdir)):
+                        read_are_dirty = True
+                        print("WARNING: Some of the %i files used below %s are uncommitted"%(len(files_read_below_topdir),
+                                                                                             topdir))
+                if not ignore_for_export_sha:
+                    topdirs_and_files_quoted_for_export_sha.append( (topdir,files_quoted_below_topdir) )
             if read_are_dirty:
                 print('WARNING: Not all used files are committed and unmodified!\n')
                 d=datetime.datetime.utcnow().isoformat()
                 d=d.split('.')[0]
                 version_string='%s / CUSTOM-DEV-VERSION'%d
             else:
-                version_string = Sys.system_throw(' '.join(['TZ=UTC ','git','log',Sys.quote('--pretty=format:%aI / %H'),
-                                                            '--max-count=1']+files_quoted),True).decode()
+                assert len(topdirs_and_files_quoted_for_export_sha)==1
+                version_string = extract_version_sha(*topdirs_and_files_quoted_for_export_sha[0])
 
         if not 'CUSTOM-DEV-VERSION' in version_string:
             official_version=self.__known_versions(self.__fixsrc(version_file)).get(version_string.split('/')[1].strip(),None)
