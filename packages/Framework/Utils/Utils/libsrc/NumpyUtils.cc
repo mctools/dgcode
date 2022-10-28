@@ -4,7 +4,7 @@
 
 py::object NumpyUtils::create_numpyarray(size_t n, double*& buf)
 {
-  buf = 0;
+  buf = nullptr;
   //Create numpy arrays for results:
   py::object numpy;
   try {
@@ -15,17 +15,11 @@ py::object NumpyUtils::create_numpyarray(size_t n, double*& buf)
   if (!numpy)
     throw std::runtime_error("Failure to import python module 'numpy'");
   py::object nparr = numpy.attr("zeros")(n,"float64");
+  if ( (size_t)py::len(nparr) != n )
+    throw std::runtime_error("NumpyUtils::create_numpyarray failure to create array of requested length");
   //Extract internal buffer of numpy array for direct C++ access:
   py::object npdata = nparr.attr("data");
   PyObject* rawdata = npdata.ptr();
-#if PY_MAJOR_VERSION<3
-  //python2
-  assert( PyBuffer_Check(rawdata) );
-  assert( (size_t)PySequence_Length(rawdata) == n * sizeof(double) );
-  PyBufferProcs * bufferProcs = rawdata->ob_type->tp_as_buffer;
-  (*bufferProcs->bf_getreadbuffer)(rawdata, 0, (void **) &buf);
-#else
-  //python3
   Py_buffer view;
   assert( (size_t)PySequence_Length(rawdata) == n );
   if ( PyObject_GetBuffer(rawdata, &view,  PyBUF_FULL) != 0 )
@@ -36,7 +30,6 @@ py::object NumpyUtils::create_numpyarray(size_t n, double*& buf)
     throw std::runtime_error("Numpy buffer has wrong length");
   buf = (double*)view.buf;;
   PyBuffer_Release(&view);//decrement ref-count
-#endif
   assert(buf);
   return nparr;
 }
