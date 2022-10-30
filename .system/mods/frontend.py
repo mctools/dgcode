@@ -34,15 +34,14 @@ rel_blddir=os.path.relpath(dirs.blddir)
 rel_instdir=os.path.relpath(dirs.installdir)
 rel_testdir=os.path.relpath(dirs.testdir)
 
-pkg_path = [d for d in dirs.pkgsearchpath if d not in [dirs.fmwkdir, dirs.projdir]]
-dgcode_invoke_dirs = [dirs.fmwkdir.parent.parent, dirs.projdir, *pkg_path]
+dgcode_invoke_dirs = [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]
 
 if not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in dgcode_invoke_dirs]):
     utils.err(['This instance of %s is associated with'%progname,'',
-               '      Framework dir : %s'%dirs.fmwkdir.parent.parent,
-               '      Projects dir  : %s'%dirs.projdir,
-             *['      Package path  : %s'%str(d) for d in pkg_path[0:1]],
-             *['                      %s'%str(d) for d in pkg_path[1:]],'',
+               '      Framework directory : %s'%dirs.fmwkdir.parent.parent,
+               '      Projects directory  : %s'%dirs.projdir,
+             *['      Extra package path  : %s'%str(d) for d in dirs.extrapkgpath[0:1]],
+             *['                            %s'%str(d) for d in dirs.extrapkgpath[1:]],'',
                'and must only be invoked in those directories or their subdirs.'])
 
 proj_pkg_selection_enabled = os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','').lower() in ['true', '1']
@@ -209,9 +208,8 @@ def parse_args():
           #    parser.error('Do not set NOT=... variable when supplying --project flag')
           projs = set(e.lower() for e in opt.project.split(','))
           extra='Framework::*,'
-          if 'val' in projs:
-              projs=[a for a in projs if a.lower() != 'val']
-              extra+='Validation::*,'
+          if dirs.extrapkgpath:
+              extra+='Extra::*,'
           if not projs:
               extra=extra[:-1]#remove comma
           new_cfgvars['ONLY']='%s%s'%(extra,','.join('Projects::%s*'%p for p in projs))
@@ -333,8 +331,8 @@ for k,v in old_cfgvars.items():
         cfgvars[k]=v
 
 #Make sure that if nothing is specified, we compile ALL packages,
-#or just Framework packages if project package selection is enabled:
-pkg_selection_default = "Framework::*" if proj_pkg_selection_enabled else "*"
+#or just Framework packages if project package selection is enabled (+ all extrapkgpath packages, if the path is set):
+pkg_selection_default = "*" if not proj_pkg_selection_enabled else ("Framework::*,Extra::*" if dirs.extrapkgpath else "Framework::*")
 if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
     cfgvars['ONLY'] = pkg_selection_default
 
@@ -421,15 +419,21 @@ def create_filter(pattern):
     aliases = dirs.pkgdir_aliases
     def expand_alias(part):
       if not '::' in part:
-        return part
-      if part.split('::')[0].lower() in aliases:
-        return os.path.join(aliases[part.split('::')[0].lower()], part.split('::')[1])
+        return [part]
+      pkgdirAlias = part.split('::')[0].lower()
+      subdirPattern = part.split('::')[1].lower()
+      if pkgdirAlias in aliases:
+        pkgdir = aliases[pkgdirAlias]
+        if isinstance(pkgdir,list):
+          return [os.path.join(d, subdirPattern) for d in pkgdir]
+        else:
+          return [os.path.join(pkgdir,subdirPattern)]
       else:
         print(prefix+"Error: Can't find directory alias for %s in %s"%(part.split('::')[0],part))
         sys.exit(1)
 
     # Separate patterns, and expand directory aliases
-    pattern_parts = [expand_alias(p) for p in pattern.replace(';',',').split(',') if p]
+    pattern_parts = [item for p in pattern.replace(';',',').split(',') if p for item in expand_alias(p)]
 
     import fnmatch,re
     namepatterns = []
@@ -441,7 +445,7 @@ def create_filter(pattern):
         dirpatterns.append(re.compile(fnmatch.translate(p.lower())).match)
       else:
         # create pattern for ALL paths in the pkg search path
-        dirpatterns.extend([re.compile(fnmatch.translate( ('%s/*/%s'%(d,p)).lower() )).match for d in dirs.pkgsearchpath])
+        dirpatterns.extend([re.compile(fnmatch.translate( ('%s/%s'%(d,p)).lower() )).match for d in dirs.pkgsearchpath])
 
     def the_filter(pkgname,absdir):
         for p in namepatterns:

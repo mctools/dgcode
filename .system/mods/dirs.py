@@ -11,6 +11,7 @@ blddir = conf.build_dir()
 blddir_indicator = conf.build_dir_indicator(blddir)
 makefiledir = blddir / 'makefiles'
 
+extrapkgpath = conf.extra_pkg_path()
 pkgsearchpath = conf.pkg_search_path(sysdir)
 
 installdir = conf.install_dir()
@@ -65,7 +66,8 @@ for d in [str(x) for x in [sysdir, blddir, *pkgsearchpath, installdir]]:
 # Package directory aliases #keep them lowercase
 pkgdir_aliases = {
   "framework": fmwkdir,
-  "projects": projdir
+  "projects": projdir,
+  "extra": extrapkgpath
   }
 
 from utils import mkdir_p,touch
