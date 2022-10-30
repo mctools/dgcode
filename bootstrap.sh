@@ -265,7 +265,7 @@ function dgrun() {
         return $EC
     fi
     shift 1
-    source $DGCODE_DIR/install/setup.sh && $prog "$@"
+    source $DGCODE_INSTALL_DIR_RESOLVED/setup.sh && $prog "$@"
 }
 
 if [ -f "$DGCODE_INSTALL_DIR_RESOLVED/setup.sh" ]; then
