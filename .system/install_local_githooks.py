@@ -70,7 +70,6 @@ def get_all_affected_git_repos( path ):
 def main():
     assert len(sys.argv) == 2
     for repo_root in get_all_affected_git_repos( sys.argv[1] ):
-        print("CHECKING GIT HOOKS IN",repo_root)
         os.chdir(repo_root)#git is very sensitive about cwd!
         install_hooks( repo_root )
 
