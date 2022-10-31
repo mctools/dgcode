@@ -142,6 +142,9 @@ def parse_args():
     group_other.add_option("--testexcerpts",
                            type="int", dest="nexcerpts", default=0,
                            help="Show N first and last lines of each log file in failed tests",metavar="N")
+    group_other.add_option("--testfilter",
+                           type="str", dest="testfilter", default='',
+                           help="Only run tests with names matching provided patterns (passed on to 'dgtests --filter', c.f. 'dgtests --help' for details)",metavar="PATTERN")
     group_other.add_option("-c", "--clean",
                            action='store_true', dest="clean", default=False,
                            help="Remove %s and %s directories and exit"%(rel_blddir,rel_instdir))
@@ -748,7 +751,10 @@ if not opt.quiet:
 
 if opt.runtests:
     utils.rm_rf(dirs.testdir)
-    ec=utils.system('. %s/setup.sh && dgtests --excerpts=%i -j%i --prefix "%s " --dir "%s"'%(dirs.installdir,opt.nexcerpts,opt.njobs,prefix,dirs.testdir))
+    _testfilter=''
+    if opt.testfilter:
+        _testfilter = ' --filter=%s'%(pipes.quote(opt.testfilter))
+    ec=utils.system('. %s/setup.sh && dgtests --excerpts=%i -j%i --prefix "%s " --dir "%s"%s'%(dirs.installdir,opt.nexcerpts,opt.njobs,prefix,dirs.testdir,_testfilter))
     if ec==0 and (cp['unused_vars'] or cp['other_warnings']):
         print (prefix+'%sWARNING%s There were warnings (see above)'%(col_bad,col_end))
         print (prefix)

@@ -36,7 +36,18 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters):
             hasreflog = '%s.log'%runnable in reflogs
             if hasreflog or runnable_is_test(runnable):
                 if filters:
-                    if not any(fnmatch.fnmatch(runnable,fltr) for fltr in filters):
+                    selected=False
+                    for fltr in filters:
+                        fltr=fltr.strip()
+                        invert=False
+                        if fltr.startswith('!'):
+                            fltr=fltr[1:].strip()
+                            invert=True
+                        if not fltr:
+                            continue
+                        if not fnmatch.fnmatch(runnable,fltr) == invert:
+                            selected=True
+                    if not selected:
                         continue
                 assert not runnable in tests
                 tests.add(runnable)
@@ -165,7 +176,8 @@ parser.add_option("-e", "--excerpts",
                   help="Show N first and last lines of each log file in failed tests",metavar="N")
 parser.add_option("-f", "--filter",
                   type="str", dest="filters", default='',
-                  help="Only run tests with names matching provided patterns (use wildcards and comma separation to specify)",metavar="PATTERN")
+                  help=("Only run tests with names matching at least one of provided patterns (use wildcards"+
+                        " and comma separation to specify, and prefix patterns with '!' to negate)"),metavar="PATTERN")
 (opt, args) = parser.parse_args()
 if args:
     parser.error('Unrecognised arguments: %s'%(' '.join(args)))
@@ -202,34 +214,3 @@ if ec:
 else:
     print (opt.prefix+'  %sAll tests completed without failures!%s'%(col_ok,col_end))
     print (opt.prefix)
-
-
-##
-##Help on class TestCase in module dgbuild.junit_xml:
-##
-##class TestCase(builtins.object)
-## |  A JUnit test case with a result and possibly some stdout or stderr
-## |
-## |  Methods defined here:
-## |
-## |  __init__(self, name, classname=None, elapsed_sec=None, stdout=None, stderr=None, assertions=None, timestamp=None, status=None, category=None, file=None, line=None, log=None, group=None, url=None)
-## |      Initialize self.  See help(type(self)) for accurate signature.
-## |
-## |  add_error_info(self, message=None, output=None, error_type=None)
-## |      Adds an error message, output, or both to the test case
-## |
-## |  add_failure_info(self, message=None, output=None, failure_type=None)
-## |      Adds a failure message, output, or both to the test case
-## |
-## |  add_skipped_info(self, message=None, output=None)
-## |      Adds a skipped message, output, or both to the test case
-## |
-## |  is_error(self)
-## |      returns true if this test case is an error
-## |
-## |  is_failure(self)
-## |      returns true if this test case is a failure
-## |
-## |  is_skipped(self)
-## |      returns true if this test case has been skipped
-##
