@@ -124,7 +124,7 @@ def githook_pre__commit():
         raise
 
 def safe_rename_orig(origfile):
-    return origfile.with_name(origfile.name+'_orig_renamed_by_hooks_py')
+    return origfile.with_name(origfile.name+'_orig_renamed_by_dgcode')#NB: Must synchonise name with that found in dgcode/.system/install_local_githooks.py
 
 def hook_dispatch():
     #Run the githook_xxx() function which corresponds to the filename with which
@@ -155,51 +155,8 @@ def hook_dispatch():
             print("invoking %s hook from %s"%(hooknamedescr,nexthook.parent))
             sys.exit(subprocess.run([str(nexthook)]+sys.argv[1:]).returncode)
 
-def install_hooks():
-    #In principle a simple matter of "git config --local core.hooksPath
-    #.githooks", but git earlier than v2.9 does not support this!
-    hooksdir=pathlib.Path(__file__).parent.absolute()
-    gitdir=hooksdir.parent
-    assert gitdir.exists() and gitdir.joinpath('.git/HEAD').exists()
-    if query_git_version() >= (2,9):
-        #"git config --local core.hooksPath .githooks" leads to various troubles
-        #when CWD is outside the repo (and --git-dir does not always help). So
-        #we simply perform a brute-force hack on .git/config to make sure the
-        #last line with the word hooksPath in the file is the one we write.
-        gitlocalcfg=gitdir.joinpath('.git/config')
-        linetowrite='\n[core] hooksPath = .githooks\n'
-        if not gitlocalcfg.exists():
-            gitlocalcfg.write_text(linetowrite)
-        else:
-            lasthookspath=None
-            for l in gitlocalcfg.read_text().splitlines():
-                if 'hooksPath' in l:
-                    lasthookspath=l
-            if not lasthookspath or lasthookspath.strip()!=linetowrite.strip():
-                with gitlocalcfg.open("at") as fh:
-                    fh.write(linetowrite)
-    else:
-        #Git is old, time for the brute-force approach of having to
-        #put all of the hooks manually into .git/hooks. However, we only do:
-        srcdir=hooksdir
-        targetdir=gitdir.joinpath('.git/hooks')
-        if targetdir.exists() and not targetdir.is_dir():
-            raise SystemExit('Error: .git/hooks exists but is not directory!')
-        targetdir.mkdir(exist_ok=True)
-        for f in hooksdir.glob('*'):
-            if '~' in f.name:
-                continue
-            t=targetdir.joinpath(f.name)
-            if t.exists():
-                if not t.samefile(f):
-                    t.rename(safe_rename_orig(t))
-            if not t.exists():
-                t.symlink_to(os.path.relpath(str(f),str(t.parent)))
 
-if __name__=="__main__":
-    if len(sys.argv)==2 and sys.argv[1]=='--install-hooks-mode':
-        install_hooks()
-    else:
-        hook_dispatch()
+if __name__ == "__main__":
+    hook_dispatch()
 
 

@@ -16,7 +16,7 @@ function _dgcode_prunepath() {
     export $1=${P:1:99999}
 }
 
-for tmp in DGCODE_DIR ESS_INSTALL_PREFIX; do
+for tmp in DGCODE_INSTALL_DIR_RESOLVED ESS_INSTALL_PREFIX; do
     #Cleanout leftover from previous invocations:
     if [ "x${!tmp}" != x ]; then
         _dgcode_prunepath PYTHONPATH "${!tmp}"
@@ -31,14 +31,17 @@ done
 hash -r > /dev/null 2>&1
 
 #Where are we?:
-DGCODE_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ ! -x $DGCODE_DIR/.system/bin/dgbuild ]; then
+DGCODE_FMWK_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ ! -x $DGCODE_FMWK_DIR/.system/bin/dgbuild ]; then
     echo "Error: Could not find the dgbuild script"
-    unset DGCODE_DIR
+    unset DGCODE_FMWK_DIR
     return 1
 fi
 
-if  [[ "$DGCODE_DIR" == /afs/* ]] || [[ "$DGCODE_DIR" == /nfs/* ]] ; then
+#Temporarily allow old variable name:
+export DGCODE_DIR="$DGCODE_FMWK_DIR"
+
+if  [[ "$DGCODE_FMWK_DIR" == /afs/* ]] || [[ "$DGCODE_FMWK_DIR" == /nfs/* ]] ; then
     #Prevent caching of python bytecode in .pyc/.pyo/__pycache__ when working on
     #network dir. Trying this as a solution after repeatedly encountering broken
     #.pyc files on AFS at CERN lxplus.
@@ -99,7 +102,7 @@ fi
 #to enable modern GCC/Python:
 if [ "x$DGCODE_NOCENTOSHELP" == "x" -a "x$DG_PLATFORM" == x -a -f /etc/redhat-release ]; then
     echo "Checking if system is CentOS/RHEL in need of activation of SCL's or modules (can be disabled with 'export DGCODE_NOCENTOSHELP=1')"
-    . $DGCODE_DIR/.system/setup_centos.sh
+    . $DGCODE_FMWK_DIR/.system/setup_centos.sh
 else
     unset DG_PLATFORM
 fi
@@ -121,7 +124,7 @@ fi
 function _dgcode_resetdgdepfixerpath() {
     #Make sure all directories with dgdepfixer inside them are removed from PATH
     #(it is thus least intrusive if dgdepfixer is always alone in it's
-    #directory). Also adds DGCODE_DIR/.system/depfix/bld/bin to the PATH:
+    #directory). Also adds DGCODE_FMWK_DIR/.system/depfix/bld/bin to the PATH:
     hash -r > /dev/null 2>&1
     while true; do
         DG_TMP_RDFP=`which dgdepfixer 2>&1` || DG_TMP_RDFP=notfound
@@ -131,12 +134,11 @@ function _dgcode_resetdgdepfixerpath() {
         _dgcode_prunepath PATH "$( cd -P "$( dirname "${DG_TMP_RDFP}" )" && pwd )"
     done
     unset DG_TMP_RDFP
-    export PATH="$DGCODE_DIR/.system/depfix/bld/bin:$PATH"
+    export PATH="$DGCODE_FMWK_DIR/.system/depfix/bld/bin:$PATH"
 }
 
-
 #Make sure "compiled" dgdepfixer is up to date:
-python3 "$DGCODE_DIR"/.system/depfix/compile.py || echo "ERRORS detected during dgdepfixer compilation!!!!"
+python3 "$DGCODE_FMWK_DIR"/.system/depfix/compile.py || echo "ERRORS detected during dgdepfixer compilation!!!!"
 #Inject it into the path and remove other dgdepfixer's:
 _dgcode_resetdgdepfixerpath
 
@@ -198,9 +200,7 @@ if [ $DG_TMP == 99 ]; then
         echo "   dgdepfixer"
         echo
         echo "Alternatively: if you are an expert and think the detected issues are not important, you can ignore this check"
-        echo "by 'export DGCODE_NODEPFIX=1'. In any case, you must source the bootstrap.sh file again once done:"
-        echo
-        echo "  . $DGCODE_DIR/bootstrap.sh"
+        echo "by 'export DGCODE_NODEPFIX=1'. In any case, you must source the bootstrap.sh file again once done."
         echo
         return 2
     else
@@ -213,18 +213,14 @@ elif [ $DG_TMP != 0 ]; then
 fi
 unset DG_TMP
 
-#setup local git hooks if relevant:
-if [ -d "$DGCODE_DIR/.git" -a -d "$DGCODE_DIR/.githooks" ]; then
-    #Make sure the hooks in .githooks directory are used to detect e.g. filesize
-    #violations immediately upon commit:
-    $DGCODE_DIR/.githooks/hooks.py --install-hooks-mode
-fi
+#Setup local git hooks by adding hooks in repo-local .githooks directories, in
+#order to detect e.g. filesize violations immediately upon commit. This actually
+#checks all repos in the path list below which contain a file
+#".githooks/dgcode_auto_add_hookpath exists" and add the .githooks of that repo
+#to that repo's hooksPath:
+python3 "${DGCODE_FMWK_DIR}"/.system/install_local_githooks.py "${DGCODE_FMWK_DIR}:${DGCODE_PROJECTS_DIR}:${DGCODE_EXTRA_PKG_PATH}"
 
-
-export DGCODE_DIR
-
-
-#Resolve the location of the install and build directories. 
+#Resolve the location of the install and build directories.
 #Both default to the DGCODE_PROJECTS_DIR, but can be overridden by user
 #specified DGCODE_INSTALL_DIR and DGCODE_BUILD_DIR, unless they're set to 'auto'
 DGCODE_INSTALL_DIR_RESOLVED=$DGCODE_PROJECTS_DIR/install
@@ -244,7 +240,7 @@ export DGCODE_BUILD_DIR_RESOLVED
 #script is automatically sourced after each dgbuild invocation:
 
 function dgbuild() {
-    python3 $DGCODE_DIR/.system/bin/dgbuild "$@" ; dgec=$?; if [ -f $DGCODE_INSTALL_DIR_RESOLVED/setup.sh ]; then source $DGCODE_INSTALL_DIR_RESOLVED/setup.sh; fi; return $dgec
+    python3 $DGCODE_FMWK_DIR/.system/bin/dgbuild "$@" ; dgec=$?; if [ -f $DGCODE_INSTALL_DIR_RESOLVED/setup.sh ]; then source $DGCODE_INSTALL_DIR_RESOLVED/setup.sh; fi; return $dgec
 }
 
 function dgrun() {
@@ -274,12 +270,12 @@ fi
 
 if [ "x$DGCODE_BOOTSTRAP_QUIET" != "x1" ]; then
     echo
-    echo "Successfully bootstrapped the ESS Detector Group Framework in: $DGCODE_DIR"
+    echo "Successfully bootstrapped the ESS Detector Group Framework in: $DGCODE_FMWK_DIR"
     echo
     echo "You now have the command 'dgbuild' available which you can run from any"
     echo "directory below the following list of directories to build the software."
     echo
-    echo "    Framework dir: $DGCODE_DIR"
+    echo "    Framework dir: $DGCODE_FMWK_DIR"
     echo "    Projects dir:  $DGCODE_PROJECTS_DIR"
     if [[ -n "${DGCODE_EXTRA_PKG_PATH}" ]]; then
         echo "    Extra package path:  ${DGCODE_EXTRA_PKG_PATH:-<none>}"
