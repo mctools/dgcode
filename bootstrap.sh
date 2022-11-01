@@ -131,81 +131,85 @@ function _dgcode_resetdgdepfixerpath() {
     export PATH="$DGCODE_FMWK_DIR/.system/depfix/bld/bin:$PATH"
 }
 
-#Make sure "compiled" dgdepfixer is up to date:
-python3 "$DGCODE_FMWK_DIR"/.system/depfix/compile.py || echo "ERRORS detected during dgdepfixer compilation!!!!"
-#Inject it into the path and remove other dgdepfixer's:
-_dgcode_resetdgdepfixerpath
+if [ "x${DGCODE_BOOTSTRAP_SKIP_DGDEPFIXER_CHECK:-}" == x ]; then
+    #Make sure "compiled" dgdepfixer is up to date:
+    python3 "$DGCODE_FMWK_DIR"/.system/depfix/compile.py || echo "ERRORS detected during dgdepfixer compilation!!!!"
+    #Inject it into the path and remove other dgdepfixer's:
+    _dgcode_resetdgdepfixerpath
 
-#Default DGDEPDIR to ~/dgdepfixer_install unless user already sourced another:
-DG_TMP="$HOME/dgdepfixer_install"
-if [ "x$DGDEPDIR" != "x" ]; then
-    DG_TMP="$DGDEPDIR"
-fi
-if [ -f "$DG_TMP/setup.sh" ]; then
-    dgdepfixer --checkcompat "$DG_TMP"
-    if [ $? == 0 ]; then
-        if [ "x$DGDEPDIR" != "x" ]; then
-            echo
-            echo "-> Confirmed compatibility of active dgdepfixer installation at $DGDEPDIR"
-            echo
+    #Default DGDEPDIR to ~/dgdepfixer_install unless user already sourced another:
+    DG_TMP="$HOME/dgdepfixer_install"
+    if [ "x$DGDEPDIR" != "x" ]; then
+        DG_TMP="$DGDEPDIR"
+    fi
+    if [ -f "$DG_TMP/setup.sh" ]; then
+        dgdepfixer --checkcompat "$DG_TMP"
+        if [ $? == 0 ]; then
+            if [ "x$DGDEPDIR" != "x" ]; then
+                echo
+                echo "-> Confirmed compatibility of active dgdepfixer installation at $DGDEPDIR"
+                echo
+            else
+                echo
+                echo "-> Activating installation at ~/dgdepfixer_install/"
+                echo
+                source $HOME/dgdepfixer_install/setup.sh
+                #Remove the newly introduced (not-updated) dgdepfixer from PATH:
+                _dgcode_resetdgdepfixerpath
+            fi
         else
-            echo
-            echo "-> Activating installation at ~/dgdepfixer_install/"
-            echo
-            source $HOME/dgdepfixer_install/setup.sh
-            #Remove the newly introduced (not-updated) dgdepfixer from PATH:
-            _dgcode_resetdgdepfixerpath
-        fi
-    else
-        if [ "x$DGDEPDIR" != "x" ]; then
-            #FIXME: We should have a dgdepfixer --cheapupgradeexisting: leave extras, update (unsetup.sh), dgdepfixer, pymods (via pip calls), cmake (if needed)
-            echo "WARNING: Currently active dgdepfixer installation at $DGDEPDIR is incompatible. Please run dgdepfixer and try to recreate it."
-            return 2
-        else
-            echo
-            echo "WARNING: Ignoring incompatible or incomplete installation in ~/dgdepfixer_install/ (you should run dgdepfixer to investigate)"
-            echo
+            if [ "x$DGDEPDIR" != "x" ]; then
+                #FIXME: We should have a dgdepfixer --cheapupgradeexisting: leave extras, update (unsetup.sh), dgdepfixer, pymods (via pip calls), cmake (if needed)
+                echo "WARNING: Currently active dgdepfixer installation at $DGDEPDIR is incompatible. Please run dgdepfixer and try to recreate it."
+                return 2
+            else
+                echo
+                echo "WARNING: Ignoring incompatible or incomplete installation in ~/dgdepfixer_install/ (you should run dgdepfixer to investigate)"
+                echo
+            fi
         fi
     fi
-fi
 
-#Sanity:
-_dgcode_resetdgdepfixerpath
+    #Sanity:
+    _dgcode_resetdgdepfixerpath
+
+    #cleanup:
+    unset _dgcode_prunepath
+
+    #diagnose dependencies:
+    dgdepfixer --diagnose
+    DG_TMP=$?
+    if [ $DG_TMP == 99 ]; then
+        unset DG_TMP
+        if [ "x$DGCODE_NODEPFIX" != "x1" ]; then
+            if [ "x$DGDEPDIR" != "x" -a -f "$DGDEPDIR/unsetup.sh" ]; then
+                echo
+                echo "-> Deactivating installation at $DGDEPDIR"
+                echo
+                . "$DGDEPDIR/unsetup.sh"
+            fi
+            echo
+            echo "WARNING: System issues detected. You can try to fix them now with the command:"
+            echo
+            echo "   dgdepfixer"
+            echo
+            echo "Alternatively: if you are an expert and think the detected issues are not important, you can ignore this check"
+            echo "by 'export DGCODE_NODEPFIX=1'. In any case, you must source the bootstrap.sh file again once done."
+            echo
+            return 2
+        else
+            echo "Proceeding despite detected problems since DGCODE_NODEPFIX is set."
+        fi
+    elif [ $DG_TMP != 0 ]; then
+        echo "ERROR: Aborting setup due to fundamental platform issues"
+        unset DG_TMP
+        return 2
+    fi
+    unset DG_TMP
+fi
 
 #cleanup:
 unset _dgcode_resetdgdepfixerpath
-unset _dgcode_prunepath
-
-#diagnose dependencies:
-dgdepfixer --diagnose
-DG_TMP=$?
-if [ $DG_TMP == 99 ]; then
-    unset DG_TMP
-    if [ "x$DGCODE_NODEPFIX" != "x1" ]; then
-        if [ "x$DGDEPDIR" != "x" -a -f "$DGDEPDIR/unsetup.sh" ]; then
-            echo
-            echo "-> Deactivating installation at $DGDEPDIR"
-            echo
-            . "$DGDEPDIR/unsetup.sh"
-        fi
-        echo
-        echo "WARNING: System issues detected. You can try to fix them now with the command:"
-        echo
-        echo "   dgdepfixer"
-        echo
-        echo "Alternatively: if you are an expert and think the detected issues are not important, you can ignore this check"
-        echo "by 'export DGCODE_NODEPFIX=1'. In any case, you must source the bootstrap.sh file again once done."
-        echo
-        return 2
-    else
-        echo "Proceeding despite detected problems since DGCODE_NODEPFIX is set."
-    fi
-elif [ $DG_TMP != 0 ]; then
-    echo "ERROR: Aborting setup due to fundamental platform issues"
-    unset DG_TMP
-    return 2
-fi
-unset DG_TMP
 
 #Setup local git hooks by adding hooks in repo-local .githooks directories, in
 #order to detect e.g. filesize violations immediately upon commit. This actually
