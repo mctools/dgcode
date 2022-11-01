@@ -53,6 +53,15 @@ if [ "x$DG_DONT_SET_PYTHONUNBUFFERED" != x1 ]; then
     export PYTHONUNBUFFERED=1
 fi
 
+#Handle DGCODE_FORCEVAR_CC/CXX which is needed to set CC/CXX reliably from conda
+#environment.yml files:
+if [ ! -z "${DGCODE_FORCEVAR_CC+x}" ]; then
+    export CC="${DGCODE_FORCEVAR_CC}"
+fi
+if [ ! -z "${DGCODE_FORCEVAR_CXX+x}" ]; then
+    export CXX="${DGCODE_FORCEVAR_CXX}"
+fi
+
 #Detect clusters with special support:
 DG_PLATFORM=
 if [[ -d /mnt/groupdata ]] && [[ "x$HOSTNAME" = *.esss.dk ]]; then
