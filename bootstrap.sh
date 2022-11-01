@@ -1,11 +1,5 @@
 #!/bin/bash
 
-if [ "x$DGCODE_USEPY2" == "x1" ]; then
-    echo "ERROR: You have set DGCODE_USEPY2=1, but Python2 support is now completely gone."
-    echo 'Please "unset DGCODE_USEPY2" and source bootstrap.sh once again to try with Python3.'
-    return 1
-fi
-
 if [[ -z "${DGCODE_PROJECTS_DIR}" ]]; then
   echo "ERROR: The DGCODE_PROJECTS_DIR variable must be set before sourcing bootstrap.sh"
   return 1
