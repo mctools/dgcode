@@ -11,8 +11,7 @@
 #Reconfigure when python version changed
 set(autoreconf_bin_Python "python3")
 
-set(autoreconf_env_Python "PYTHONPATH;PYTHONHOME")
-
+set(autoreconf_env_Python "PYTHONPATH;PYTHONHOME;CONDA_PREFIX")
 
 EXECUTE_PROCESS(COMMAND "which" "python3"
                 OUTPUT_VARIABLE PYTHON_EXECUTABLE
@@ -21,6 +20,53 @@ EXECUTE_PROCESS(COMMAND "which" "python3"
 if (NOT "x${tmp_ec}" STREQUAL "x0" OR NOT EXISTS "${PYTHON_EXECUTABLE}")
   message(FATAL_ERROR "No python3 interpreter in PATH")
 endif()
+
+
+set(Python3_EXECUTABLE "${PYTHON_EXECUTABLE}")#hint for find_package(Python3 ..)
+find_package (Python3 COMPONENTS Interpreter Development)
+
+if ( Python3_FOUND )
+  #Found via CMake, yay!
+  message("-- Real python executable: ${Python3_EXECUTABLE}")
+  set(PYTHON_VERSION_STRING "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}.${Python3_VERSION_PATCH}")
+  message("-- Python version: ${PYTHON_VERSION_STRING}")
+  if ( NOT ${Python3_VERSION_MAJOR} EQUAL 3 OR ${Python3_VERSION_MINOR} LESS 6 )
+    message( FATAL_ERROR "Python version incompatible (found ${PYTHON_VERSION_STRING} required is python3.6 or later)")
+  endif()
+  if ( NOT Python3_INTERPRETER_ID STREQUAL "Python" )
+    message(FATAL_ERROR "Python implementation does not appear to be CPython.")
+  endif()
+
+  if ( NOT Python3_Interpreter_FOUND )
+    message(FATAL_ERROR "Python implementation did not provide interpreter (this should not happen!).")
+  endif()
+  if ( NOT Python3_Development_FOUND )
+    message(FATAL_ERROR "Python installation does not have development artifacts (i.e. header files).")
+  endif()
+  if ( Python3_INCLUDE_DIRS )
+    set(DG_GLOBAL_COMPILE_FLAGS_CXX "${DG_GLOBAL_COMPILE_FLAGS_CXX} -I${Python3_INCLUDE_DIRS}")
+    set(DG_GLOBAL_COMPILE_FLAGS_C "${DG_GLOBAL_COMPILE_FLAGS_C} -I${Python3_INCLUDE_DIRS}")
+  endif()
+  if ( Python3_LINK_OPTIONS )
+    set(DG_GLOBAL_LINK_FLAGS "${DG_GLOBAL_LINK_FLAGS} ${Python3_LINK_OPTIONS}")
+  endif()
+  #make sure chosen python lib is put in LD_LIBRARY_PATH of installed setup.sh
+  #(the executable will be symlinked into dgcode's sysbin later):
+  if (Python3_LIBRARIES)
+    list(APPEND DG_LIBS_TO_SYMLINK "${Python3_LIBRARIES}")
+    findpackage_liblist_to_flags("${Python3_LIBRARIES}" "${Python3_LIBRARY_DIRS}" tmp_extra_link_flags)
+    set(DG_GLOBAL_LINK_FLAGS "${DG_GLOBAL_LINK_FLAGS} ${tmp_extra_link_flags} ")
+  endif()
+  #Not 100% sure if we need all of the the following:
+  set(PYTHONINTERP_FOUND 1)
+  set(PYTHONLIBS_FOUND 1)#FIXME NOT USED
+  set(PYTHONLIBS_VERSION_STRING "${PYTHON_VERSION_STRING}")
+  list(APPEND DG_GLOBAL_VERSION_DEPS_CXX "Python##${PYTHON_VERSION_STRING}")
+  list(APPEND DG_GLOBAL_VERSION_DEPS_C "Python##${PYTHON_VERSION_STRING}")
+  return()
+endif()
+
+#Pure CMake did not work - fall back to old-school hacks:
 
 get_filename_component(PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}" REALPATH)
 EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" "-c" "import sys;print(sys.version_info[0])"
