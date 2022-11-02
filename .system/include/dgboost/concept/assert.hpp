@@ -29,7 +29,7 @@
 
 # ifdef BOOST_MSVC
 #  include <dgboost/concept/detail/msvc.hpp>
-# elif BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+# elif BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
 #  include <dgboost/concept/detail/borland.hpp>
 # else 
 #  include <dgboost/concept/detail/general.hpp>

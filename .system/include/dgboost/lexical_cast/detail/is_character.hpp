@@ -1,6 +1,6 @@
 // Copyright Kevlin Henney, 2000-2005.
 // Copyright Alexander Nasonov, 2006-2010.
-// Copyright Antony Polukhin, 2011-2019.
+// Copyright Antony Polukhin, 2011-2022.
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -35,8 +35,8 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost {
         struct is_character
         {
             typedef BOOST_DEDUCED_TYPENAME dgboost::integral_constant<
-              bool,
-              dgboost::is_same< T, char >::value ||
+                bool,
+                dgboost::is_same< T, char >::value ||
                     #if !defined(BOOST_NO_STRINGSTREAM) && !defined(BOOST_NO_STD_WSTRING)
                         dgboost::is_same< T, wchar_t >::value ||
                     #endif
@@ -46,8 +46,8 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost {
                     #ifndef BOOST_NO_CXX11_CHAR32_T
                         dgboost::is_same< T, char32_t >::value ||
                     #endif
-                   	dgboost::is_same< T, unsigned char >::value ||
-                   	dgboost::is_same< T, signed char >::value
+                        dgboost::is_same< T, unsigned char >::value ||
+                        dgboost::is_same< T, signed char >::value
             > type;
 
             BOOST_STATIC_CONSTANT(bool, value = (type::value) );

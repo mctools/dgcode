@@ -1,5 +1,6 @@
 
 // Copyright (C) 2005-2016 Daniel James
+// Copyright (C) 2022 Christian Mazakas
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,25 +26,18 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost {
         typedef dgboost::unordered::detail::allocator_traits<value_allocator>
           value_allocator_traits;
 
-        typedef dgboost::unordered::detail::pick_node<A, value_type> pick;
-        typedef typename pick::node node;
-        typedef typename pick::bucket bucket;
-        typedef typename pick::link_pointer link_pointer;
-
         typedef dgboost::unordered::detail::table<types> table;
         typedef dgboost::unordered::detail::map_extractor<value_type> extractor;
 
-        typedef typename dgboost::unordered::detail::pick_policy<K>::type policy;
+        typedef typename dgboost::allocator_void_pointer<value_allocator>::type
+          void_pointer;
 
-        typedef dgboost::unordered::iterator_detail::iterator<node> iterator;
-        typedef dgboost::unordered::iterator_detail::c_iterator<node> c_iterator;
-        typedef dgboost::unordered::iterator_detail::l_iterator<node> l_iterator;
-        typedef dgboost::unordered::iterator_detail::cl_iterator<node>
-          cl_iterator;
+        typedef dgboost::unordered::node_handle_map<
+          node<value_type, void_pointer>, K, M, A>
+          node_type;
 
-        typedef dgboost::unordered::node_handle_map<node, K, M, A> node_type;
-        typedef dgboost::unordered::insert_return_type_map<node, K, M, A>
-          insert_return_type;
+        typedef typename table::iterator iterator;
+        typedef dgboost::unordered::insert_return_type_map<iterator, node_type> insert_return_type;
       };
 
       template <typename K, typename M, typename H, typename P, typename A>

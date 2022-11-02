@@ -22,7 +22,7 @@ works correctly. */
 #  pragma warning(disable: 4180)
 # endif
 
-# include <dgboost/bind.hpp>
+# include <dgboost/bind/bind.hpp>
 # include <dgboost/bind/protect.hpp>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace python { 
@@ -40,6 +40,7 @@ namespace detail
     , Target&(*)()
   )
   {
+      using namespace dgboost::placeholders;
       return objects::make_iterator_function<Target>(
           dgboost::protect(dgboost::bind(get_start, _1))
         , dgboost::protect(dgboost::bind(get_finish, _1))

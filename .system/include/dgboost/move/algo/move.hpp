@@ -27,7 +27,11 @@
 #include <dgboost/move/utility_core.hpp>
 #include <dgboost/move/detail/iterator_traits.hpp>
 #include <dgboost/move/detail/iterator_to_raw_pointer.hpp>
+#include <dgboost/move/detail/addressof.hpp>
 #include <dgboost/core/no_exceptions_support.hpp>
+#if defined(BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
+#include <algorithm>
+#endif
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 

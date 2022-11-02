@@ -26,8 +26,15 @@
 
 #include <dgboost/smart_ptr/detail/sp_interlocked.hpp>
 #include <dgboost/smart_ptr/detail/sp_typeinfo_.hpp>
-#include <dgboost/detail/workaround.hpp>
+#include <dgboost/config/workaround.hpp>
 #include <dgboost/config.hpp>
+
+#if defined(BOOST_SP_REPORT_IMPLEMENTATION)
+
+#include <dgboost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("Using Win32 sp_counted_base")
+
+#endif
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {

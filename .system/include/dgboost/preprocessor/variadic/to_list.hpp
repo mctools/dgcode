@@ -14,12 +14,19 @@
 # define BOOST_PREPROCESSOR_VARIADIC_TO_LIST_HPP
 #
 # include <dgboost/preprocessor/config/config.hpp>
+# include <dgboost/preprocessor/control/if.hpp>
 # include <dgboost/preprocessor/tuple/to_list.hpp>
+# include <dgboost/preprocessor/variadic/has_opt.hpp>
+# include <dgboost/preprocessor/variadic/size.hpp>
 #
 # /* BOOST_PP_VARIADIC_TO_LIST */
 #
-# if BOOST_PP_VARIADICS
-#    define BOOST_PP_VARIADIC_TO_LIST(...) BOOST_PP_TUPLE_TO_LIST((__VA_ARGS__))
+# if BOOST_PP_VARIADIC_HAS_OPT()
+#     define BOOST_PP_VARIADIC_TO_LIST_NOT_EMPTY(...) BOOST_PP_TUPLE_TO_LIST((__VA_ARGS__))
+#     define BOOST_PP_VARIADIC_TO_LIST_EMPTY(...) BOOST_PP_NIL
+#     define BOOST_PP_VARIADIC_TO_LIST(...) BOOST_PP_IF(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__),BOOST_PP_VARIADIC_TO_LIST_NOT_EMPTY,BOOST_PP_VARIADIC_TO_LIST_EMPTY)(__VA_ARGS__)
+# else
+#     define BOOST_PP_VARIADIC_TO_LIST(...) BOOST_PP_TUPLE_TO_LIST((__VA_ARGS__))
 # endif
 #
 # endif

@@ -9,7 +9,7 @@
 #include <dgboost/config.hpp>
 #include <dgboost/config/workaround.hpp>
 
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
 // From Paul Mensonides
 #include <dgboost/preprocessor/punctuation/comma.hpp>
 #include <dgboost/preprocessor/detail/split.hpp>

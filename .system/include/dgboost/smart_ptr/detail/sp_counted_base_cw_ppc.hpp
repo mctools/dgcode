@@ -25,7 +25,15 @@
 //
 
 #include <dgboost/smart_ptr/detail/sp_typeinfo_.hpp>
+#include <dgboost/smart_ptr/detail/sp_obsolete.hpp>
 #include <dgboost/config.hpp>
+
+#if defined(BOOST_SP_REPORT_IMPLEMENTATION)
+
+#include <dgboost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("Using CodeWarrior/PowerPC sp_counted_base")
+
+#endif
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {
@@ -54,7 +62,11 @@ inline long atomic_decrement( register long * pw )
 
     asm
     {
+#if defined(__PPCZen__) || defined(__PPCe500__) || defined(__PPCe500v2__)
+    msync
+#else
     sync
+#endif
 
 loop:
 

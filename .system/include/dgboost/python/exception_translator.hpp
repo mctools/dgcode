@@ -7,7 +7,7 @@
 
 # include <dgboost/python/detail/prefix.hpp>
 
-# include <dgboost/bind.hpp>
+# include <dgboost/bind/bind.hpp>
 # include <dgboost/bind/placeholders.hpp>
 # include <dgboost/type.hpp>
 # include <dgboost/python/detail/translate_exception.hpp>
@@ -18,6 +18,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace py
 template <class ExceptionType, class Translate>
 void register_exception_translator(Translate translate, dgboost::type<ExceptionType>* = 0)
 {
+    using namespace dgboost::placeholders;
     detail::register_exception_handler(
         dgboost::bind<bool>(detail::translate_exception<ExceptionType,Translate>(), _1, _2, translate)
         );

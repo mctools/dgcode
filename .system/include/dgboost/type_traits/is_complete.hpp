@@ -15,6 +15,7 @@
 #include <dgboost/type_traits/is_function.hpp>
 #include <dgboost/type_traits/detail/yes_no_type.hpp>
 #include <dgboost/config/workaround.hpp>
+#include <cstddef>
 
 /*
  * CAUTION:
@@ -40,7 +41,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 
    namespace detail{
 
-      template <unsigned N>
+      template <std::size_t N>
       struct ok_tag { double d; char c[N]; };
 
       template <class T>

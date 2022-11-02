@@ -7,6 +7,7 @@
 
 #include <dgboost/config.hpp>
 #include <dgboost/typeof/constant.hpp>
+#include <cstddef> // for std::size_t
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace type_of {
 

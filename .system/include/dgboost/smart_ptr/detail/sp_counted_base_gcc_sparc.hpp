@@ -20,8 +20,18 @@
 //  Thanks to Michael van der Westhuizen
 
 #include <dgboost/smart_ptr/detail/sp_typeinfo_.hpp>
+#include <dgboost/smart_ptr/detail/sp_obsolete.hpp>
 #include <dgboost/config.hpp>
 #include <inttypes.h> // int32_t
+
+#if defined(BOOST_SP_REPORT_IMPLEMENTATION)
+
+#include <dgboost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("Using g++/Sparc sp_counted_base")
+
+#endif
+
+BOOST_SP_OBSOLETE()
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {

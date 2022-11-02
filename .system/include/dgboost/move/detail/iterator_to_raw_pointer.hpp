@@ -27,11 +27,11 @@ namespace movelib {
 namespace detail {
 
 template <class T>
-inline T* iterator_to_pointer(T* i)
+BOOST_MOVE_FORCEINLINE T* iterator_to_pointer(T* i)
 {  return i; }
 
 template <class Iterator>
-inline typename dgboost::movelib::iterator_traits<Iterator>::pointer
+BOOST_MOVE_FORCEINLINE typename dgboost::movelib::iterator_traits<Iterator>::pointer
    iterator_to_pointer(const Iterator &i)
 {  return i.operator->();  }
 
@@ -46,7 +46,7 @@ struct iterator_to_element_ptr
 }  //namespace detail {
 
 template <class Iterator>
-inline typename dgboost::movelib::detail::iterator_to_element_ptr<Iterator>::type
+BOOST_MOVE_FORCEINLINE typename dgboost::movelib::detail::iterator_to_element_ptr<Iterator>::type
    iterator_to_raw_pointer(const Iterator &i)
 {
    return ::dgboost::movelib::to_raw_pointer

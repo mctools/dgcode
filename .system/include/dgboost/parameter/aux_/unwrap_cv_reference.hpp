@@ -4,8 +4,8 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef UNWRAP_CV_REFERENCE_050328_HPP
-#define UNWRAP_CV_REFERENCE_050328_HPP
+#ifndef BOOST_PARAMETER_AUX_UNWRAP_CV_REFERENCE_HPP
+#define BOOST_PARAMETER_AUX_UNWRAP_CV_REFERENCE_HPP
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 
@@ -60,7 +60,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
 #else   // !defined(BOOST_PARAMETER_CAN_USE_MP11) || MSVC-14.0
 #include <dgboost/mpl/bool.hpp>
 #include <dgboost/type_traits/remove_reference.hpp>
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
+#if !BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564)) && \
     !BOOST_WORKAROUND(BOOST_GCC, < 40000)
 #include <dgboost/mpl/eval_if.hpp>
 #endif
@@ -119,13 +119,13 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
         );
 
         typedef dgboost::mpl::bool_<
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
             is_cv_reference_wrapper::
 #endif 
         value> type;
     };
 
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) || \
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564)) || \
     BOOST_WORKAROUND(BOOST_GCC, < 40000)
     template <
         typename T

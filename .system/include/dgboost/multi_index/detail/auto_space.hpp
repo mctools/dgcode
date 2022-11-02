@@ -1,4 +1,4 @@
-/* Copyright 2003-2018 Joaquin M Lopez Munoz.
+/* Copyright 2003-2022 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -15,9 +15,10 @@
 
 #include <dgboost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
 #include <algorithm>
+#include <dgboost/core/noncopyable.hpp>
 #include <dgboost/multi_index/detail/adl_swap.hpp>
 #include <dgboost/multi_index/detail/allocator_traits.hpp>
-#include <dgboost/noncopyable.hpp>
+#include <dgboost/type_traits/integral_constant.hpp>
 #include <memory>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost{
@@ -64,11 +65,25 @@ struct auto_space:private noncopyable
 
   void swap(auto_space& x)
   {
-    if(al_!=x.al_)adl_swap(al_,x.al_);
+    swap(
+      x,
+      dgboost::integral_constant<
+        bool,alloc_traits::propagate_on_container_swap::value>());
+  }
+
+  void swap(auto_space& x,dgboost::true_type /* swap_allocators */)
+  {
+    adl_swap(al_,x.al_);
     std::swap(n_,x.n_);
     std::swap(data_,x.data_);
   }
     
+  void swap(auto_space& x,dgboost::false_type /* swap_allocators */)
+  {
+    std::swap(n_,x.n_);
+    std::swap(data_,x.data_);
+  }
+
 private:
   allocator al_;
   size_type n_;

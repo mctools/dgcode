@@ -7,10 +7,11 @@
 #ifndef BOOST_ENABLE_IF_23022003THW_HPP
 #define BOOST_ENABLE_IF_23022003THW_HPP
 
-#include <dgboost/detail/workaround.hpp>
-#include <dgboost/mpl/identity.hpp>
-
+#include <dgboost/config.hpp>
 #include <dgboost/iterator/detail/config_def.hpp>
+#if defined(BOOST_NO_SFINAE) || defined(BOOST_NO_IS_CONVERTIBLE)
+#include <dgboost/type_traits/type_identity.hpp>
+#endif
 
 //
 // Boost iterators uses its own enable_if cause we need
@@ -48,7 +49,6 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost
       struct base
       {
 #ifdef BOOST_NO_SFINAE
-
         typedef T type;
 
         // This way to do it would give a nice error message containing
@@ -69,7 +69,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost
 # if !defined(BOOST_NO_SFINAE) && !defined(BOOST_NO_IS_CONVERTIBLE)
       : enabled<(Cond::value)>::template base<Return>
 # else
-      : mpl::identity<Return>
+      : dgboost::type_identity<Return>
 # endif
     {
     };

@@ -13,7 +13,7 @@
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 
-#if defined( __CODEGEARC__ )
+#if defined( BOOST_CODEGEARC )
    template <class T> struct is_compound : public integral_constant<bool, __is_compound(T)> {};
 #else
    template <class T> struct is_compound : public integral_constant<bool, ! ::dgboost::is_fundamental<T>::value> {};

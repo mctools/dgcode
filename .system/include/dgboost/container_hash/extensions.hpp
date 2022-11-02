@@ -22,7 +22,6 @@
 #include <dgboost/detail/container_fwd.hpp>
 #include <dgboost/core/enable_if.hpp>
 #include <dgboost/static_assert.hpp>
-#include <vector>
 
 #if !defined(BOOST_NO_CXX11_HDR_ARRAY)
 #   include <array>
@@ -32,9 +31,7 @@
 #   include <tuple>
 #endif
 
-#if !defined(BOOST_NO_CXX11_HDR_MEMORY)
-#   include <memory>
-#endif
+#include <memory>
 
 #if defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
 #include <dgboost/type_traits/is_array.hpp>
@@ -69,56 +66,6 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost
         dgboost::hash_combine(seed, v.first);
         dgboost::hash_combine(seed, v.second);
         return seed;
-    }
-
-    inline std::size_t hash_range(
-        std::vector<bool>::iterator first,
-        std::vector<bool>::iterator last)
-    {
-        std::size_t seed = 0;
-
-        for(; first != last; ++first)
-        {
-            hash_combine<bool>(seed, *first);
-        }
-
-        return seed;
-    }
-
-    inline std::size_t hash_range(
-        std::vector<bool>::const_iterator first,
-        std::vector<bool>::const_iterator last)
-    {
-        std::size_t seed = 0;
-
-        for(; first != last; ++first)
-        {
-            hash_combine<bool>(seed, *first);
-        }
-
-        return seed;
-    }
-
-    inline void hash_range(
-        std::size_t& seed,
-        std::vector<bool>::iterator first,
-        std::vector<bool>::iterator last)
-    {
-        for(; first != last; ++first)
-        {
-            hash_combine<bool>(seed, *first);
-        }
-    }
-
-    inline void hash_range(
-        std::size_t& seed,
-        std::vector<bool>::const_iterator first,
-        std::vector<bool>::const_iterator last)
-    {
-        for(; first != last; ++first)
-        {
-            hash_combine<bool>(seed, *first);
-        }
     }
 
     template <class T, class A>

@@ -352,7 +352,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost
    private:
       void test(dgboost::false_type)
       {
-          f(first,second);
+          (void) f(first,second);
           Return r = f(first, second); // require operator()
           (void)r;
       }

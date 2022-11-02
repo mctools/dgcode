@@ -124,7 +124,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
     template <
         typename Keyword
       , typename Arg
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
       , typename = typename ::dgboost::parameter::aux
         ::is_cv_reference_wrapper<Arg>::type
 #endif
@@ -138,7 +138,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
     };
 }}} // namespace dgboost::parameter::aux_
 
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
 #include <dgboost/mpl/bool.hpp>
 #include <dgboost/type_traits/remove_reference.hpp>
 

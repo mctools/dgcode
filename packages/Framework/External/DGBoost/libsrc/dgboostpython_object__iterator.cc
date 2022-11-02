@@ -5,7 +5,7 @@
 
 #include <dgboost/python/object/iterator_core.hpp>
 #include <dgboost/python/object/function_object.hpp>
-#include <dgboost/bind.hpp>
+#include <dgboost/bind/bind.hpp>
 #include <dgboost/mpl/vector/vector10.hpp>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace python { namespace objects { 

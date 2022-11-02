@@ -25,7 +25,17 @@
 //
 
 #include <dgboost/smart_ptr/detail/sp_typeinfo_.hpp>
+#include <dgboost/smart_ptr/detail/sp_obsolete.hpp>
 #include <dgboost/config.hpp>
+
+#if defined(BOOST_SP_REPORT_IMPLEMENTATION)
+
+#include <dgboost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("Using g++/x86 sp_counted_base")
+
+#endif
+
+BOOST_SP_OBSOLETE()
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {

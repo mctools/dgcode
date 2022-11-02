@@ -41,13 +41,12 @@
 #endif
 
 #include <cstddef>
+#include <iterator>
 #include <stdexcept>
 #include <dgboost/assert.hpp>
 #include <dgboost/static_assert.hpp>
 #include <dgboost/swap.hpp>
 
-// Handles broken standard libraries better than <iterator>
-#include <dgboost/detail/iterator.hpp>
 #include <dgboost/throw_exception.hpp>
 #include <algorithm>
 

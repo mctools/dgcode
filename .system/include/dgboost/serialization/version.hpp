@@ -9,7 +9,7 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // version.hpp:
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -25,7 +25,7 @@
 
 #include <dgboost/type_traits/is_base_and_derived.hpp>
 
-namespace dgboost {} namespace boost = dgboost; namespace dgboost { 
+namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 namespace serialization {
 
 struct basic_traits;
@@ -69,8 +69,6 @@ const int version<T>::value;
  * ALL the serialization traits are available.  Included the implementation
  * here with this comment as a reminder not to do this!
  */
-//#include <dgboost/serialization/level.hpp>
-//#include <dgboost/mpl/equal_to.hpp>
 
 #include <dgboost/mpl/less.hpp>
 #include <dgboost/mpl/comparison.hpp>

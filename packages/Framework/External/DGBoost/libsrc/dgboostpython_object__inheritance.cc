@@ -11,7 +11,7 @@
 #include <dgboost/graph/adjacency_list.hpp>
 #include <dgboost/graph/reverse_graph.hpp>
 #include <dgboost/property_map/property_map.hpp>
-#include <dgboost/bind.hpp>
+#include <dgboost/bind/bind.hpp>
 #include <dgboost/integer_traits.hpp>
 #include <dgboost/tuple/tuple.hpp>
 #include <dgboost/tuple/tuple_comparison.hpp>
@@ -184,6 +184,7 @@ namespace
   // map a type to a position in the index
   inline type_index_t::iterator type_position(class_id type)
   {
+      using namespace dgboost::placeholders;
       typedef index_entry entry;
       
       return std::lower_bound(

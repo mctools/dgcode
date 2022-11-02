@@ -21,6 +21,13 @@
 # include <ia64intrin.h>
 #endif
 
+#if defined(BOOST_SP_REPORT_IMPLEMENTATION)
+
+#include <dgboost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("Using __sync spinlock")
+
+#endif
+
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {
 
@@ -31,7 +38,7 @@ class spinlock
 {
 public:
 
-    int v_;
+    unsigned char v_;
 
 public:
 

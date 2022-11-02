@@ -12,11 +12,11 @@
 
 #include <dgboost/config.hpp>
 #include <dgboost/assert.hpp>
-#include <dgboost/checked_delete.hpp>
+#include <dgboost/core/checked_delete.hpp>
 #include <dgboost/smart_ptr/detail/sp_nullptr_t.hpp>
 #include <dgboost/smart_ptr/detail/sp_disable_deprecated.hpp>
 #include <dgboost/smart_ptr/detail/sp_noexcept.hpp>
-#include <dgboost/detail/workaround.hpp>
+#include <dgboost/config/workaround.hpp>
 
 #ifndef BOOST_NO_AUTO_PTR
 # include <memory>          // for std::auto_ptr

@@ -6,17 +6,18 @@
 //
 //     Distributed under the Boost Software License, Version 1.0.
 //        (See accompanying file LICENSE_1_0.txt or copy at
-//              http://www.boost.org/LICENSE_1_0.txt)
+//              https://www.boost.org/LICENSE_1_0.txt)
 //
 //         ---------------------------------------------------
-//       See http://www.boost.org/libs/integer for documentation.
+//       See https://www.boost.org/libs/integer for documentation.
 // ------------------------------------------------------------------------- //
 
 
 #ifndef BOOST_INTEGER_STATIC_LOG2_HPP
 #define BOOST_INTEGER_STATIC_LOG2_HPP
 
-#include "dgboost/integer_fwd.hpp" // for dgboost::intmax_t
+#include <dgboost/config.hpp>
+#include <dgboost/integer_fwd.hpp>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 
@@ -121,7 +122,5 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost {
  struct static_log2<0> { };
 
 }
-
-
 
 #endif // include guard

@@ -17,24 +17,34 @@
 #include <dgboost/type_traits/is_base_and_derived.hpp>
 #include <dgboost/utility/enable_if.hpp>
 
-namespace dgboost {} namespace boost = dgboost; namespace dgboost {  namespace graph { namespace detail {
+namespace dgboost {} namespace boost = dgboost; namespace dgboost
+{
+namespace graph
+{
+    namespace detail
+    {
 
-struct no_parameter {};
+        struct no_parameter
+        {
+        };
 
-} } } // end namespace dgboost::graph::detail
+    }
+}
+} // end namespace dgboost::graph::detail
 
 #ifndef BOOST_NO_SFINAE
 
-#define BOOST_GRAPH_ENABLE_IF_MODELS(Graph, Tag, Type)               \
-  typename enable_if_c<(is_base_and_derived<                         \
-                          Tag,                                       \
-                          typename graph_traits<Graph>::traversal_category>::value), \
-                       Type>::type
+#define BOOST_GRAPH_ENABLE_IF_MODELS(Graph, Tag, Type)                    \
+    typename enable_if_c<                                                 \
+        (is_base_and_derived< Tag,                                        \
+            typename graph_traits< Graph >::traversal_category >::value), \
+        Type >::type
 
-#define BOOST_GRAPH_ENABLE_IF_MODELS_PARM(Graph, Tag)                   \
-  , BOOST_GRAPH_ENABLE_IF_MODELS(Graph, Tag,                            \
-                                 ::dgboost::graph::detail::no_parameter)  \
-    = ::dgboost::graph::detail::no_parameter()
+#define BOOST_GRAPH_ENABLE_IF_MODELS_PARM(Graph, Tag)         \
+    ,                                                         \
+        BOOST_GRAPH_ENABLE_IF_MODELS(                         \
+            Graph, Tag, ::dgboost::graph::detail::no_parameter) \
+        = ::dgboost::graph::detail::no_parameter()
 
 #else
 

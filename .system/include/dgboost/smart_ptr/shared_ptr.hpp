@@ -14,23 +14,16 @@
 //  See http://www.boost.org/libs/smart_ptr/ for documentation.
 //
 
-#include <dgboost/config.hpp>   // for broken compiler workarounds
-
-// In order to avoid circular dependencies with Boost.TR1
-// we make sure that our include of <memory> doesn't try to
-// pull in the TR1 headers: that's why we use this header 
-// rather than including <memory> directly:
-#include <dgboost/config/no_tr1/memory.hpp>  // std::auto_ptr
-
-#include <dgboost/assert.hpp>
-#include <dgboost/checked_delete.hpp>
-#include <dgboost/throw_exception.hpp>
 #include <dgboost/smart_ptr/detail/shared_count.hpp>
-#include <dgboost/detail/workaround.hpp>
 #include <dgboost/smart_ptr/detail/sp_convertible.hpp>
 #include <dgboost/smart_ptr/detail/sp_nullptr_t.hpp>
 #include <dgboost/smart_ptr/detail/sp_disable_deprecated.hpp>
 #include <dgboost/smart_ptr/detail/sp_noexcept.hpp>
+#include <dgboost/core/checked_delete.hpp>
+#include <dgboost/throw_exception.hpp>
+#include <dgboost/assert.hpp>
+#include <dgboost/config.hpp>
+#include <dgboost/config/workaround.hpp>
 
 #if !defined(BOOST_SP_NO_ATOMIC_ACCESS)
 #include <dgboost/smart_ptr/detail/spinlock_pool.hpp>
@@ -40,6 +33,7 @@
 #include <functional>           // for std::less
 #include <typeinfo>             // for std::bad_cast
 #include <cstddef>              // for std::size_t
+#include <memory>               // for std::auto_ptr
 
 #if !defined(BOOST_NO_IOSTREAM)
 #if !defined(BOOST_NO_IOSFWD)
@@ -86,7 +80,7 @@ template< class T > struct sp_element< T[] >
     typedef T type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_element< T[N] >
 {
@@ -135,7 +129,7 @@ template< class T > struct sp_dereference< T[] >
     typedef void type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_dereference< T[N] >
 {
@@ -160,7 +154,7 @@ template< class T > struct sp_member_access< T[] >
     typedef void type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_member_access< T[N] >
 {
@@ -185,7 +179,7 @@ template< class T > struct sp_array_access< T[] >
     typedef T & type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_array_access< T[N] >
 {
@@ -380,17 +374,36 @@ public:
     }
 
     //
-    // Requirements: D's copy constructor must not throw
+    // Requirements: D's copy/move constructors must not throw
     //
     // shared_ptr will release p by calling d(p)
     //
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class Y, class D> shared_ptr( Y * p, D d ): px( p ), pn( p, static_cast< D&& >( d ) )
+    {
+        dgboost::detail::sp_deleter_construct( this, p );
+    }
+
+#else
 
     template<class Y, class D> shared_ptr( Y * p, D d ): px( p ), pn( p, d )
     {
         dgboost::detail::sp_deleter_construct( this, p );
     }
 
+#endif
+
 #if !defined( BOOST_NO_CXX11_NULLPTR )
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class D> shared_ptr( dgboost::detail::sp_nullptr_t p, D d ): px( p ), pn( p, static_cast< D&& >( d ) )
+    {
+    }
+
+#else
 
     template<class D> shared_ptr( dgboost::detail::sp_nullptr_t p, D d ): px( p ), pn( p, d )
     {
@@ -398,18 +411,41 @@ public:
 
 #endif
 
+#endif
+
     // As above, but with allocator. A's copy constructor shall not throw.
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class Y, class D, class A> shared_ptr( Y * p, D d, A a ): px( p ), pn( p, static_cast< D&& >( d ), a )
+    {
+        dgboost::detail::sp_deleter_construct( this, p );
+    }
+
+#else
 
     template<class Y, class D, class A> shared_ptr( Y * p, D d, A a ): px( p ), pn( p, d, a )
     {
         dgboost::detail::sp_deleter_construct( this, p );
     }
 
+#endif
+
 #if !defined( BOOST_NO_CXX11_NULLPTR )
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class D, class A> shared_ptr( dgboost::detail::sp_nullptr_t p, D d, A a ): px( p ), pn( p, static_cast< D&& >( d ), a )
+    {
+    }
+
+#else
 
     template<class D, class A> shared_ptr( dgboost::detail::sp_nullptr_t p, D d, A a ): px( p ), pn( p, d, a )
     {
     }
+
+#endif
 
 #endif
 
@@ -631,9 +667,8 @@ public:
 
 #if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
 
-    shared_ptr( shared_ptr && r ) BOOST_SP_NOEXCEPT : px( r.px ), pn()
+    shared_ptr( shared_ptr && r ) BOOST_SP_NOEXCEPT : px( r.px ), pn( static_cast< dgboost::detail::shared_count && >( r.pn ) )
     {
-        pn.swap( r.pn );
         r.px = 0;
     }
 
@@ -647,11 +682,9 @@ public:
     shared_ptr( shared_ptr<Y> && r )
 
 #endif
-    BOOST_SP_NOEXCEPT : px( r.px ), pn()
+    BOOST_SP_NOEXCEPT : px( r.px ), pn( static_cast< dgboost::detail::shared_count && >( r.pn ) )
     {
         dgboost::detail::sp_assert_convertible< Y, T >();
-
-        pn.swap( r.pn );
         r.px = 0;
     }
 
@@ -699,6 +732,20 @@ public:
         this_type( p ).swap( *this );
     }
 
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class Y, class D> void reset( Y * p, D d )
+    {
+        this_type( p, static_cast< D&& >( d ) ).swap( *this );
+    }
+
+    template<class Y, class D, class A> void reset( Y * p, D d, A a )
+    {
+        this_type( p, static_cast< D&& >( d ), a ).swap( *this );
+    }
+
+#else
+
     template<class Y, class D> void reset( Y * p, D d )
     {
         this_type( p, d ).swap( *this );
@@ -708,6 +755,8 @@ public:
     {
         this_type( p, d, a ).swap( *this );
     }
+
+#endif
 
     template<class Y> void reset( shared_ptr<Y> const & r, element_type * p ) BOOST_SP_NOEXCEPT
     {
@@ -775,6 +824,21 @@ public:
     template<class Y> bool owner_before( weak_ptr<Y> const & rhs ) const BOOST_SP_NOEXCEPT
     {
         return pn < rhs.pn;
+    }
+
+    template<class Y> bool owner_equals( shared_ptr<Y> const & rhs ) const BOOST_SP_NOEXCEPT
+    {
+        return pn == rhs.pn;
+    }
+
+    template<class Y> bool owner_equals( weak_ptr<Y> const & rhs ) const BOOST_SP_NOEXCEPT
+    {
+        return pn == rhs.pn;
+    }
+
+    std::size_t owner_hash_value() const BOOST_SP_NOEXCEPT
+    {
+        return pn.hash_value();
     }
 
     void * _internal_get_deleter( dgboost::detail::sp_typeinfo_ const & ti ) const BOOST_SP_NOEXCEPT
@@ -1155,6 +1219,25 @@ template< class T > std::size_t hash_value( dgboost::shared_ptr<T> const & p ) B
 
 } // namespace dgboost
 
+// std::hash
+
+#if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
+
+namespace std
+{
+
+template<class T> struct hash< ::dgboost::shared_ptr<T> >
+{
+    std::size_t operator()( ::dgboost::shared_ptr<T> const & p ) const BOOST_SP_NOEXCEPT
+    {
+        return std::hash< typename ::dgboost::shared_ptr<T>::element_type* >()( p.get() );
+    }
+};
+
+} // namespace std
+
+#endif // #if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
+
 #include <dgboost/smart_ptr/detail/local_sp_deleter.hpp>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
@@ -1174,6 +1257,13 @@ template<class D, class T> D const * basic_get_local_deleter( D const *, shared_
 }
 
 } // namespace detail
+
+#if defined(__cpp_deduction_guides)
+
+template<class T> shared_ptr( weak_ptr<T> ) -> shared_ptr<T>;
+template<class T, class D> shared_ptr( std::unique_ptr<T, D> ) -> shared_ptr<T>;
+
+#endif
 
 } // namespace dgboost
 

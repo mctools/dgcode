@@ -15,7 +15,7 @@
 # include <dgboost/preprocessor/arithmetic/inc.hpp>
 # include <dgboost/preprocessor/comparison/not_equal.hpp>
 # include <dgboost/preprocessor/config/config.hpp>
-# include <dgboost/preprocessor/control/expr_iif.hpp>
+# include <dgboost/preprocessor/control/iif.hpp>
 # include <dgboost/preprocessor/facilities/identity.hpp>
 # include <dgboost/preprocessor/logical/bitand.hpp>
 # include <dgboost/preprocessor/seq/detail/is_empty.hpp>
@@ -31,16 +31,22 @@
 #    define BOOST_PP_SEQ_REST_N_I(n, seq) BOOST_PP_SEQ_REST_N_DETAIL_EXEC(n, seq, BOOST_PP_SEQ_DETAIL_EMPTY_SIZE(seq))
 # endif
 #
+#    define BOOST_PP_SEQ_REST_N_DETAIL_EXEC_NO_MATCH(n, seq)
+#    define BOOST_PP_SEQ_REST_N_DETAIL_EXEC_MATCH(n, seq) \
+            BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_SEQ_SPLIT(BOOST_PP_INC(n), BOOST_PP_IDENTITY( (nil) seq )))() \
+/**/
 #    define BOOST_PP_SEQ_REST_N_DETAIL_EXEC(n, seq, size) \
-		BOOST_PP_EXPR_IIF \
-			( \
-			BOOST_PP_BITAND \
-				( \
-				BOOST_PP_SEQ_DETAIL_IS_NOT_EMPTY_SIZE(size), \
-				BOOST_PP_NOT_EQUAL(n,size) \
-				), \
-			BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_SEQ_SPLIT(BOOST_PP_INC(n), BOOST_PP_IDENTITY( (nil) seq )))() \
-			) \
+        BOOST_PP_IIF \
+            ( \
+            BOOST_PP_BITAND \
+                ( \
+                BOOST_PP_SEQ_DETAIL_IS_NOT_EMPTY_SIZE(size), \
+                BOOST_PP_NOT_EQUAL(n,size) \
+                ), \
+            BOOST_PP_SEQ_REST_N_DETAIL_EXEC_MATCH, \
+            BOOST_PP_SEQ_REST_N_DETAIL_EXEC_NO_MATCH \
+            ) \
+        (n, seq)  \
 /**/
 #
 # endif

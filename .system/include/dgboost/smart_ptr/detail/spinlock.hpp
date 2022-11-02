@@ -28,20 +28,18 @@
 //  #define BOOST_DETAIL_SPINLOCK_INIT <unspecified>
 //
 
+#include <dgboost/smart_ptr/detail/sp_has_gcc_intrinsics.hpp>
+#include <dgboost/smart_ptr/detail/sp_has_sync_intrinsics.hpp>
 #include <dgboost/config.hpp>
-#include <dgboost/smart_ptr/detail/sp_has_sync.hpp>
 
 #if defined( BOOST_SP_USE_STD_ATOMIC )
-# if !defined( __clang__ )
-#   include <dgboost/smart_ptr/detail/spinlock_std_atomic.hpp>
-# else
-//  Clang (at least up to 3.4) can't compile spinlock_pool when
-//  using std::atomic, so substitute the __sync implementation instead.
-#   include <dgboost/smart_ptr/detail/spinlock_sync.hpp>
-# endif
+#  include <dgboost/smart_ptr/detail/spinlock_std_atomic.hpp>
 
 #elif defined( BOOST_SP_USE_PTHREADS )
 #  include <dgboost/smart_ptr/detail/spinlock_pt.hpp>
+
+#elif defined( BOOST_SP_HAS_GCC_INTRINSICS )
+#  include <dgboost/smart_ptr/detail/spinlock_gcc_atomic.hpp>
 
 #elif !defined( BOOST_NO_CXX11_HDR_ATOMIC )
 #  include <dgboost/smart_ptr/detail/spinlock_std_atomic.hpp>
@@ -49,7 +47,7 @@
 #elif defined(__GNUC__) && defined( __arm__ ) && !defined( __thumb__ )
 #  include <dgboost/smart_ptr/detail/spinlock_gcc_arm.hpp>
 
-#elif defined( BOOST_SP_HAS_SYNC )
+#elif defined( BOOST_SP_HAS_SYNC_INTRINSICS )
 #  include <dgboost/smart_ptr/detail/spinlock_sync.hpp>
 
 #elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)

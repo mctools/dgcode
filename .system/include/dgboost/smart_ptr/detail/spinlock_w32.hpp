@@ -18,6 +18,13 @@
 #include <dgboost/smart_ptr/detail/sp_interlocked.hpp>
 #include <dgboost/smart_ptr/detail/yield_k.hpp>
 
+#if defined(BOOST_SP_REPORT_IMPLEMENTATION)
+
+#include <dgboost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("Using Win32 spinlock")
+
+#endif
+
 // BOOST_COMPILER_FENCE
 
 #if defined(__INTEL_COMPILER)

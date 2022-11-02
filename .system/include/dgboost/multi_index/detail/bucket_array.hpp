@@ -1,4 +1,4 @@
-/* Copyright 2003-2018 Joaquin M Lopez Munoz.
+/* Copyright 2003-2022 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -15,10 +15,10 @@
 
 #include <dgboost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
 #include <algorithm>
+#include <dgboost/core/noncopyable.hpp>
 #include <dgboost/multi_index/detail/allocator_traits.hpp>
 #include <dgboost/multi_index/detail/auto_space.hpp>
 #include <dgboost/multi_index/detail/hash_index_node.hpp>
-#include <dgboost/noncopyable.hpp>
 #include <dgboost/preprocessor/repetition/repeat.hpp>
 #include <dgboost/preprocessor/seq/elem.hpp>
 #include <dgboost/preprocessor/seq/enum.hpp>
@@ -171,6 +171,13 @@ public:
   {
     std::swap(size_index_,x.size_index_);
     spc.swap(x.spc);
+  }
+
+  template<typename BoolConstant>
+  void swap(bucket_array& x,BoolConstant swap_allocators)
+  {
+    std::swap(size_index_,x.size_index_);
+    spc.swap(x.spc,swap_allocators);
   }
 
 private:

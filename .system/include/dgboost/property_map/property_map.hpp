@@ -15,7 +15,7 @@
 #include <dgboost/config.hpp>
 #include <dgboost/static_assert.hpp>
 #include <cstddef>
-#include <dgboost/detail/iterator.hpp>
+#include <iterator>
 #include <dgboost/concept/assert.hpp>
 #include <dgboost/concept_check.hpp>
 #include <dgboost/concept_archetype.hpp>
@@ -407,14 +407,14 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost {
   template <class RAIter, class ID>
   inline safe_iterator_property_map<
     RAIter, ID,
-    typename dgboost::detail::iterator_traits<RAIter>::value_type,
-    typename dgboost::detail::iterator_traits<RAIter>::reference>
+    typename std::iterator_traits<RAIter>::value_type,
+    typename std::iterator_traits<RAIter>::reference>
   make_safe_iterator_property_map(RAIter iter, std::size_t n, ID id) {
     BOOST_CONCEPT_ASSERT((RandomAccessIteratorConcept<RAIter>));
     typedef safe_iterator_property_map<
       RAIter, ID,
-      typename dgboost::detail::iterator_traits<RAIter>::value_type,
-      typename dgboost::detail::iterator_traits<RAIter>::reference> PA;
+      typename std::iterator_traits<RAIter>::value_type,
+      typename std::iterator_traits<RAIter>::reference> PA;
     return PA(iter, n, id);
   }
   template <class RAIter, class Value, class ID>
@@ -594,10 +594,6 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost {
   }
 
 } // namespace dgboost
-
-#ifdef BOOST_GRAPH_USE_MPI
-#include <dgboost/property_map/parallel/parallel_property_maps.hpp>
-#endif
 
 #include <dgboost/property_map/vector_property_map.hpp>
 

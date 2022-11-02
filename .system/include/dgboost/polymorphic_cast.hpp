@@ -50,13 +50,19 @@
 #define BOOST_POLYMORPHIC_CAST_HPP
 
 # include <dgboost/config.hpp>
-# include <dgboost/assert.hpp>
-# include <dgboost/throw_exception.hpp>
-# include <typeinfo>
 
 #ifdef BOOST_HAS_PRAGMA_ONCE
 #   pragma once
 #endif
+
+# include <dgboost/assert.hpp>
+# include <dgboost/core/addressof.hpp>
+# include <dgboost/core/enable_if.hpp>
+# include <dgboost/throw_exception.hpp>
+# include <dgboost/type_traits/is_reference.hpp> 
+# include <dgboost/type_traits/remove_reference.hpp>
+
+# include <typeinfo>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {
@@ -79,7 +85,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost
 
 //  polymorphic_downcast  ----------------------------------------------------//
 
-    //  BOOST_ASSERT() checked polymorphic downcast.  Crosscasts prohibited.
+    //  BOOST_ASSERT() checked raw pointer polymorphic downcast.  Crosscasts prohibited.
 
     //  WARNING: Because this cast uses BOOST_ASSERT(), it violates
     //  the One Definition Rule if used in multiple translation units
@@ -93,6 +99,26 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost
     {
         BOOST_ASSERT( dynamic_cast<Target>(x) == x );  // detect logic error
         return static_cast<Target>(x);
+    }
+
+    //  BOOST_ASSERT() checked reference polymorphic downcast.  Crosscasts prohibited.
+
+    //  WARNING: Because this cast uses BOOST_ASSERT(), it violates
+    //  the One Definition Rule if used in multiple translation units
+    //  where BOOST_DISABLE_ASSERTS, BOOST_ENABLE_ASSERT_HANDLER
+    //  NDEBUG are defined inconsistently.
+
+    //  Contributed by Julien Delacroix
+
+    template <class Target, class Source>
+    inline typename dgboost::enable_if_c<
+        dgboost::is_reference<Target>::value, Target
+    >::type polymorphic_downcast(Source& x)
+    {
+        typedef typename dgboost::remove_reference<Target>::type* target_pointer_type;
+        return *dgboost::polymorphic_downcast<target_pointer_type>(
+            dgboost::addressof(x)
+        );
     }
 
 } // namespace dgboost

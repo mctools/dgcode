@@ -19,13 +19,13 @@
 #include <memory>             // TR1 cyclic inclusion fix
 
 #include <dgboost/assert.hpp>
-#include <dgboost/checked_delete.hpp>
+#include <dgboost/core/checked_delete.hpp>
 
 #include <dgboost/smart_ptr/shared_ptr.hpp>
 #include <dgboost/smart_ptr/detail/shared_count.hpp>
 #include <dgboost/smart_ptr/detail/sp_nullptr_t.hpp>
 #include <dgboost/smart_ptr/detail/sp_noexcept.hpp>
-#include <dgboost/detail/workaround.hpp>
+#include <dgboost/config/workaround.hpp>
 
 #include <cstddef>            // for std::ptrdiff_t
 #include <algorithm>          // for std::swap

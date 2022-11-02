@@ -9,6 +9,7 @@
 # include <dgboost/python/detail/referent_storage.hpp>
 # include <dgboost/python/detail/destroy.hpp>
 # include <dgboost/python/detail/type_traits.hpp>
+# include <dgboost/align/align.hpp>
 # include <dgboost/static_assert.hpp>
 # include <cstddef>
 
@@ -132,7 +133,13 @@ template <class T>
 inline rvalue_from_python_data<T>::~rvalue_from_python_data()
 {
     if (this->stage1.convertible == this->storage.bytes)
-        python::detail::destroy_referent<ref_type>(this->storage.bytes);
+    {
+        size_t allocated = sizeof(this->storage);
+        void *ptr = this->storage.bytes;
+        void *aligned_storage =
+            ::dgboost::alignment::align(dgboost::python::detail::alignment_of<T>::value, 0, ptr, allocated);
+        python::detail::destroy_referent<ref_type>(aligned_storage);
+    }
 }
 
 }}} // namespace dgboost::python::converter

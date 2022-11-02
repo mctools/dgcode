@@ -295,6 +295,15 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
             return this->get_value();
         }
 
+        template <typename Default>
+        inline BOOST_CONSTEXPR reference
+            operator[](
+                ::dgboost::parameter::aux::default_r_<key_type,Default> const&
+            ) const
+        {
+            return this->get_value();
+        }
+
         template <typename F>
         inline BOOST_CONSTEXPR reference
             operator[](
@@ -662,7 +671,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
             ::dgboost::parameter::aux::tagged_argument<Keyword,Arg>
           , ::dgboost::parameter::aux::arg_list<
                 ::dgboost::parameter::aux::tagged_argument<Keyword2,Arg2>
-            > 
+            >
         >
             operator,(
                 ::dgboost::parameter::aux
@@ -673,7 +682,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
                 ::dgboost::parameter::aux::tagged_argument<Keyword,Arg>
               , ::dgboost::parameter::aux::arg_list<
                     ::dgboost::parameter::aux::tagged_argument<Keyword2,Arg2>
-                > 
+                >
             >(
                 *this
               , ::dgboost::parameter::aux::arg_list<
@@ -695,7 +704,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
         }
 
 #if defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING) || \
-    BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+    BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
         template <typename KW, typename Default>
         inline BOOST_CONSTEXPR Default&
             get_with_default(

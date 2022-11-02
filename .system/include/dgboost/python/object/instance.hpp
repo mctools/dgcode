@@ -6,7 +6,7 @@
 # define INSTANCE_DWA200295_HPP
 
 # include <dgboost/python/detail/prefix.hpp>
-
+# include <dgboost/python/detail/type_traits.hpp>
 # include <cstddef>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace python
@@ -28,7 +28,7 @@ struct instance
     typedef typename dgboost::python::detail::type_with_alignment<
         dgboost::python::detail::alignment_of<Data>::value
     >::type align_t;
-          
+
     union
     {
         align_t align;
@@ -41,9 +41,10 @@ struct additional_instance_size
 {
     typedef instance<Data> instance_data;
     typedef instance<char> instance_char;
-    BOOST_STATIC_CONSTANT(
-        std::size_t, value = sizeof(instance_data)
-                           - BOOST_PYTHON_OFFSETOF(instance_char,storage));
+    BOOST_STATIC_CONSTANT(std::size_t,
+                          value = sizeof(instance_data) -
+                             BOOST_PYTHON_OFFSETOF(instance_char,storage) +
+                             dgboost::python::detail::alignment_of<Data>::value);
 };
 
 }}} // namespace dgboost::python::object

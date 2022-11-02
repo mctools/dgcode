@@ -14,6 +14,7 @@
 # define BOOST_PREPROCESSOR_VARIADIC_HPP
 #
 # include <dgboost/preprocessor/variadic/elem.hpp>
+# include <dgboost/preprocessor/variadic/has_opt.hpp>
 # include <dgboost/preprocessor/variadic/size.hpp>
 # include <dgboost/preprocessor/variadic/to_array.hpp>
 # include <dgboost/preprocessor/variadic/to_list.hpp>

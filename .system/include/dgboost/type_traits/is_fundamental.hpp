@@ -15,7 +15,7 @@
 namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 
 //* is a type T a fundamental type described in the standard (3.9.1)
-#if defined( __CODEGEARC__ )
+#if defined( BOOST_CODEGEARC )
 template <class T> struct is_fundamental : public integral_constant<bool, __is_fundamental(T)> {};
 #else
 template <class T> struct is_fundamental : public integral_constant<bool, ::dgboost::is_arithmetic<T>::value || ::dgboost::is_void<T>::value> {};

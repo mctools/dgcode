@@ -21,17 +21,6 @@
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {
 
-#ifdef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
-
-template< class C >
-inline BOOST_DEDUCED_TYPENAME range_reverse_iterator<C>::type
-rend( C& c )
-{
-    return BOOST_DEDUCED_TYPENAME range_reverse_iterator<C>::type( dgboost::begin( c ) );
-}
-
-#else
-
 template< class C >
 inline BOOST_DEDUCED_TYPENAME range_reverse_iterator<C>::type
 rend( C& c )
@@ -49,8 +38,6 @@ rend( const C& c )
         iter_type;
     return iter_type( dgboost::begin( c ) );
 }
-
-#endif
 
 template< class T >
 inline BOOST_DEDUCED_TYPENAME range_reverse_iterator<const T>::type

@@ -13,78 +13,83 @@
 #include <dgboost/type_traits/remove_reference.hpp>
 
 #include <dgboost/concept/detail/concept_def.hpp>
-namespace dgboost {} namespace boost = dgboost; namespace dgboost {
+namespace dgboost {} namespace boost = dgboost; namespace dgboost
+{
 
-  BOOST_concept(Buffer, (B))
-  {
+BOOST_concept(Buffer, (B))
+{
     typedef typename B::value_type value_type;
     typedef typename B::size_type size_type;
-    
-    BOOST_CONCEPT_USAGE(Buffer) {
-      typedef typename dgboost::add_reference<value_type>::type reference;
-      
-      BOOST_CONCEPT_ASSERT((Assignable<value_type>));
-      
-      buf.push(g_ct);
-      buf.pop();
-      reference t = buf.top();
-      dgboost::ignore_unused_variable_warning(t);
+
+    BOOST_CONCEPT_USAGE(Buffer)
+    {
+        typedef typename dgboost::add_reference< value_type >::type reference;
+
+        BOOST_CONCEPT_ASSERT((Assignable< value_type >));
+
+        buf.push(g_ct);
+        buf.pop();
+        reference t = buf.top();
+        dgboost::ignore_unused_variable_warning(t);
     }
-    
-    void const_constraints(const B& cbuf) {
-      typedef typename dgboost::add_const<typename dgboost::remove_reference<value_type>::type>::type& const_reference;
-      
-      const_reference ct = cbuf.top();
-      s = cbuf.size();
-      if (cbuf.empty())
-        dummy = __LINE__;
+
+    void const_constraints(const B& cbuf)
+    {
+        typedef typename dgboost::add_const<
+            typename dgboost::remove_reference< value_type >::type >::type&
+            const_reference;
+
+        const_reference ct = cbuf.top();
+        s = cbuf.size();
+        if (cbuf.empty())
+            dummy = __LINE__;
     }
-    
+
     int dummy;
-    
+
     static const value_type g_ct;
     size_type s;
     B buf;
-  };
-  
-  BOOST_concept(UpdatableQueue, (Q))
-    : Buffer<Q>
-  {
-    BOOST_CONCEPT_USAGE(UpdatableQueue) {
-      q.update(g_ct);
+};
+
+BOOST_concept(UpdatableQueue, (Q)) : Buffer< Q >
+{
+    BOOST_CONCEPT_USAGE(UpdatableQueue) { q.update(g_ct); }
+
+    void const_constraints(const Q& cq)
+    {
+        if (cq.contains(g_ct))
+            dummy = __LINE__;
     }
-    
-    void const_constraints(const Q& cq) {
-      if (cq.contains(g_ct))
-        dummy = __LINE__;
-    }
-    
+
     int dummy;
-    
-    static const typename Buffer<Q>::value_type g_ct;
+
+    static const typename Buffer< Q >::value_type g_ct;
     Q q;
-  };
-  
-  BOOST_concept(KeyedUpdatableQueue, (Q))
-    : UpdatableQueue<Q>
-  {
+};
+
+BOOST_concept(KeyedUpdatableQueue, (Q)) : UpdatableQueue< Q >
+{
     typedef typename Q::key_type key_type;
     typedef typename Q::key_map key_map;
-    
-    BOOST_CONCEPT_USAGE(KeyedUpdatableQueue) {
-      BOOST_CONCEPT_ASSERT((dgboost::ReadWritePropertyMapConcept<key_map, typename Buffer<Q>::value_type>));
+
+    BOOST_CONCEPT_USAGE(KeyedUpdatableQueue)
+    {
+        BOOST_CONCEPT_ASSERT((dgboost::ReadWritePropertyMapConcept< key_map,
+            typename Buffer< Q >::value_type >));
     }
-    
-    void const_constraints(const Q& cq) {
-      km = cq.keys();
-      k = get(km, g_ct);
+
+    void const_constraints(const Q& cq)
+    {
+        km = cq.keys();
+        k = get(km, g_ct);
     }
-    
-    static const typename Buffer<Q>::value_type g_ct;
+
+    static const typename Buffer< Q >::value_type g_ct;
     key_type k;
     key_map km;
     Q q;
-  };
+};
 
 } // end `namespace dgboost`
 #include <dgboost/concept/detail/concept_undef.hpp>

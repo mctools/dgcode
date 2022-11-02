@@ -25,7 +25,7 @@
 
 # include <dgboost/type.hpp>
 
-# include <dgboost/detail/iterator.hpp>
+# include <iterator>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace python { namespace objects {
 
@@ -42,7 +42,7 @@ struct iterator_range
 {
     iterator_range(object sequence, Iterator start, Iterator finish);
 
-    typedef dgboost::detail::iterator_traits<Iterator> traits_t;
+    typedef std::iterator_traits<Iterator> traits_t;
 
     struct next
     {

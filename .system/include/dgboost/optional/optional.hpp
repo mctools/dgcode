@@ -1,5 +1,5 @@
 // Copyright (C) 2003, 2008 Fernando Luis Cacciola Carballal.
-// Copyright (C) 2014 - 2018 Andrzej Krzemienski.
+// Copyright (C) 2014 - 2021 Andrzej Krzemienski.
 //
 // Use, modification, and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,7 +18,9 @@
 #define BOOST_OPTIONAL_OPTIONAL_FLC_19NOV2002_HPP
 
 #include <new>
+#ifndef BOOST_NO_IOSTREAM
 #include <iosfwd>
+#endif // BOOST_NO_IOSTREAM
 
 #ifdef BOOST_OPTIONAL_DETAIL_USE_STD_TYPE_TRAITS
 #  include <type_traits>
@@ -35,14 +37,18 @@
 #include <dgboost/type.hpp>
 #include <dgboost/type_traits/alignment_of.hpp>
 #include <dgboost/type_traits/conditional.hpp>
+#include <dgboost/type_traits/conjunction.hpp>
+#include <dgboost/type_traits/disjunction.hpp>
 #include <dgboost/type_traits/has_nothrow_constructor.hpp>
 #include <dgboost/type_traits/type_with_alignment.hpp>
 #include <dgboost/type_traits/remove_const.hpp>
 #include <dgboost/type_traits/remove_reference.hpp>
 #include <dgboost/type_traits/decay.hpp>
+#include <dgboost/type_traits/is_assignable.hpp>
 #include <dgboost/type_traits/is_base_of.hpp>
 #include <dgboost/type_traits/is_const.hpp>
 #include <dgboost/type_traits/is_constructible.hpp>
+#include <dgboost/type_traits/is_convertible.hpp>
 #include <dgboost/type_traits/is_lvalue_reference.hpp>
 #include <dgboost/type_traits/is_nothrow_move_assignable.hpp>
 #include <dgboost/type_traits/is_nothrow_move_constructible.hpp>
@@ -59,6 +65,7 @@
 #include <dgboost/optional/detail/optional_config.hpp>
 #include <dgboost/optional/detail/optional_factory_support.hpp>
 #include <dgboost/optional/detail/optional_aligned_storage.hpp>
+#include <dgboost/optional/detail/optional_hash.hpp>
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace optional_detail {
 
@@ -123,6 +130,7 @@ class optional_base : public optional_tag
   protected :
 
     typedef T value_type ;
+    typedef typename dgboost::remove_const<T>::type unqualified_value_type;
 
   protected:
     typedef T &       reference_type ;
@@ -399,14 +407,14 @@ class optional_base : public optional_tag
 
     void construct ( argument_type val )
      {
-       ::new (m_storage.address()) value_type(val) ;
+       ::new (m_storage.address()) unqualified_value_type(val) ;
        m_initialized = true ;
      }
 
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
     void construct ( rval_reference_type val )
      {
-       ::new (m_storage.address()) value_type( dgboost::move(val) ) ;
+       ::new (m_storage.address()) unqualified_value_type( dgboost::move(val) ) ;
        m_initialized = true ;
      }
 #endif
@@ -418,7 +426,7 @@ class optional_base : public optional_tag
     template<class... Args>
     void construct ( in_place_init_t, Args&&... args )
     {
-      ::new (m_storage.address()) value_type( dgboost::forward<Args>(args)... ) ;
+      ::new (m_storage.address()) unqualified_value_type( dgboost::forward<Args>(args)... ) ;
       m_initialized = true ;
     }
 
@@ -449,13 +457,13 @@ class optional_base : public optional_tag
     template<class Arg>
     void construct ( in_place_init_t, Arg&& arg )
      {
-       ::new (m_storage.address()) value_type( dgboost::forward<Arg>(arg) );
+       ::new (m_storage.address()) unqualified_value_type( dgboost::forward<Arg>(arg) );
        m_initialized = true ;
      }
 
     void construct ( in_place_init_t )
      {
-       ::new (m_storage.address()) value_type();
+       ::new (m_storage.address()) unqualified_value_type();
        m_initialized = true ;
      }
 
@@ -509,20 +517,20 @@ class optional_base : public optional_tag
     template<class Arg>
     void construct ( in_place_init_t, const Arg& arg )
      {
-       ::new (m_storage.address()) value_type( arg );
+       ::new (m_storage.address()) unqualified_value_type( arg );
        m_initialized = true ;
      }
 
     template<class Arg>
     void construct ( in_place_init_t, Arg& arg )
      {
-       ::new (m_storage.address()) value_type( arg );
+       ::new (m_storage.address()) unqualified_value_type( arg );
        m_initialized = true ;
      }
 
     void construct ( in_place_init_t )
      {
-       ::new (m_storage.address()) value_type();
+       ::new (m_storage.address()) unqualified_value_type();
        m_initialized = true ;
      }
 
@@ -667,7 +675,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr&& expr, void const* )
     {
-      new (m_storage.address()) value_type(dgboost::forward<Expr>(expr)) ;
+      new (m_storage.address()) unqualified_value_type(dgboost::forward<Expr>(expr)) ;
       m_initialized = true ;
     }
 
@@ -688,7 +696,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr const& expr, void const* )
      {
-       new (m_storage.address()) value_type(expr) ;
+       new (m_storage.address()) unqualified_value_type(expr) ;
        m_initialized = true ;
      }
 
@@ -726,7 +734,7 @@ class optional_base : public optional_tag
        {
          // An exception can be thrown here.
          // It it happens, THIS will be left uninitialized.
-         new (m_storage.address()) value_type(dgboost::move(expr.get())) ;
+         new (m_storage.address()) unqualified_value_type(dgboost::move(expr.get())) ;
          m_initialized = true ;
        }
      }
@@ -739,7 +747,7 @@ class optional_base : public optional_tag
        {
          // An exception can be thrown here.
          // It it happens, THIS will be left uninitialized.
-         new (m_storage.address()) value_type(expr.get()) ;
+         new (m_storage.address()) unqualified_value_type(expr.get()) ;
          m_initialized = true ;
        }
      }
@@ -777,9 +785,9 @@ class optional_base : public optional_tag
 
 #include <dgboost/optional/detail/optional_trivially_copyable_base.hpp>
 
-// definition of metafunciton is_optional_val_init_candidate
+// definition of metafunction is_optional_val_init_candidate
 template <typename U>
-struct is_optional_related
+struct is_optional_or_tag
   : dgboost::conditional< dgboost::is_base_of<optional_detail::optional_tag, BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type>::value
                      || dgboost::is_same<BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type, none_t>::value
                      || dgboost::is_same<BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type, in_place_init_t>::value
@@ -787,14 +795,22 @@ struct is_optional_related
     dgboost::true_type, dgboost::false_type>::type
 {};
 
+template <typename T, typename U>
+struct has_dedicated_constructor
+  : dgboost::disjunction<is_optional_or_tag<U>, dgboost::is_same<T, BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type> >
+{};
+
+template <typename U>
+struct is_in_place_factory
+  : dgboost::disjunction< dgboost::is_base_of<dgboost::in_place_factory_base, BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type>,
+                        dgboost::is_base_of<dgboost::typed_in_place_factory_base, BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type> >
+{};
+
 #if !defined(BOOST_OPTIONAL_DETAIL_NO_IS_CONSTRUCTIBLE_TRAIT)
 
 template <typename T, typename U>
-struct is_convertible_to_T_or_factory
-  : dgboost::conditional< dgboost::is_base_of<dgboost::in_place_factory_base, BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type>::value
-                     || dgboost::is_base_of<dgboost::typed_in_place_factory_base, BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type>::value
-                     || (dgboost::is_constructible<T, U&&>::value && !dgboost::is_same<T, BOOST_DEDUCED_TYPENAME dgboost::decay<U>::type>::value)
-                      , dgboost::true_type, dgboost::false_type>::type
+struct is_factory_or_constructible_to_T
+  : dgboost::disjunction< is_in_place_factory<U>, dgboost::is_constructible<T, U&&> >
 {};
 
 template <typename T, typename U>
@@ -804,7 +820,7 @@ struct is_optional_constructible : dgboost::is_constructible<T, U>
 #else
 
 template <typename, typename>
-struct is_convertible_to_T_or_factory : dgboost::true_type
+struct is_factory_or_constructible_to_T : dgboost::true_type
 {};
 
 template <typename T, typename U>
@@ -813,10 +829,58 @@ struct is_optional_constructible : dgboost::true_type
 
 #endif // is_convertible condition
 
+#if !defined(BOOST_NO_CXX11_DECLTYPE) && !BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+// for is_assignable
+
+#if (!defined BOOST_NO_CXX11_RVALUE_REFERENCES)
+// On some initial rvalue reference implementations GCC does it in a strange way,
+// preferring perfect-forwarding constructor to implicit copy constructor.
+
 template <typename T, typename U>
+struct is_opt_assignable
+  : dgboost::conjunction<dgboost::is_convertible<U&&, T>, dgboost::is_assignable<T&, U&&> >
+{};
+
+#else
+
+template <typename T, typename U>
+struct is_opt_assignable
+  : dgboost::conjunction<dgboost::is_convertible<U, T>, dgboost::is_assignable<T&, U> >
+{};
+
+#endif
+
+#else
+
+template <typename T, typename U>
+struct is_opt_assignable : dgboost::is_convertible<U, T>
+{};
+
+#endif
+
+template <typename T, typename U>
+struct is_factory_or_opt_assignable_to_T
+  : dgboost::disjunction< is_in_place_factory<U>, is_opt_assignable<T, U> >
+{};
+
+template <typename T, typename U, bool = has_dedicated_constructor<T, U>::value>
 struct is_optional_val_init_candidate
-  : dgboost::conditional< !is_optional_related<U>::value && is_convertible_to_T_or_factory<T, U>::value
-                      , dgboost::true_type, dgboost::false_type>::type
+  : dgboost::false_type
+{};
+
+template <typename T, typename U>
+struct is_optional_val_init_candidate<T, U, false>
+  : is_factory_or_constructible_to_T<T, U>
+{};
+
+template <typename T, typename U, bool = has_dedicated_constructor<T, U>::value>
+struct is_optional_val_assign_candidate
+  : dgboost::false_type
+{};
+
+template <typename T, typename U>
+struct is_optional_val_assign_candidate<T, U, false>
+  : is_factory_or_opt_assignable_to_T<T, U>
 {};
 
 } // namespace optional_detail
@@ -967,7 +1031,7 @@ class optional
     // Can throw if T::T(T&&) does
 
 #ifndef BOOST_OPTIONAL_DETAIL_NO_DEFAULTED_MOVE_FUNCTIONS
-    optional ( optional && rhs ) = default;
+    optional ( optional && ) = default;
 #else
     optional ( optional && rhs )
       BOOST_NOEXCEPT_IF(::dgboost::is_nothrow_move_constructible<T>::value)
@@ -989,7 +1053,7 @@ class optional
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
 
     template<class Expr>
-    BOOST_DEDUCED_TYPENAME dgboost::enable_if<optional_detail::is_optional_val_init_candidate<T, Expr>, optional&>::type
+    BOOST_DEDUCED_TYPENAME dgboost::enable_if<optional_detail::is_optional_val_assign_candidate<T, Expr>, optional&>::type
     operator= ( Expr&& expr )
       {
         this->assign_expr(dgboost::forward<Expr>(expr),dgboost::addressof(expr));
@@ -1581,6 +1645,7 @@ get_pointer ( optional<T>& opt )
 
 } // namespace dgboost
 
+#ifndef BOOST_NO_IOSTREAM
 namespace dgboost {} namespace boost = dgboost; namespace dgboost {
 
 // The following declaration prevents a bug where operator safe-bool is used upon streaming optional object if you forget the IO header.
@@ -1593,6 +1658,7 @@ operator<<(std::basic_ostream<CharType, CharTrait>& os, optional_detail::optiona
 }
 
 } // namespace dgboost
+#endif // BOOST_NO_IOSTREAM
 
 #include <dgboost/optional/detail/optional_relops.hpp>
 #include <dgboost/optional/detail/optional_swap.hpp>

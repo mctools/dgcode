@@ -22,6 +22,13 @@
 #include <dgboost/smart_ptr/detail/spinlock_pool.hpp>
 #include <dgboost/config.hpp>
 
+#if defined(BOOST_SP_REPORT_IMPLEMENTATION)
+
+#include <dgboost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("Using spinlock-based sp_counted_base")
+
+#endif
+
 namespace dgboost {} namespace boost = dgboost; namespace dgboost
 {
 

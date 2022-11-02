@@ -4,8 +4,8 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef ARG_LIST_050329_HPP
-#define ARG_LIST_050329_HPP
+#ifndef BOOST_PARAMETER_AUX_ARG_LIST_HPP
+#define BOOST_PARAMETER_AUX_ARG_LIST_HPP
 
 namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace parameter { namespace aux {
 
@@ -599,7 +599,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
         template <typename KW>
         static ::dgboost::parameter::aux::no_tag has_key(KW*);
 
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
         // The overload set technique doesn't work with these older compilers,
         // so they need some explicit handholding.
 
@@ -670,7 +670,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
 #include <dgboost/core/enable_if.hpp>
 #endif
 
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if !BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
 #include <dgboost/parameter/aux_/preprocessor/nullptr.hpp>
 #endif
 
@@ -767,7 +767,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
             };
         };
 
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if !BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
         // Overload for key_type, so the assert below will fire
         // if the same keyword is used again.
         static ::dgboost::parameter::aux::yes_tag has_key(key_type*);
@@ -827,7 +827,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
         }
 
      public:
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
         // These older compilers don't support the overload set creation
         // idiom well, so we need to do all the return type calculation
         // for the compiler and dispatch through an outer function template.
@@ -927,7 +927,7 @@ namespace dgboost {} namespace boost = dgboost; namespace dgboost { namespace pa
         {
             return this->arg.get_value();
         }
-#else   // !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
+#else   // !BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x564))
         inline BOOST_CONSTEXPR reference
             operator[](::dgboost::parameter::keyword<key_type> const&) const
         {

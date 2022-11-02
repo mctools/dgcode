@@ -13,9 +13,6 @@
 #define BOOST_PREPROCESSOR_REMOVE_PARENS_HPP
 
 #include <dgboost/preprocessor/config/config.hpp>
-
-#if BOOST_PP_VARIADICS
-
 #include <dgboost/preprocessor/control/iif.hpp>
 #include <dgboost/preprocessor/facilities/identity.hpp>
 #include <dgboost/preprocessor/punctuation/is_begin_parens.hpp>
@@ -35,5 +32,4 @@
   BOOST_PP_IDENTITY(BOOST_PP_TUPLE_ENUM(param)) \
 /**/
 
-#endif /* BOOST_PP_VARIADICS */
 #endif /* BOOST_PREPROCESSOR_REMOVE_PARENS_HPP */
