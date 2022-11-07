@@ -49,6 +49,13 @@ namespace dgboost {
       PyErr_Print();
       handle_exception();
     }
+
+    template <class T>
+    inline py::object dg_ptr2pyobj_refexisting( T* t )
+    {
+      return py::object(py::detail::new_reference(typename py::reference_existing_object::apply<T *>::type()(t)));
+    }
+
   }
 }
 
