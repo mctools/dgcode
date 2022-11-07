@@ -235,7 +235,8 @@ class ExportMgr:
             if not l or l.startswith('#'):
                 continue
             commithash,version=l.split('#',1)[0].split()
-            assert len(commithash) == 40
+            #assert len(commithash) == 40
+            assert len(commithash) >= 39
             version_parts=tuple(int(v) for v in version.split('.'))
             assert len(version_parts)==3
             assert not commithash in out,'duplicate commit hashes'
