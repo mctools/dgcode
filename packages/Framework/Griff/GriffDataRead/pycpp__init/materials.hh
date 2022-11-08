@@ -10,7 +10,7 @@ namespace GriffDataRead {
       auto elem = m->getElement(i);
       l.append( py::dg_ptr2pyobj_refexisting( elem ) );
     }
-    return l;
+    return std::move(l);
   }
   py::object py_get_isotope_list( const Element*elem )
   {
@@ -20,7 +20,7 @@ namespace GriffDataRead {
     for ( unsigned i = 0; i < n; ++i ) {
       l.append( py::dg_ptr2pyobj_refexisting( elem->getIsotope(i) ) );
     }
-    return l;
+    return std::move(l);
   }
 
   //Due to lack of overloading, we add dump methods directly to the objects in python:
