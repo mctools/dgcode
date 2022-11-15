@@ -1,3 +1,11 @@
+#Just before writing, we also decodes all the link flags (here for global
+#variables and further below for each extdep):
+decode_link_options( "${DG_GLOBAL_LINK_FLAGS}" CXX DG_GLOBAL_LINK_FLAGS )
+decode_link_options( "${DG_GLOBAL_LINK_FLAGS_PREPENDED}" CXX DG_GLOBAL_LINK_FLAGS_PREPENDED )
+foreach( lang C CXX Fortran )
+  decode_link_options( "${CMAKE_${lang}_EXECLINK_FLAGS}" ${lang} CMAKE_${lang}_EXECLINK_FLAGS )
+  decode_link_options( "${CMAKE_${lang}_LINK_FLAGS}" ${lang} CMAKE_${lang}_EXECLINK_FLAGS )
+endforeach()
 
 set(output_file ${CMAKE_CURRENT_BINARY_DIR}/${output_filename})
 file(WRITE ${output_file} "#Dependency information extracted via cmake\n")
@@ -70,6 +78,7 @@ endforeach()
 
 foreach(extdep ${extdep_all})
   if (HAS_${extdep})
+    decode_link_options( "${ExtDep_${extdep}_LINK_FLAGS}" CXX ExtDep_${extdep}_LINK_FLAGS )
     list(APPEND extdep_present ${extdep})
     file(${oa} "EXT@${extdep}@PRESENT@1\n")
     file(${oa} "EXT@${extdep}@LINK@${ExtDep_${extdep}_LINK_FLAGS}\n")
