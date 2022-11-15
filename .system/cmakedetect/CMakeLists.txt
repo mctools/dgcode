@@ -15,7 +15,7 @@ if (DG_QUIET)
   endfunction()
 endif()
 
-project(DETECT)
+project( DETECT LANGUAGES C CXX )
 
 set(output_filename "cmakecfg.txt")
 
