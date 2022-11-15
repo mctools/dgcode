@@ -22,6 +22,10 @@ def standardMPLFixes():
     import matplotlib.pyplot
     import matplotlib.figure
     import matplotlib.scale
+    try:
+        import matplotlib.backends.backend_pdf
+    except ImportError:
+        pass
     disableFPEDuringCall(matplotlib.pyplot,'tight_layout')
     disableFPEDuringCall(matplotlib.figure.Figure,'tight_layout')
     disableFPEDuringCall(matplotlib.figure.Figure,'savefig')
