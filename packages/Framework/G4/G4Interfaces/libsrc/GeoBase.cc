@@ -73,7 +73,7 @@ G4Interfaces::GeoBase::PlacedVols G4Interfaces::GeoBase::place(G4VSolid* shape,G
   auto lv = new G4LogicalVolume(shape, mat, name ? G4String(name) : shape->GetName());
   auto pv = new G4PVPlacement(rot, G4ThreeVector(x,y,z), lv, name ? G4String(name) : shape->GetName(), mother, false, copyNum, m_checkOverlaps);
   if (col.GetAlpha()<1.0e-13) {
-    lv->SetVisAttributes(G4VisAttributes::Invisible);
+    lv->SetVisAttributes(G4VisAttributes::GetInvisible());
   } else {
     static std::map<G4Colour,G4VisAttributes*,impGeoBase__compare_colour> cache;
     auto it = cache.find(col);
@@ -98,7 +98,7 @@ G4Interfaces::GeoBase::PlacedVols G4Interfaces::GeoBase::place(G4VSolid* shape,G
   auto lv = new G4LogicalVolume(shape, mat, name ? G4String(name) : shape->GetName());
   auto pv = new G4PVPlacement(trf, lv, name ? G4String(name) : shape->GetName(), mother, false, copyNum, m_checkOverlaps);
   if (col.GetAlpha()<1.0e-13) {
-    lv->SetVisAttributes(G4VisAttributes::Invisible);
+    lv->SetVisAttributes(G4VisAttributes::GetInvisible());
   } else {
     static std::map<G4Colour,G4VisAttributes*,impGeoBase__compare_colour> cache;
     auto it = cache.find(col);
@@ -123,7 +123,7 @@ G4Interfaces::GeoBase::PlacedVols G4Interfaces::GeoBase::place(G4LogicalVolume* 
 {
   auto pv = new G4PVPlacement(rot, G4ThreeVector(x,y,z), lv, name ? G4String(name) : lv->GetName(), mother, false, copyNum, m_checkOverlaps);
   if (col.GetAlpha()<1.0e-13) {
-    lv->SetVisAttributes(G4VisAttributes::Invisible);
+    lv->SetVisAttributes(G4VisAttributes::GetInvisible());
   } else {
     static std::map<G4Colour,G4VisAttributes*,impGeoBase__compare_colour> cache;
     auto it = cache.find(col);
@@ -147,7 +147,7 @@ G4Interfaces::GeoBase::PlacedVols G4Interfaces::GeoBase::place(G4LogicalVolume* 
 {
   auto pv = new G4PVPlacement(trf, lv, name ? G4String(name) : lv->GetName(), mother, false, copyNum, m_checkOverlaps);
   if (col.GetAlpha()<1.0e-13) {
-    lv->SetVisAttributes(G4VisAttributes::Invisible);
+    lv->SetVisAttributes(G4VisAttributes::GetInvisible());
   } else {
     static std::map<G4Colour,G4VisAttributes*,impGeoBase__compare_colour> cache;
     auto it = cache.find(col);

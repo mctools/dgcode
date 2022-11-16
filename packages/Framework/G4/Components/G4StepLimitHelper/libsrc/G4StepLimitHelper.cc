@@ -52,7 +52,8 @@ void G4StepLimitHelper::set(volume *v, G4int pgdCode, G4double uStepMax)
       bool model_exist=false;
 
       const G4ProcessVector* pl = pmanager->GetProcessList();
-      for (G4int i=0;i<pl->size();++i) {
+      auto size_pl = pl->size();
+      for (decltype(size_pl) i=0;i<pl->size();++i) {
         if (!pmanager->GetProcessActivation(i))
           continue;
         G4StepLimiter* model = dynamic_cast<G4StepLimiter*>((*pl)[i]);
