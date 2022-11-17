@@ -97,6 +97,7 @@ def _add_help_text(fig,ax,histtype):
     #NB: Move to figure to avoid colorbar overlapping in 2d plots (colorbars
     #reside in different subplots):
     ax.texts.remove(ib)
+    ib.figure = fig
     fig.texts.append(ib)
     ib.set_visible(False)
     ib.set_zorder(99999)#big number, one bigger than for statbox
@@ -149,6 +150,7 @@ def _add_statbox(fig,ax,stats,vis,snap_to_corner=False):
     #NB: Move to figure to avoid colorbar overlapping in 2d plots (colorbars
     #reside in different subplots):
     ax.texts.remove(sb)
+    sb.figure = fig
     fig.texts.append(sb)
     sb.set_visible(vis)
     sb.set_zorder(99998)#big number, one smaller than for infobox
