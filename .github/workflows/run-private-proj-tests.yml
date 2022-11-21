@@ -7,10 +7,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  privateProjects:
-    uses:  mctools/dgcode_actions/.github/workflows/run_private_projects_tests.yml@main
+  use-test-workflow:
+    uses: mctools/dgcode_actions/.github/workflows/run_tests.yml@main
     secrets:
       PRIVATE_PROJ_REPO_URL: ${{ secrets.PRIVATE_PROJ_REPO_URL }}
       PRIVATE_PROJ_REPO_PAT: ${{ secrets.PRIVATE_PROJ_REPO_PAT }}
     with:
+      pkg-repo: dgcode/dgcode_private_projects
+      pkg-repo-branch: main
       dgcode-branch: '${{ github.ref_name }}'
+      setup-choice: defaults
