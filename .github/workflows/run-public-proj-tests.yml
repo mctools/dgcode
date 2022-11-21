@@ -1,0 +1,16 @@
+name: Call Public Projects test workflow
+
+on:
+  push:
+  schedule:
+    - cron: '30 23 * * 0'  # 23:30 every Sunday
+  workflow_dispatch:
+
+jobs:
+  use-test-workflow:
+    uses: mctools/dgcode_actions/.github/workflows/run_tests.yml@main
+    with:
+      pkg-repo: ess-dg/dgcode_projects
+      pkg-repo-branch: main
+      dgcode-branch: '${{ github.ref_name }}'
+      setup-choice: defaults

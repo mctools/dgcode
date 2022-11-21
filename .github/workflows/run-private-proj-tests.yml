@@ -2,7 +2,6 @@ name: Call Private Projects test workflow
 
 on:
   push:
-    branches: [ main ]
   schedule:
     - cron: '30 23 * * 0'  # 23:30 every Sunday
   workflow_dispatch:
@@ -13,4 +12,5 @@ jobs:
     secrets:
       PRIVATE_PROJ_REPO_URL: ${{ secrets.PRIVATE_PROJ_REPO_URL }}
       PRIVATE_PROJ_REPO_PAT: ${{ secrets.PRIVATE_PROJ_REPO_PAT }}
-  
+    with:
+      dgcode-branch: '${{ github.ref_name }}'
