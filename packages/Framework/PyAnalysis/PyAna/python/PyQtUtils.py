@@ -23,7 +23,7 @@ from PyQt5 import QtCore, QtWidgets
 
 try:
     import matplotlib
-    if not matplotlib.compare_versions(matplotlib.__version__,'3.1.3'):
+    if hasattr(matplotlib,'compare_versions') and not matplotlib.compare_versions(matplotlib.__version__,'3.1.3'):
         print("WARNING: Your version of matplotlib is too old to work properly with pyqt5. Please upgrade.")
         print('         If using pip, this can perhaps be done by: python3 -mpip install --upgrade matplotlib')
 except ImportError:
