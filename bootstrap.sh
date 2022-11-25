@@ -7,7 +7,7 @@ fi
 
 function _dgcode_prunepath() {
     P=$(IFS=:;for p in ${!1}; do [[ $p != ${2}* ]] && echo -n ":$p"; done)
-    export $1=${P:1:99999}
+    export $1="${P:1:99999}"
 }
 
 for tmp in DGCODE_INSTALL_DIR_RESOLVED ESS_INSTALL_PREFIX; do

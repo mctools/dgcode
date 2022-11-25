@@ -147,7 +147,7 @@ class stdinstaller:
         fluff=['','#'*(len(fluff)+2),fluff+' #','#'*(len(fluff)+2),'']
         prunepath=['function prunepath() {',
                    '    P=$(IFS=:;for p in ${!1:-}; do [[ $p != ${2}* ]] && echo -n ":$p"; done)',
-                   '    export $1=${P:1:99999}',
+                   '    export $1="${P:1:99999}"',
                    '}','']
         setup_cont=self.setup_file_contents(instdir)
         pev=self.prefix_env_var()

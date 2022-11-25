@@ -26,7 +26,7 @@ if [ "x$<pn>_INSTALL_PREFIX" != "x$DIR" ]; then
         # Undo effect of sourcing setup file in different location
         function prunepath() {
             P=$(IFS=:;for p in ${!1:-}; do [[ $p != ${2}* ]] && echo -n ":$p"; done)
-            export $1=${P:1:99999}
+            export $1="${P:1:99999}"
         }
         prunepath PATH $<pn>_INSTALL_PREFIX
         prunepath PYTHONPATH $<pn>_INSTALL_PREFIX

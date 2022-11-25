@@ -886,7 +886,7 @@ for i in "$DGDEPDIR_tmptmp/extras"/*/unsetup.sh; do
 done
 function prunepath() {
     P=$(IFS=:;for p in ${!1:-}; do [[ $p != ${2}* ]] && echo -n ":$p"; done)
-    export $1=${P:1:99999}
+    export $1="${P:1:99999}"
 }
 if [ "x${DGDEPDIR}" == "x${DGDEPDIR_tmptmp}" ]; then
     unset DGDEPDIR
