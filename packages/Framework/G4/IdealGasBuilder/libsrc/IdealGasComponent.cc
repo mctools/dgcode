@@ -50,7 +50,7 @@ void IdealGas::Component::addElement(G4Element* el, double count)
   m_name += el->GetName();
   if (count!=1.0) {
     char buf[64];
-    int n = sprintf(buf, "%g",count);
+    int n = snprintf(buf, 64, "%g",count);
     if (n>63)
       throw std::runtime_error("IdealGas::Component::addElement buffer error");
     m_name.append(buf,n);

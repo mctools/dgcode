@@ -312,7 +312,7 @@ void G4Launcher::Launcher::Imp::preinit_vis(Launcher * launcher)
   m_vis->Initialize();
   launcher->cmd("/vis/scene/create");
   std::string tmp; tmp.resize(m_visengine.size()+20);
-  int ntmp = sprintf ( &tmp[0], "/vis/open %s",m_visengine.c_str());
+  int ntmp = snprintf ( &tmp[0], m_visengine.size()+20, "/vis/open %s",m_visengine.c_str());
   assert(ntmp<(int)tmp.size());
   tmp.resize(ntmp);
   launcher->cmd(tmp.c_str());
