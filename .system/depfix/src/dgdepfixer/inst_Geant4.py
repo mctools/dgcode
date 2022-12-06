@@ -30,10 +30,15 @@ class Geant4Installer(DG.installutils.stdinstaller):
     def in_source_buildandconfig(self): return False
     def dbg_flags(self): return ['-DCMAKE_BUILD_TYPE=Debug','-DCMAKE_DEBUG_POSTFIX=','-DCMAKE_CXX_FLAGS_DEBUG=-g -UG4FPE_DEBUG']
     def configure_command(self,instdir,srcdir,blddir,version,extra_options):
-        flags=['-DCMAKE_INSTALL_PREFIX=%s'%instdir,
-               '-Wno-dev',
-               '-DCMAKE_CXX_STANDARD=17',
-               '-DCMAKE_BUILD_TYPE=Release']
+        flags=[ '-DCMAKE_INSTALL_PREFIX=%s'%instdir,
+                '-Wno-dev',
+                '-DCMAKE_CXX_STANDARD=17',
+                '-DCMAKE_BUILD_TYPE=Release',
+                '-DGEANT4_BUILD_TLS_MODEL=global-dynamic',#Needed when launching G4 from Python
+                 #(see https://geant4-forum.web.cern.ch/t/how-to-install-g4-python-environment-for-mac-g4py/3538/6)
+                '-DBUILD_SHARED_LIBS=ON',#seen in the geant4-feedstock conda-forge recipe so using here for safety
+               ]
+
 
         if version.startswith('10.') or version.startswith('v10.'):
             g4cxxstd_val = 'c++17' if (version.startswith('10.04') or version.startswith('10.00')) else '17'
@@ -54,9 +59,10 @@ class Geant4Installer(DG.installutils.stdinstaller):
                       '-DGEANT4_USE_RAYTRACER_X11=ON',
                       '-DGEANT4_USE_QT=ON',
                       '-DGEANT4_USE_XM=ON']
-        if self._extraopt_mt:
+
+        if self._extraopt_mt or version.startswith('11.') or version.startswith('v11.'):
             flags += [ '-DGEANT4_BUILD_MULTITHREADED=ON' ]
-            flags += [ '-DGEANT4_BUILD_TLS_MODEL=global-dynamic' ]#Needed when launching G4 from Python
+
         flags+=extra_options
         return ['cmake']+self._prune_duplicate_flags(flags)+[str(srcdir)]
     def validate_version(self,version):
@@ -97,7 +103,7 @@ class Geant4Installer(DG.installutils.stdinstaller):
         parser.add_argument("--nodata",default=False,action='store_true',dest="extraopt_nodata",
                             help=hidefullfct('Set to disable download and installation of Geant4 process data (expert users only!).'))
         parser.add_argument("--mt",default=False,action='store_true',dest="extraopt_mt",
-                            help=hidefullfct('Set to build Geant4 with with support for multi-threading (expert users only).'))
+                            help=hidefullfct('Set to build Geant4 with with support for multi-threading. NOTE: MT builds will ALWAYS be enabled for G4 11.x.y'))
         return
     def get_parser_options(self,opt):
         setattr(self,'_extraopt_gui',opt.extraopt_gui)
