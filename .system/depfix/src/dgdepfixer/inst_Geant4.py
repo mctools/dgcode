@@ -14,20 +14,33 @@ class Geant4Installer(DG.installutils.stdinstaller):
         if version=='10.04.p03':
             #Need patch which backports C++17 fixes to 10.4.3 (from https://github.com/ess-dg/geant4-dgpatches):
             return 'http://tkittel.web.cern.ch/tkittel/depfix/geant4.%s_dgpatch1.tar.gz'%version
+        if version.startswith('11.') or version.startswith('v'):
+            old_p = any( e.startswith('.p') for e in version.split('.') )
+            old_00 = any( ( len(e)>1 and e.startswith('0') ) for e in version.split('.') )
+            if old_p or old_00:
+                raise SystemExit('Error: use syntax 11.0.3 or v11.0.3 rather than 11.00.p03')
+            _ = version if version.startswith('v') else 'v'+version
+            return 'https://gitlab.cern.ch/geant4/geant4/-/archive/%s/geant4-%s.tar.gz'%(_,_)
         return 'http://cern.ch/geant4-data/releases/geant4.%s.tar.gz'%version
+
     def unpack_command(self,version):
         assert version
-        return ['python3','-mtarfile','-e','geant4.%s*.tar.gz'%version]
-    def src_work_subdir(self,version): return 'geant4*.%s/'%version
+        return ['python3','-mtarfile','-e','geant4*%s*.tar.gz'%version]
+    def src_work_subdir(self,version): return 'geant4*%s/'%version
     def in_source_buildandconfig(self): return False
     def dbg_flags(self): return ['-DCMAKE_BUILD_TYPE=Debug','-DCMAKE_DEBUG_POSTFIX=','-DCMAKE_CXX_FLAGS_DEBUG=-g -UG4FPE_DEBUG']
     def configure_command(self,instdir,srcdir,blddir,version,extra_options):
-        g4cxxstd_val = 'c++17' if (version.startswith('10.04') or version.startswith('10.00')) else '17'
         flags=['-DCMAKE_INSTALL_PREFIX=%s'%instdir,
                '-Wno-dev',
-               '-DGEANT4_BUILD_CXXSTD=%s'%g4cxxstd_val,#=c++17 confirmed to work with g4 10.04, and =17 with 10.07.
                '-DCMAKE_CXX_STANDARD=17',
                '-DCMAKE_BUILD_TYPE=Release']
+
+        if version.startswith('10.') or version.startswith('v10.'):
+            g4cxxstd_val = 'c++17' if (version.startswith('10.04') or version.startswith('10.00')) else '17'
+            flags += [ '-DGEANT4_BUILD_CXXSTD=%s'%g4cxxstd_val ]#=c++17 confirmed to work with g4 10.04, and =17 with 10.07.
+        else:
+            flags += [ '-DCMAKE_CXX_STANDARD_REQUIRED=ON' ]
+
         if not any('GEANT4_USE_SYSTEM_CLHEP' in eo for eo in extra_options):
             flags +=['-DGEANT4_USE_SYSTEM_CLHEP=OFF']
         if not any('GEANT4_USE_SYSTEM_EXPAT' in eo for eo in extra_options):
