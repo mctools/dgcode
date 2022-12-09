@@ -1,3 +1,4 @@
+#include "Core/Python.hh"//for dynamic NCrystalDev support
 #include "G4Materials/NamedMaterialProvider.hh"
 #include "G4Materials/CommonMaterials.hh"
 #include "G4Materials/ShieldingMaterials.hh"
@@ -217,7 +218,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
           return NC::NullOpt;
         auto parts = NC::StrView(ss).splitTrimmedNoEmpty(':');
         if ( parts.empty()
-             || NC::isOneOf(parts.at(0),"IdealGas","NCrystal","MIX","ESS_B4C","ESS_POLYETHYLENE") )
+             || NC::isOneOf(parts.at(0),"IdealGas","NCrystal","NCrystalDev","MIX","ESS_B4C","ESS_POLYETHYLENE") )
           return NC::NullOpt;
         NC::Optional<NC::MatCfg> res;
         try {
@@ -253,6 +254,8 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     allowedproperties.insert("formula");
   } else if (matinfo.name=="ESS_POLYETHYLENE") {
     //nothing special (should anyway end up as TS_POLYETHYLENE (and we should have option to create TS mats from G4 nist mats
+  } else if (matinfo.name=="NCrystalDev") {
+    allowedproperties.insert("cfg");
   } else if (matinfo.name=="NCrystal") {
     allowedproperties.insert("cfg");
     allowedproperties.insert("overridebaseg4mat");//can specify G4 NIST material to combine with NC::Scatter
@@ -406,6 +409,29 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     // mat->SetChemicalFormula(mat_orig->GetChemicalFormula());
     // mat->GetIonisation()->SetMeanExcitationEnergy(mat_orig->GetIonisation()->GetMeanExcitationEnergy());
 
+  } else if (matinfo.name=="NCrystalDev") {
+    std::string cfgstr = matinfo.propertyAsString("cfg","");
+    cfgstr += matinfo.getTempAsNCrystalCfgStrPostfix();
+    cfgstr += matinfo.getDensityAsNCrystalCfgStrPostfix();
+    //Use NCrystal from the NCrystalPreview package in the ncrystaldev repo, but
+    //use python bindings to avoid a static dependency (FIXME: It would be
+    //better to enable dynamic "NamedMaterial factories" and have such a factory
+    //in the NCrystalDev repo!!!).
+    {
+      const char * essinstdir = getenv("ESS_INSTALL_PREFIX");
+      if ( !essinstdir || !Core::file_exists(std::string(essinstdir)+"/python/NCrystalPreview/__init__.py") ) {
+        throw std::runtime_error("ERROR: In order to use \"NCrystalDev\" materials the NCrystalPreview package\n"
+                                 "must be enabled. This is intended solely for code in the ncrystaldev repo, most\n"
+                                 "users should use \"NCrystal\" instead of \"NCrystalDev\".\n");
+      }
+      py::ensurePyInit();
+      py::object mod = py::import("NCrystalPreview");
+      py::object pyg4mat = mod.attr("createMaterial")(py::str(cfgstr));
+      boost::shared_ptr<G4Material> bpmat = py::extract<boost::shared_ptr<G4Material> >(pyg4mat);
+      mat = bpmat.get();
+      //Nasty trick to get boost::shared_ptr to release the material ptr:
+      new(&bpmat) boost::shared_ptr<G4Material>();
+    }
   } else if (matinfo.name=="NCrystal") {
     const std::string& overridebaseg4mat = matinfo.propertyAsString("overridebaseg4mat","");
     std::string cfgstr = matinfo.propertyAsString("cfg","");
