@@ -1,9 +1,10 @@
-#include "Core/Python.hh"
 #include "G4Materials/NamedMaterialProvider.hh"
 #include "G4Materials/CommonMaterials.hh"
 #include "G4Materials/ShieldingMaterials.hh"
 #include "G4NCrystalRel/G4NCrystal.hh"
 #include "NCrystalRel/NCrystal.hh"
+#include "NCrystalRel/internal_NCCfgTypes.hh"
+#include "NCrystalRel/internal_NCMath.hh"
 #include "IdealGasBuilder/IdealGasBuilder.hh"
 #include "Core/Units.hh"
 #include "Core/Constants.hh"
@@ -15,6 +16,9 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
+
+namespace NC = NCrystalRel;
+namespace G4NC = G4NCrystalRel;
 
 namespace NamedMaterialProvider {
 
@@ -59,7 +63,7 @@ namespace NamedMaterialProvider {
       return dbl;
     }
 
-    const std::string& propertyAsString(const std::string&p, const std::string& default_value) const {
+    std::string propertyAsString(const std::string&p, const std::string& default_value) const {
       auto it = properties.find(p);
       if (it==properties.end())
         return default_value;
@@ -69,6 +73,7 @@ namespace NamedMaterialProvider {
     bool hasNonDefaultDensity() const {
       return hasProperty("scale_density")||hasProperty("density_gcm3")||hasProperty("density_kgm3");
     }
+
     double getDensity(double default_density) const {
       if (hasProperty("scale_density"))
         return default_density * propertyAsDouble("scale_density",1.0);
@@ -77,6 +82,32 @@ namespace NamedMaterialProvider {
       if (hasProperty("density_kgm3"))
         return propertyAsDouble("density_kgm3",default_density/(Units::kilogram/Units::meter3))*(Units::kilogram/Units::meter3);
       return default_density;
+    }
+
+    std::string getDensityAsNCrystalCfgStrPostfix() const {
+      if (hasProperty("scale_density")) {
+        std::ostringstream os;
+        os << ";density="<<NC::fmt( propertyAsDouble("scale_density",-999.0) ) << "x";
+        return os.str();
+      } else if (hasProperty("density_gcm3")) {
+        std::ostringstream os;
+        os << ";density="<<NC::fmt( propertyAsDouble("density_gcm3", -999.0) ) << "gcm3";
+        return os.str();
+      } else if (hasProperty("density_kgm3")) {
+        std::ostringstream os;
+        os << ";density="<<NC::fmt( propertyAsDouble("density_kgm3",-999.0) ) << "kgm3";
+        return os.str();
+      }
+      return std::string();
+    }
+
+    std::string getTempAsNCrystalCfgStrPostfix() const {
+      if (hasProperty("temp_kelvin")) {
+        std::ostringstream ss;
+        ss << ";temp="<<NC::fmt( propertyAsDouble("temp_kelvin",-999.0) ) << "K";
+        return ss.str();
+      }
+      return std::string();
     }
 
     void bad(const char*c) const {
@@ -154,16 +185,58 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     return itCache->second;
   }
 
+  auto validate = []( const G4Material * mat)
+  {
+    if ( !mat )
+      throw std::runtime_error("NamedMaterialProvider ERROR: Would return nullptr");
+    //Guard against: https://bugzilla-geant4.kek.jp/show_bug.cgi?id=2520:
+    if ( mat->GetBaseMaterial() && mat->GetBaseMaterial()->GetBaseMaterial() )
+      throw std::runtime_error("NamedMaterialProvider ERROR: Would return double-based material which is not supported");
+    return const_cast<G4Material*>(mat); //FIXME!
+
+    //FIXME: We should return const g4materials!!!
+  };
+
+
+
+
   //Map aliases (only on exact string contents, no other parameters allowed to keep support trivial):
   if (ss=="ESS_Al") ss = "NCrystal:cfg=NCrystalRel/Al_sg225.ncmat";
   else if (ss=="ESS_Cu") ss = "NCrystal:cfg=NCrystalRel/Cu_sg225.ncmat";
   else if (ss=="ESS_Ti") ss = "NCrystal:cfg=NCrystalRel/Ti_sg194.ncmat";
   else if (ss=="ESS_V") ss = "NCrystal:cfg=NCrystalRel/V_sg229.ncmat";
 
+#if 0
+  //Support pure NCrystal cfg strings:
+  {
+    auto ncrystal_matcfg = [&ss]() -> NC::Optional<NC::MatCfg>
+      {
+        if ( NC::StrView(ss).contains_any(NC::Cfg::forbidden_chars_multiphase ) )
+          return NC::NullOpt;
+        if ( !NC::StrView(ss).contains_any(".;:" ) )
+          return NC::NullOpt;
+        auto parts = NC::StrView(ss).splitTrimmedNoEmpty(':');
+        if ( parts.empty()
+             || NC::isOneOf(parts.at(0),"IdealGas","NCrystal","MIX","ESS_B4C","ESS_POLYETHYLENE") )
+          return NC::NullOpt;
+        NC::Optional<NC::MatCfg> res;
+        try {
+          NC::MatCfg trycfg( ss );
+          res = std::move(trycfg);
+        } catch ( NC::Error::BadInput& ) {
+        }
+        return res;
+      }();
+
+    if ( ncrystal_matcfg.has_value() ) {
+      //No caching, just rely on NCrystal:
+      return validate( G4NC::createMaterial( ncrystal_matcfg.value() ) );
+    }
+  }
+#endif
+
   //Decode:
   MatInfo matinfo(ss);
-
-
 
   ////////////////////////////////////////////////////////
   ////// Check that only allowed properties are set //////
@@ -180,10 +253,9 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     allowedproperties.insert("formula");
   } else if (matinfo.name=="ESS_POLYETHYLENE") {
     //nothing special (should anyway end up as TS_POLYETHYLENE (and we should have option to create TS mats from G4 nist mats
-  } else if (matinfo.name=="NCrystal"||matinfo.name=="NCrystalDev") {
+  } else if (matinfo.name=="NCrystal") {
     allowedproperties.insert("cfg");
-    if (matinfo.name=="NCrystal")
-      allowedproperties.insert("overridebaseg4mat");//NCrystalRel users can specify G4 NIST material to combine with NCrystalRel::Scatter
+    allowedproperties.insert("overridebaseg4mat");//can specify G4 NIST material to combine with NC::Scatter
   } else if (matinfo.name=="MIX") {//
     allowedproperties.insert("comp1");
     allowedproperties.insert("comp2");
@@ -334,61 +406,29 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     // mat->SetChemicalFormula(mat_orig->GetChemicalFormula());
     // mat->GetIonisation()->SetMeanExcitationEnergy(mat_orig->GetIonisation()->GetMeanExcitationEnergy());
 
-  } else if (matinfo.name=="NCrystalDev") {
-    const char * essinstdir = getenv("ESS_INSTALL_PREFIX");
-    if (!Core::file_exists(std::string(essinstdir?essinstdir:"/??missing??")+"/python/NCrystalPreview/__init__.py")) {
-      printf("%sERROR: In order to use \"NCrystalDev\" materials the NCrystalPreview package\n"
-             "must be enabled. For example by adding it to a pkg.info file in your project.\n"
-             "Note that \"NCrystalDev\" materials use bleeding-edge NCrystal development code\n"
-             "from Projects/NCrystal. Use \"NCrystal\" instead to use the last stable version\n"
-             "of NCrystal from Framework/External/NCrystal.\n",s_prefix.c_str());
-      exit(1);
-    }
-    py::ensurePyInit();
-    const std::string& cfg = matinfo.propertyAsString("cfg","");
-    py::object mod = py::import("NCrystalPreview");
-    py::object pyg4mat = mod.attr("createMaterial")(py::str(cfg));
-    boost::shared_ptr<G4Material> bpmat = py::extract<boost::shared_ptr<G4Material> >(pyg4mat);
-    mat = bpmat.get();
-    //Nasty trick to get boost::shared_ptr to release the material ptr:
-    new(&bpmat) boost::shared_ptr<G4Material>();
-    if (matinfo.hasNonDefaultDensity()||matinfo.hasProperty("temp_kelvin")) {
-      //wrap the pure ncrystal material in a material with changed density and/or temp:
-      G4Material * mat0 = mat;
-      mat = new G4Material(matinfo.fullname.c_str(),
-                           matinfo.getDensity(mat0->GetDensity()),
-                           mat0,
-                           mat0->GetState(),
-                           matinfo.propertyAsDouble("temp_kelvin",mat->GetTemperature()),
-                           mat0->GetPressure());
-    }
   } else if (matinfo.name=="NCrystal") {
     const std::string& overridebaseg4mat = matinfo.propertyAsString("overridebaseg4mat","");
-    const std::string& cfg = matinfo.propertyAsString("cfg","");
+    std::string cfgstr = matinfo.propertyAsString("cfg","");
+    //Absorp density/temp parameters into cfgstr (this also avoids nesting G4
+    //base-materials which is apparently not supported).
+    cfgstr += matinfo.getTempAsNCrystalCfgStrPostfix();
+    cfgstr += matinfo.getDensityAsNCrystalCfgStrPostfix();
+    auto ncrystal_matcfg = NC::MatCfg( cfgstr );
     if (overridebaseg4mat.empty()) {
-      mat = G4NCrystalRel::createMaterial(cfg.c_str());
-      if (matinfo.hasNonDefaultDensity()||matinfo.hasProperty("temp_kelvin")) {
-        //wrap the pure ncrystal material in a material with changed density and/or temp:
-        G4Material * mat0 = mat;
-        mat = new G4Material(matinfo.fullname.c_str(),
-                             matinfo.getDensity(mat0->GetDensity()),
-                             mat0,
-                             mat0->GetState(),
-                             matinfo.propertyAsDouble("temp_kelvin",mat->GetTemperature()),
-                             mat0->GetPressure());
-      }
+      mat = G4NC::createMaterial( ncrystal_matcfg );
     } else {
       mat = CommonMaterials::getNISTMaterial(overridebaseg4mat.c_str(),s_prefix.c_str());//base material selected directly by user
-      auto ncsc = NCrystalRel::FactImpl::createScatter(cfg.c_str());
-      const double density = matinfo.getDensity(mat->GetDensity());
-      const double temperature = matinfo.propertyAsDouble("temp_kelvin",mat->GetTemperature()/Units::kelvin)*Units::kelvin;
+      auto ncsc = NC::FactImpl::createScatter( ncrystal_matcfg );
+      auto ncinfo = NC::FactImpl::createInfo( ncrystal_matcfg );
+      const double density = matinfo.getDensity( mat->GetDensity() );//We apparently take the density+state from the NIST base material,
+                                                                     //but not temperature (not sure if this is the best way?)
       mat = new G4Material(matinfo.fullname.c_str(),
                            density,
                            mat,
                            mat->GetState(),
-                           temperature,
+                           ncinfo->getTemperature().dbl(),
                            mat->GetPressure());
-      G4NCrystalRel::Manager::getInstance()->addScatterProperty(mat,std::move(ncsc));
+      G4NC::Manager::getInstance()->addScatterProperty(mat,std::move(ncsc));
     }
   } else if (matinfo.name=="ESS_B4C") {
 
@@ -508,8 +548,10 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
 
   assert(mat);
 
-  //make sure the name is set consistently
-  if (matinfo.fullname!=mat->GetName()) {
+  //make sure the name is set consistently (only when material does not already have a base material!!!)
+  //See also https://bugzilla-geant4.kek.jp/show_bug.cgi?id=2520
+
+  if ( matinfo.fullname != mat->GetName() && mat->GetBaseMaterial() == nullptr ) {
     G4Material * mat0 = mat;
     mat = new G4Material(matinfo.fullname.c_str(),
                          mat0->GetDensity(),
@@ -520,9 +562,10 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     //NXSG4::copyProperty(mat0,mat);
     //No need to copy NCrystal property, since it resides in the
     //G4MaterialPropertyTable which is copied over when used as a base material.
+    //update: the mat->GetBaseMaterial() check means we never do this for the NCrystal materials
   }
-  assert(matinfo.fullname == mat->GetName());
-  cache[ss] = mat;
-  return mat;
+  //  assert(matinfo.fullname == mat->GetName());
 
+  cache[ss] = mat;
+  return validate( mat );
 }
