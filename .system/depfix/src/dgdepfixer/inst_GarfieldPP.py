@@ -22,6 +22,8 @@ class GarfieldPPInstaller(DG.installutils.stdinstaller):
                '-Wno-dev',
                '-DCMAKE_CXX_STANDARD=17',
                '-DCMAKE_BUILD_TYPE=Release']
+        flags += ['-DWITH_EXAMPLES=OFF']#does not currently (2022-12-12) work with G4 11.x.y.
+        flags += ['-DWITH_DOC=OFF']#no need to involve doxygen
         if sys.platform=='darwin':
             flags+=['-DCMAKE_INSTALL_NAME_DIR=%s/lib'%DG.sysutils.quote(instdir)]
         flags+=extra_options
