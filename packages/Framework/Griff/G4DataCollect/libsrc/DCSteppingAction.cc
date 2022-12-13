@@ -8,9 +8,15 @@
 #include <algorithm>
 #include <set>
 #include <limits>
+#include <stdexcept>
 #include "DBMetaDataEntry.hh"
 #include "Randomize.hh"
 #include "G4Version.hh"
+
+#ifdef G4MULTITHREADED
+#  include "G4RunManager.hh"
+#  include "G4MTRunManager.hh"
+#endif
 
 namespace G4DataCollectInternals {
 
@@ -33,6 +39,16 @@ namespace G4DataCollectInternals {
 
   void DCSteppingAction::initMgr()
   {
+#ifdef G4MULTITHREADED
+    {
+      auto runmgr = G4RunManager::GetRunManager();
+      if (!runmgr)
+        throw std::runtime_error("Logic error: Griff DCSteppingAction should not initialise before G4RunManager is created.");
+      if (dynamic_cast<G4MTRunManager*>(G4RunManager::GetRunManager()))
+        throw std::runtime_error("Griff Data collection detected usage of G4MTRunManager which is not supported!");
+    }
+#endif
+
     std::string extension(GriffFormat::Format::getFormat()->fileExtension());
     bool has_extension(Core::ends_with(m_outputFile,extension));
     if (FrameworkGlobals::isForked()) {
@@ -67,12 +83,6 @@ namespace G4DataCollectInternals {
     if ( strs[2]=="[MT]$" ) {
       strs[2]="$";
       strs[1] += "_MT";
-      static bool first = true;
-      if (first) {
-        first = false;
-        std::cout<<"Griff Data collect WARNING: Detected G4 version with multithreaded support ("
-                 <<G4Version<<"). Hopefully you are not actually running multithreaded which is not supported!"<<std::endl;
-      }
     }
     assert(strs.size()==3&&strs[0]=="$Name:"&&strs[2]=="$");
     setMetaData("G4Version",strs[1].c_str());
