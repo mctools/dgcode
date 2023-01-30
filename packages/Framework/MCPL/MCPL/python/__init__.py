@@ -1268,7 +1268,7 @@ def _pdg_database(pdgcode):
 def _unique_count(a,weights=None):
     """returns (unique,count) where unique is an array of sorted unique values in a, and count is the corresponding frequency counts"""
     unique, inverse = np_unique(a, return_inverse=True)
-    count = np.zeros(len(unique), np.int if weights is None else np_dtype(type(weights[0])))
+    count = np.zeros(len(unique), int if weights is None else np_dtype(type(weights[0])))
     _np_add_at(count, inverse, 1 if weights is None else weights)
     return (unique, count)
 
@@ -1411,7 +1411,7 @@ def collect_stats(mcplfile,stats=_str('all'),bin_data=True):
             ranges[s] = (ranges[s][0]-1.0,ranges[s][1]+1.0)
 
     hists={}
-    freq_uc=dict((s,(np.asarray([],dtype=np.int),np.asarray([],dtype=np.float))) for s in freq_stats)
+    freq_uc=dict((s,(np.asarray([],dtype=int),np.asarray([],dtype=float))) for s in freq_stats)
     if (std_stats and bin_data) or freq_stats:
         #pass through and collect data:
         if weight_sum is None:
