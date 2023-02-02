@@ -17,6 +17,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         name: last_commit_check
+        workflow_conclusion: ""
         if_no_artifact_found: warn
 
     - name: Get the time of the last run
