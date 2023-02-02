@@ -17,7 +17,6 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         name: last_commit_check
-        search_artifacts: true
         if_no_artifact_found: warn
 
     - name: Get the time of the last run
@@ -45,6 +44,6 @@ jobs:
         path: last_commit_check.txt
 
   run_test_workflow:
-    uses: mctools/dgcode/.github/workflows/run-private-proj-tests.yml@dev-workflows
+    uses: mctools/dgcode/.github/workflows/run-private-proj-tests.yml@main
     needs: decide_if_test_run_is_needed
     if: needs.decide_if_test_run_is_needed.outputs.runTests == 1
