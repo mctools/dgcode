@@ -18,6 +18,7 @@ jobs:
       with:
         name: last_commit_check
         workflow_conclusion: ""
+        check_artifacts: true
         if_no_artifact_found: warn
 
     - name: Get the time of the last run
