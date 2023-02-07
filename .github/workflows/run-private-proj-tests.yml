@@ -17,4 +17,4 @@ jobs:
       pkg-repo: dgcode/dgcode_private_projects
       pkg-repo-branch: main
       dgcode-branch: '${{ github.ref_name }}'
-      setup-choice: defaults
+      platform-choice: defaults

@@ -13,4 +13,4 @@ jobs:
       pkg-repo: mctools/dgcode_val
       pkg-repo-branch: main
       dgcode-branch: '${{ github.ref_name }}'
-      setup-choice: all
+      platform-choice: all
