@@ -112,6 +112,7 @@ def listfiles(d,filterfnc=0,error_on_no_match=True,ignore_logs=False):
                 if filterfnc(f):
                     yield f
                 elif error_on_no_match:
+                    import error
                     error.error("Forbidden file %s/%s"%(d,f))
             else:
                 yield f
