@@ -139,6 +139,7 @@ def show(filename=None,tight=True,dpi=1200,automode=True):
     In automode, filename must always be given and user must have called askPDF earlier.
 
     """
+    assert dpi==1200,"dpi argument actually no longer supported"
     from PyAna import plt
     #if tight:
     #    plt.tight_layout()
@@ -151,7 +152,7 @@ def show(filename=None,tight=True,dpi=1200,automode=True):
             filename=None
 
     if filename:
-        plt.savefig(filename,dpi=dpi,bbox_inches=('tight' if tight else None))
+        plt.savefig(filename,bbox_inches=('tight' if tight else None))
         print("Wrote %s"%filename)
     else:
         plt.show2()

@@ -848,7 +848,7 @@ class MCPLFile:
         (nparticles,(ncomments,nblobs,opt_userflags,opt_polarisation,opt_singleprec),
          opt_universalpdgcode,(particlesize,_tmp)) = y[0]
         #convert all int types to python 'int' (which is 64bit), to avoid
-        #conversions like int+np.uint64->np.float64, and flags to bool:
+        #conversions like int+np.uint64->float, and flags to bool:
         nparticles = int(nparticles)
         self._np = nparticles#needs frequent access
         particlesize = int(particlesize)

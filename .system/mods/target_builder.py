@@ -33,6 +33,8 @@ def apply_patterns(pkg):
             l=nfo[1](pkg,d)#call factory
             #subdirs matching a target-generating pattern can not have subdirs themselves. This seems like a good place to check for it:
             for sf in os.listdir(dd):
+                if sf=='.ipynb_checkpoints':
+                    continue#ignore these as a workaround (although we should guard against them being committed)
                 sf=os.path.join(dd,sf)
                 if os.path.isdir(sf):
                     error.error('Sub-directories are not allowed in %s/%s/'%(pkg.name,d))
