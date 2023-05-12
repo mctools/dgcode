@@ -83,7 +83,7 @@ def quote_cmd(cmd):
         return ' '.join(quote(c) for c in cmd)
     return cmd
 
-def system(cmd,catch_output=False):
+def system(cmd,catch_output=False,env=None):
     """A better alternative to os.system which flushes stdout/stderr, makes sure the
        shell is always bash, and wraps exit codes larger than 127 to 127. Set
        catch_output to True to instead return both exit code and the output of the
@@ -99,25 +99,25 @@ def system(cmd,catch_output=False):
     fixec = lambda ec : ec if (ec>=0 and ec<=127) else 127
     if catch_output:
         try:
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,env=env)
             output = p.communicate()[0]
         except:
             #todo: in case of failure we should return the output as well!
             return 1,''
         return fixec(p.returncode),output
     else:
-        ec=subprocess.call(cmd)
+        ec=subprocess.call(cmd,env=env)
     sys.stdout.flush()
     sys.stderr.flush()
     return fixec(ec)
 
-def system_throw(cmd,catch_output=False):
+def system_throw(cmd,catch_output=False,env=None):
     """same as system except doesn't return exit code and throws RuntimeError in case of non-zero exit code"""
     out=None
     if catch_output:
-        ec,out = system(cmd,catch_output)
+        ec,out = system(cmd,catch_output,env=env)
     else:
-        ec = system(cmd,catch_output)
+        ec = system(cmd,catch_output,env=env)
     if ec:
         raise RuntimeError('command failed: %s'%cmd)
     return out
