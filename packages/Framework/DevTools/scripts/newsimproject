@@ -96,8 +96,8 @@ Now you can go through them and replace their contents as needed for your projec
 Do not forget to update documentation in comments and pkg.info files!
 """
 is_std_loc = target_dir.parent == default_projdir
-proj_pkg_selection_enabled = legacy_mode or bool(os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG',''))
-
+proj_pkg_selection_enabled = ( legacy_mode or
+                               os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','').lower() in ['true', '1'] )
 maybe_tell_about_minusp = True
 
 if not legacy_mode and not any([target_dir.is_relative_to(d) for d in cfg.dirs.pkgsearchpath]):
