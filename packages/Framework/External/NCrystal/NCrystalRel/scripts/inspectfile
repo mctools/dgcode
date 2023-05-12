@@ -390,7 +390,7 @@ def create_title_and_labels(parts):
 
 def _end_plot(plt,pdf):
     if _unittest:
-        plt.savefig(open(os.devnull,'wb'),format='raw',dpi=10)
+        plt.savefig(open(os.devnull,'wb'),format='raw')#hotfix against matplotlib warning
         plt.close()
     elif pdf:
         pdf.savefig()
