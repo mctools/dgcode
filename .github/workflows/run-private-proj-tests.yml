@@ -13,6 +13,7 @@ jobs:
     secrets:
       PRIVATE_PROJ_REPO_URL: ${{ secrets.PRIVATE_PROJ_REPO_URL }}
       PRIVATE_PROJ_REPO_PAT: ${{ secrets.PRIVATE_PROJ_REPO_PAT }}
+      DMSC_GITLAB_CERT: ${{ secrets.DMSC_GITLAB_CERT }}
     with:
       pkg-repo: dgcode/dgcode_private_projects
       pkg-repo-branch: main
