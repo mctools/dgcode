@@ -54,10 +54,10 @@ def h1d_bar_args(self):
     return {leftx:b[:-1],'height':c,'width': self.binwidth,'align':'edge'}
 
 def h1d_contents(self):
-    return numpy.frombuffer(self._rawContents(), dtype=numpy.float64,count=self.nbins)
+    return numpy.frombuffer(self._rawContents(), dtype=float,count=self.nbins)
 
 def h1d_errors(self):
-    e2 = numpy.frombuffer(self._rawErrorsSquared(), dtype=numpy.float64,count=self.nbins)
+    e2 = numpy.frombuffer(self._rawErrorsSquared(), dtype=float,count=self.nbins)
     return numpy.sqrt(e2)
 
 def h1d_binedges(self):
@@ -97,13 +97,13 @@ def h1d_fill(self,*args):
         raise ValueError("Hist1D.fill requires 1 or 2 arguments")
 
     if isinstance(args[0],numpy.ndarray):
-        if not args[0].flags['FORC'] or args[0].dtype!=numpy.float64:
-            raise TypeError("Array filling must use numpy float64 arrays with contiguous memory")
+        if not args[0].flags['FORC'] or args[0].dtype!=float:
+            raise TypeError("Array filling must use numpy float arrays with contiguous memory")
         assert args[0].itemsize==8
 
         if len(args)==2:
-            if not isinstance(args[1],numpy.ndarray) or not args[1].flags['FORC'] or args[1].dtype!=numpy.float64:
-                raise TypeError("Array filling must use numpy float64 arrays with contiguous memory")
+            if not isinstance(args[1],numpy.ndarray) or not args[1].flags['FORC'] or args[1].dtype!=float:
+                raise TypeError("Array filling must use numpy float arrays with contiguous memory")
             assert args[1].itemsize==8
         self._rawfillFromBuffer(*[a.data for a in args])
     else:
@@ -138,7 +138,7 @@ def h2d_extent(self):
     return [self.xmin,self.xmax,self.ymin,self.ymax]
 
 def h2d_contents(self):
-    c=numpy.frombuffer(self._rawContents(), dtype=numpy.float64,count=self.nbinsx*self.nbinsy)
+    c=numpy.frombuffer(self._rawContents(), dtype=float,count=self.nbinsx*self.nbinsy)
     c.shape=(self.nbinsx,self.nbinsy)
     return c
 
@@ -161,8 +161,8 @@ def h2d_fill(self,*args):
     for a in args:
         if isinstance(a,numpy.ndarray):
             nnp+=1
-            if not a.flags['FORC'] or a.dtype!=numpy.float64:
-                raise TypeError("Array filling must use numpy float64 arrays with contiguous memory")
+            if not a.flags['FORC'] or a.dtype!=float:
+                raise TypeError("Array filling must use numpy float arrays with contiguous memory")
                 assert a.itemsize==8
     if nnp:
         self._rawfillFromBuffer(*[a.data for a in args])
