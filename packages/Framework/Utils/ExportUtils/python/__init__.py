@@ -329,6 +329,9 @@ class ExportMgr:
                 #ignore ourselves:
                 #files_read_below_topdir = [f for f in files_read_below_topdir if not f.parts[-3:]==('ExportUtils','python','__init__.py') ]
                 files_quoted_below_topdir = [Sys.quote(f) for f in files_read_below_topdir]
+                if not files_quoted_below_topdir:
+                    print(f"Ignoring commit id of repo not participating in export: {topdir}")
+                    continue
                 #ignore_for_export_sha = not files_read_below_topdir
                 with Sys.changedir(topdir):
                     if list(Utils.GitUtils.git_status_iter(files_read_below_topdir)):
@@ -345,6 +348,8 @@ class ExportMgr:
                 version_string='%s / CUSTOM-DEV-VERSION'%d
             else:
                 #assert len(topdirs_and_files_quoted_for_export_sha)==1
+                if not topdirs_and_files_quoted_for_export_sha:
+                    raise SystemExit('Unexpected error: no topdirs/files exported!')
                 _=list(extract_version_sha(*f) for f in topdirs_and_files_quoted_for_export_sha)
                 timestamp=max(*list(sorted(timestamp for timestamp,hashval in _)))
                 combinedhash = "%".join(sorted(hashval for timestamp,hashval in _))
