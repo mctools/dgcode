@@ -4,7 +4,7 @@
 ##                                                                            ##
 ##  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   ##
 ##                                                                            ##
-##  Copyright 2015-2022 NCrystal developers                                   ##
+##  Copyright 2015-2023 NCrystal developers                                   ##
 ##                                                                            ##
 ##  Licensed under the Apache License, Version 2.0 (the "License");           ##
 ##  you may not use this file except in compliance with the License.          ##
@@ -27,8 +27,10 @@ pyversion = sys.version_info[0:3]
 _minpyversion=(3,6,0)
 if pyversion < _minpyversion:
     raise SystemExit('Unsupported python version %i.%i.%i detected (needs %i.%i.%i or later).'%(pyversion+_minpyversion))
-import os
-import pathlib
+import os as _os
+os = _os
+import pathlib as _pathlib
+pathlib = _pathlib
 
 def maybeThisIsConda():
     return ( os.environ.get('CONDA_PREFIX',None) or
@@ -53,18 +55,23 @@ def fixSysPathAndImportNCrystal( *, allowfail = False ):
         sys.path.insert(0,str(pml.absolute().resolve()))
     try:
         import NCrystalRel as NCrystal
-    except ImportError:
+    except ImportError as e:
         if allowfail:
             return
-        msg = 'ERROR: Could not import the NCrystal Python module'
+        msg = 'ERROR: Could not import the NCrystal Python module (reason: "%s")'%e
         if maybeThisIsConda():
             msg += ' (if using conda it might help to close your terminal and activate your environment again)'
         elif not hack_syspath:
             msg += ' (perhaps your PYTHONPATH is misconfigured)'
         raise SystemExit(msg)
     return NCrystal
+
+def ncImportSubModule( mainmodule, submodulename ):
+    _ = __import__( '%s.%s' % ( mainmodule.__name__, submodulename ) )
+    return getattr(_,submodulename)
 ################################################################################################
 NC = fixSysPathAndImportNCrystal()
+nc_numpy = ncImportSubModule( NC, '_numpy' )
 
 #########################################################################
 ########################### System setup ################################
@@ -263,9 +270,9 @@ def create_ekins(npoints,range_override):
     if range_override:
         if range_override[0]<=0.0:
             range_override = ( range_override[1]*1e-10, range_override[1] )
-        return NC._np_geomspace(*range_override,npoints)
+        return nc_numpy._np_geomspace(*range_override,npoints)
     else:
-        return NC._np_geomspace(1e-5,1e2,npoints)
+        return nc_numpy._np_geomspace(1e-5,1e2,npoints)
 
 def create_wavelengths(np,cfgs,npoints,range_override):
     if range_override:
@@ -276,7 +283,7 @@ def create_wavelengths(np,cfgs,npoints,range_override):
         max_bragg_threshold = ( max(bragg_thresholds) if bragg_thresholds else None ) or fallback
         wls_max = 1.2 * ( float(int(max_bragg_threshold*1.01+1.0)) if not math.isinf(max_bragg_threshold) else fallback )
         wls_min = 1e-4
-    return NC._np_linspace( wls_min, wls_max, npoints )
+    return nc_numpy._np_linspace( wls_min, wls_max, npoints )
 
 _mpldpi=[None]
 _pdffilename='ncrystal.pdf'
@@ -390,7 +397,7 @@ def create_title_and_labels(parts):
 
 def _end_plot(plt,pdf):
     if _unittest:
-        plt.savefig(open(os.devnull,'wb'),format='raw')#hotfix against matplotlib warning
+        plt.savefig(open(os.devnull,'wb'),format='raw')
         plt.close()
     elif pdf:
         pdf.savefig()
@@ -844,7 +851,13 @@ def main():
         print("created %s"%_pdffilename)
 
 if __name__=='__main__':
-    main()
+    import sys
+    if '--pytrace' in sys.argv[1:]:
+        sys.argv.remove('--pytrace')
+        import trace
+        trace.Trace().runfunc(main)
+    else:
+        main()
 
 # TODO:
 #   - allow tuning of n2d and alpha pars for 2D plot?

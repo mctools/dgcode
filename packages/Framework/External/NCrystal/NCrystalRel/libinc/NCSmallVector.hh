@@ -5,7 +5,7 @@
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
 //                                                                            //
-//  Copyright 2015-2022 NCrystal developers                                   //
+//  Copyright 2015-2023 NCrystal developers                                   //
 //                                                                            //
 //  Licensed under the Apache License, Version 2.0 (the "License");           //
 //  you may not use this file except in compliance with the License.          //
@@ -489,6 +489,7 @@ namespace NCrystalRel {
       std::swap(m_count,o.m_count);
       this->setBeginPtr( m_data.large.data = o.m_data.large.data);
       m_data.large.capacity = o.m_data.large.capacity;
+      o.m_data.large.capacity = 0;//why did we leave out this line earlier?
       Impl::setBeginPtrSmallData(&o);
     }
     assert(o.empty());

@@ -5,7 +5,7 @@
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
 //                                                                            //
-//  Copyright 2015-2022 NCrystal developers                                   //
+//  Copyright 2015-2023 NCrystal developers                                   //
 //                                                                            //
 //  Licensed under the Apache License, Version 2.0 (the "License");           //
 //  you may not use this file except in compliance with the License.          //
@@ -50,10 +50,12 @@ namespace NCrystalRel {
       using units = units_temperature;
       static double value_validate( double value )
       {
-        if ( ! ( value == -1.0 || ( value >= 0.001 && value <= 1e6 ) ) )
+        if ( ! ( value == -1.0 || ( value >= Temperature::allowed_range.first && value <= Temperature::allowed_range.second ) ) )
           NCRYSTAL_THROW2(BadInput,"Out of range temperature value "
                           <<Temperature{value}<<" provided for parameter \""<<name
-                          <<"\" (valid temperatures must be in the range 0.001K .. 1000000K)");
+                          <<"\" (valid temperatures must be in the range "
+                          <<Temperature{Temperature::allowed_range.first}
+                          <<" .. "<<Temperature{Temperature::allowed_range.second}<<")");
         return value;
       }
     };

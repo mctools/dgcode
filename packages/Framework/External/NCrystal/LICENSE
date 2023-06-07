@@ -1,9 +1,9 @@
 
-==============================================================================================
-= License and copyright info concerning code in the Framework/External/NCrystal subdirectory =
-==============================================================================================
+====================================================================================
+= License and copyright info concerning code in the External/NCrystal subdirectory =
+====================================================================================
 
-This subdirectory contains an import of the offical NCrystal code (v3.4.1)
+This subdirectory contains an import of the offical NCrystal code (v3.6.1)
 from github. NCrystal is a library and associated tools which enables
 calculations for Monte Carlo simulations of thermal neutrons in crystals and
 other materials. More info at https://mctools.github.io/ncrystal/
@@ -21,7 +21,7 @@ reproduced below.
 
 NCrystal : A library for thermal neutron transport in crystals and other materials
 
-Copyright 2015-2022 NCrystal developers
+Copyright 2015-2023 NCrystal developers
 
 This software was mainly developed at the European Spallation Source ERIC (ESS)
 and the Technical University of Denmark (DTU). This work was supported in part

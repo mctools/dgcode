@@ -5,7 +5,7 @@
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
 //                                                                            //
-//  Copyright 2015-2022 NCrystal developers                                   //
+//  Copyright 2015-2023 NCrystal developers                                   //
 //                                                                            //
 //  Licensed under the Apache License, Version 2.0 (the "License");           //
 //  you may not use this file except in compliance with the License.          //
@@ -306,13 +306,21 @@ namespace NCrystalRel {
     nc_assert( size>0 );//size 0 malloc is UB
     nc_assert( alignment>0 );//duh!
     nc_assert( (alignment & (alignment - 1)) == 0 );//checks if (non-zero) alignment is power of 2.
+
+#if defined(__GNUC__) && (__GNUC__ > 11 )
+    if ( false ) {//Very temporary workaround for gcc 12! This is of course pretty nasty!
+#else
+
 #  if defined(__GNUC__) && (__GNUC__*1000+__GNUC_MINOR__)<4009
     //gcc didn't add max_align_t to std:: until gcc 4.9
     constexpr auto alignof_max_align_t = alignof(max_align_t);
 #  else
     constexpr auto alignof_max_align_t = alignof(std::max_align_t);
 #  endif
+
+
     if ( alignment <= alignof_max_align_t ) {
+#endif
       //std::malloc is supposed to work in this case (and std::aligned_alloc
       //might NOT work!):
       void * result = std::malloc(size);

@@ -2,7 +2,7 @@
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
 //                                                                            //
-//  Copyright 2015-2022 NCrystal developers                                   //
+//  Copyright 2015-2023 NCrystal developers                                   //
 //                                                                            //
 //  Licensed under the Apache License, Version 2.0 (the "License");           //
 //  you may not use this file except in compliance with the License.          //
@@ -645,6 +645,7 @@ const char * NC::NCMATData::DynInfo::diType2Str( DynInfoType di)
   case DynInfoType::ScatKnl: return "ScatKnl";
   default:
     nc_assert_always(false);
+    return "";//need a return statement here to avoid spurious compiler warning with gcc12
   case DynInfoType::Undefined:
     return "Undefined";
   }

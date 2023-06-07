@@ -2,7 +2,7 @@
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
 //                                                                            //
-//  Copyright 2015-2022 NCrystal developers                                   //
+//  Copyright 2015-2023 NCrystal developers                                   //
 //                                                                            //
 //  Licensed under the Apache License, Version 2.0 (the "License");           //
 //  you may not use this file except in compliance with the License.          //
@@ -142,11 +142,12 @@ NC::VectS NC::ncglob(const std::string& pattern) {
   return result;
 }
 //Windows getcwd:
-std::string NC::ncgetcwd() {
-    char buff[MAX_PATH];
-    GetModuleFileName( NULL, buff, MAX_PATH );
-    string::size_type position = string( buff ).find_last_of( "\\/" );
-    return string( buff ).substr( 0, position);
+std::string NC::ncgetcwd()
+{
+  char buff[MAX_PATH];
+  GetModuleFileName( NULL, buff, MAX_PATH );
+  std::string::size_type position = std::string( buff ).find_last_of( "\\/" );
+  return std::string( buff ).substr( 0, position);
 }
 #else
 //POSIX globbing:

@@ -5,7 +5,7 @@
 /*                                                                            */
 /*  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   */
 /*                                                                            */
-/*  Copyright 2015-2022 NCrystal developers                                   */
+/*  Copyright 2015-2023 NCrystal developers                                   */
 /*                                                                            */
 /*  Licensed under the Apache License, Version 2.0 (the "License");           */
 /*  you may not use this file except in compliance with the License.          */
@@ -248,6 +248,40 @@ extern "C" {
                                                       const double** alphagrid,
                                                       const double** betagrid,
                                                       const double** sab );
+
+  /* Extract Sjolander Gn functions directly from VDOS curves. The res_gn_vals     */
+  /* array should be freed with ncrystalrel_dealloc_doubleptr after usage.            */
+  NCRYSTAL_API void ncrystalrel_raw_vdos2gn( const double* vdos_egrid,
+                                          const double* vdos_density,
+                                          unsigned vdos_egrid_npts,
+                                          unsigned vdos_density_npts,
+                                          double scattering_xs,
+                                          double mass_amu,
+                                          double temperature,
+                                          unsigned nvalue,
+                                          double* res_gn_xmin,
+                                          double* res_gn_xmax,
+                                          unsigned* res_gn_npts,
+                                          double** res_gn_vals );
+
+  /* Expand VDOS to scattering kernel with Sjolander's method, functions directly */
+  /* from VDOS curves. The alpha, beta, and sab arrays should be freed with       */
+  /* ncrystalrel_dealloc_doubleptr after usage. The order_weight_fct can optionally  */
+  /* be used to change the contribution of a given Gn order to the kernel.        */
+  NCRYSTAL_API void ncrystalrel_raw_vdos2knl( const double* vdos_egrid,
+                                           const double* vdos_density,
+                                           unsigned vdos_egrid_npts,
+                                           unsigned vdos_density_npts,
+                                           double scattering_xs,
+                                           double mass_amu,
+                                           double temperature,
+                                           unsigned vdoslux,
+                                           double (*order_weight_fct)( unsigned order ),
+                                           unsigned* nalpha,
+                                           unsigned* nbeta,
+                                           double** alpha,
+                                           double** beta,
+                                           double** sab );
 
   /* Access vdos data for ditype 3.                                                */
   NCRYSTAL_API void ncrystalrel_dyninfo_extract_vdos( ncrystalrel_info_t,
@@ -523,9 +557,10 @@ extern "C" {
   /* pluginname0,filename0,plugintype0,pluginname1,filename1,plugintype1,...:      */
   NCRYSTAL_API void ncrystalrel_get_plugin_list( unsigned* nstrs, char*** strs );
 
-  /* Deallocate strings:                                                           */
+  /* Deallocate strings / double arrays:                                           */
   NCRYSTAL_API void ncrystalrel_dealloc_stringlist( unsigned len, char** );
   NCRYSTAL_API void ncrystalrel_dealloc_string( char* );
+  NCRYSTAL_API void ncrystalrel_dealloc_doubleptr( double* );
 
   /* NCrystal version info:                                                        */
 #ifdef NCRYSTAL_VERSION_MAJOR
@@ -544,10 +579,10 @@ extern "C" {
 #  undef NCRYSTAL_VERSION_STR
 #endif
 #define NCRYSTAL_VERSION_MAJOR 3
-#define NCRYSTAL_VERSION_MINOR 4
+#define NCRYSTAL_VERSION_MINOR 6
 #define NCRYSTAL_VERSION_PATCH 1
-#define NCRYSTAL_VERSION   3004001 /* (1000000*MAJOR+1000*MINOR+PATCH)             */
-#define NCRYSTAL_VERSION_STR "3.4.1"
+#define NCRYSTAL_VERSION   3006001 /* (1000000*MAJOR+1000*MINOR+PATCH)             */
+#define NCRYSTAL_VERSION_STR "3.6.1"
   NCRYSTAL_API int ncrystalrel_version(); /* returns NCRYSTAL_VERSION                  */
   NCRYSTAL_API const char * ncrystalrel_version_str(); /* returns NCRYSTAL_VERSION_STR */
 

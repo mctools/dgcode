@@ -2,7 +2,7 @@
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
 //                                                                            //
-//  Copyright 2015-2022 NCrystal developers                                   //
+//  Copyright 2015-2023 NCrystal developers                                   //
 //                                                                            //
 //  Licensed under the Apache License, Version 2.0 (the "License");           //
 //  you may not use this file except in compliance with the License.          //
@@ -30,7 +30,7 @@ double NC::debyeIsotropicMSD( DebyeTemperature dt, Temperature t, AtomMass am )
   //Don't do this since we want to allow t=0: t.validate();
   am.validate();
   nc_assert_always(dt.get()>0.0&&dt.get()<1e5);
-  nc_assert_always(t.get()>=0.0&&t.get()<1e5);
+  nc_assert_always(t.get()>=0.0&&t.get()<=Temperature::allowed_range.second);
   nc_assert_always(am.get()>=1.007&&am.get()<500);
   return calcDebyeMSDScale( dt, am )*calcDebyeMSDShape(t.get()/dt.get());
 }

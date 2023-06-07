@@ -5,7 +5,7 @@
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
 //                                                                            //
-//  Copyright 2015-2022 NCrystal developers                                   //
+//  Copyright 2015-2023 NCrystal developers                                   //
 //                                                                            //
 //  Licensed under the Apache License, Version 2.0 (the "License");           //
 //  you may not use this file except in compliance with the License.          //
@@ -182,6 +182,9 @@ namespace NCrystalRel {
     static constexpr const char * unit() noexcept { return "K"; }
     constexpr double kT() const noexcept;
     void validate() const;
+
+    struct temp_range{ double first, second; };//std::pair not allowed in constexpr
+    static constexpr temp_range allowed_range = temp_range{0.001, 1000000.0};
   };
 
   class NCRYSTAL_API DebyeTemperature final : public EncapsulatedValue<DebyeTemperature> {
@@ -780,8 +783,12 @@ namespace NCrystalRel {
 
   inline void Temperature::validate() const
   {
-    if ( ! ( m_value > 0.0 && m_value < 1e9 ) )
+    if ( ! ( m_value > 0.0 && m_value < 1e99 ) )
       NCRYSTAL_THROW2(CalcError,"Temperature::validate() failed. Invalid value:" << *this );
+    if ( ! ( m_value >= allowed_range.first ) )
+      NCRYSTAL_THROW2(CalcError,"Temperature::validate() failed for T="<<*this<<" (temperature values below "<<Temperature{allowed_range.first}<< " are not supported).");
+    if ( ! ( m_value <= allowed_range.second ) )
+      NCRYSTAL_THROW2(CalcError,"Temperature::validate() failed for T="<<*this<<" (temperature values above "<<Temperature{allowed_range.second}<< " are not supported).");
   }
 
   inline void DebyeTemperature::validate() const
