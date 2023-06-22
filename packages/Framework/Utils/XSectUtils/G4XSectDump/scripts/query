@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from __future__ import print_function
 import os
 import G4Launcher
 defphyslist = 'QGSP_BIC_HP_EMZ' if G4Launcher.g4version() > 1030 else 'QGSP_BIC_HP'

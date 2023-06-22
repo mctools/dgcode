@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import division
 import XSectParse.ParseXSectFile
 import Core.Units
 from Utils.NeutronMath import neutron_eV_to_angstrom

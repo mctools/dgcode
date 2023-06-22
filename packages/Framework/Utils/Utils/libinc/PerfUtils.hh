@@ -450,7 +450,8 @@ inline void PerfUtils::get_vmem_rss_kb(double&vmem,double&rss,bool vmemonly) {
 inline double PerfUtils::get_vmem_kb() { double v,r;get_vmem_rss_kb(v,r,true); return v; }
 inline double PerfUtils::get_rss_kb() { double v,r;get_vmem_rss_kb(v,r); return r; }
 inline double PerfUtils::get_malloc_kb() {
-#ifndef __linux
+  //#ifndef __linux
+#if 1//Simply doesnt work any more?!?!?
   return 0.0;
 #else
   //~0.2microsec/call under libc malloc, 4microsec/call under tcmalloc (mallinfo() call dominates).
