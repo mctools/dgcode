@@ -54,9 +54,11 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_UnaryBool(){}
     virtual int_type evaluate() const {
-      return _boolify(_eval<TValue>(ExprEntityBase::child(0)));
+      return _boolify(_eval<TValue>(this->ExprEntityBase::child(0)));
     }
   };
+
+
 
   ExprEntityPtr create_unarybool(ExprEntityPtr arg)
   {
@@ -97,7 +99,7 @@ namespace ExprParser {
     //TODO: This will accept "1234hello", we should use the second parameter to
     //check all chars were converted!
     //
-    str_type v = _eval<str_type>(ExprEntityBase::child(0));
+    str_type v = _eval<str_type>(this->ExprEntityBase::child(0));
     int_type res;
     std::size_t nprocessed(0);
     try {
@@ -116,7 +118,7 @@ namespace ExprParser {
   {
     //TODO: This will accept "1.234hello", we should use the second parameter to
     //check all chars were converted!
-    str_type v = _eval<str_type>(ExprEntityBase::child(0));
+    str_type v = _eval<str_type>(this->ExprEntityBase::child(0));
     float_type res;
     std::size_t nprocessed(0);
     try {
@@ -129,10 +131,10 @@ namespace ExprParser {
     return res;
   }
   template<> inline str_type ExprEntity_TypeCast<int_type,str_type>::evaluate() const {
-    return std::to_string(_eval<int_type>(ExprEntityBase::child(0)));
+    return std::to_string(_eval<int_type>(this->ExprEntityBase::child(0)));
   }
   template<> inline str_type ExprEntity_TypeCast<float_type,str_type>::evaluate() const {
-    return std::to_string(_eval<float_type>(ExprEntityBase::child(0)));
+    return std::to_string(_eval<float_type>(this->ExprEntityBase::child(0)));
   }
 
   template<class target_type>

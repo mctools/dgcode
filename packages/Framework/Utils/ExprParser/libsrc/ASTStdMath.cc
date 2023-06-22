@@ -30,7 +30,7 @@ namespace ExprParser {
     virtual ~ExprEntity_BinaryAddition(){}
     virtual type_res evaluate() const {
       //todo: not very efficient implementation for strings...
-      return _eval<type_arg1>(ExprEntityBase::child(0)) + _eval<type_arg2>(ExprEntityBase::child(1));
+      return _eval<type_arg1>(this->ExprEntityBase::child(0)) + _eval<type_arg2>(this->ExprEntityBase::child(1));
     }
   protected:
 
@@ -42,7 +42,7 @@ namespace ExprParser {
       //5+0.0 -> 5.0), and since this method is called, the other argument must
       //be non-constant.
       //
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1));
       ExprEntityPtr res(0);
       if (c0->isConstant()&&_eval<type_arg1>(c0)==type_arg1())
         res = c1;//addition with c0 won't do anything.
@@ -99,7 +99,7 @@ namespace ExprParser {
     virtual ~ExprEntity_UnaryMinus(){}
     virtual TValue evaluate() const {
       //todo: not very efficient implementation for strings...
-      return - _eval<TValue>(ExprEntityBase::child(0));
+      return - _eval<TValue>(this->ExprEntityBase::child(0));
     }
   };
 
@@ -141,7 +141,7 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_BinarySubtraction(){}
     virtual type_res evaluate() const {
-      return _eval<type_arg1>(ExprEntityBase::child(0)) - _eval<type_arg2>(ExprEntityBase::child(1));
+      return _eval<type_arg1>(this->ExprEntityBase::child(0)) - _eval<type_arg2>(this->ExprEntityBase::child(1));
     }
   protected:
 
@@ -152,7 +152,7 @@ namespace ExprParser {
       //the first entity. Like for addition, we also need to consider
       //preservation of ints to floats promotion.
 
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1));
       ExprEntityPtr res(0);
       bool need_unary_minus(false);
       if (c0->isConstant()&&_eval<type_arg1>(c0)==type_arg1()) {
@@ -216,7 +216,7 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_FixedPower(){}
     virtual type_res evaluate() const {
-      type_res a = _eval<type_arg>(ExprEntityBase::child(0));
+      type_res a = _eval<type_arg>(this->ExprEntityBase::child(0));
       if (power==2) { return a*a; }//1 mult
       else if (power==3) { return a*a*a; }//2 mult
       else if (power==4) { a *= a; return a*a; }//2 mult
@@ -287,13 +287,13 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_BinaryMultiplication(){}
     virtual type_res evaluate() const {
-      return _eval<type_arg1>(ExprEntityBase::child(0)) * _eval<type_arg2>(ExprEntityBase::child(1));
+      return _eval<type_arg1>(this->ExprEntityBase::child(0)) * _eval<type_arg2>(this->ExprEntityBase::child(1));
     }
   protected:
 
     virtual ExprEntityPtr specialOptimisedVersion() const
     {
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1));
       if (c0==c1)
         return create_fixedpower<type_res>(c0,2);//replace with c0^2
 
@@ -391,13 +391,13 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_BinaryDivision(){}
     virtual type_res evaluate() const {
-      return _eval<type_arg1>(ExprEntityBase::child(0)) / _eval<type_arg2>(ExprEntityBase::child(1));
+      return _eval<type_arg1>(this->ExprEntityBase::child(0)) / _eval<type_arg2>(this->ExprEntityBase::child(1));
     }
   protected:
 
     virtual ExprEntityPtr specialOptimisedVersion() const
     {
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1));
       bool const0(c0->isConstant());
       bool const1(c1->isConstant());
       type_arg1 v0 = const0 ? _eval<type_arg1>(c0) : type_arg1();
@@ -472,7 +472,7 @@ namespace ExprParser {
     virtual ~ExprEntity_BinaryExponentiation(){}
     virtual float_type evaluate() const {
       //Implementation (specialisation for int,int->int given below)
-      return std::pow((float_type)_eval<type_arg1>(ExprEntityBase::child(0)),(float_type)_eval<type_arg2>(ExprEntityBase::child(1)));
+      return std::pow((float_type)_eval<type_arg1>(this->ExprEntityBase::child(0)),(float_type)_eval<type_arg2>(this->ExprEntityBase::child(1)));
     }
   private:
     virtual ExprEntityPtr specialOptimisedVersion() const
@@ -488,7 +488,7 @@ namespace ExprParser {
       //TODO: return create_fixedpower<type_res>(ExprEntityPtr arg, unsigned power)
 
       if (child(1)->isConstant()) {
-        float_type n = _eval<type_arg2>(ExprEntityBase::child(1));
+        float_type n = _eval<type_arg2>(this->ExprEntityBase::child(1));
         if (n>=1.0&&n<=9.0&&n==std::round(n))
           return create_fixedpower<float_type>(child(0), (int_type)std::round(n));
       }
@@ -513,8 +513,8 @@ namespace ExprParser {
     virtual int_type evaluate() const
     {
       //a^n. 0^0 is undefined, as is negative n
-      int_type a = _eval<int_type>(ExprEntityBase::child(0));
-      int_type n = _eval<int_type>(ExprEntityBase::child(1));
+      int_type a = _eval<int_type>(this->ExprEntityBase::child(0));
+      int_type n = _eval<int_type>(this->ExprEntityBase::child(1));
       if (n<1) {
         if (n==0) {
           if (a==0)
@@ -537,7 +537,7 @@ namespace ExprParser {
     virtual ExprEntityPtr specialOptimisedVersion() const
     {
       if (child(1)->isConstant()) {
-        int_type n = _eval<int_type>(ExprEntityBase::child(1));
+        int_type n = _eval<int_type>(this->ExprEntityBase::child(1));
         if (n>=1&&n<=9)
           return create_fixedpower<int_type>(child(0), n);
       }
@@ -582,7 +582,7 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_Modulo(){}
     virtual int_type evaluate() const {
-      return _eval<int_type>(ExprEntityBase::child(0)) % _eval<int_type>(ExprEntityBase::child(1));
+      return _eval<int_type>(this->ExprEntityBase::child(0)) % _eval<int_type>(this->ExprEntityBase::child(1));
     }
     //todo: 0 % anything is 0, anything % 1 is 0
   };
@@ -610,7 +610,7 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_BooleanNot(){}
     virtual int_type evaluate() const {
-      return _is_true(_eval<TValue>(ExprEntityBase::child(0))) ? 0l : 1l;
+      return _is_true(_eval<TValue>(this->ExprEntityBase::child(0))) ? 0l : 1l;
     }
   };
 
@@ -646,13 +646,13 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_BooleanAnd(){}
     virtual int_type evaluate() const {
-      return _is_true(_eval<type_arg1>(ExprEntityBase::child(0))) ? _boolify(_eval<type_arg2>(ExprEntityBase::child(1))) : 0l;
+      return _is_true(_eval<type_arg1>(this->ExprEntityBase::child(0))) ? _boolify(_eval<type_arg2>(this->ExprEntityBase::child(1))) : 0l;
     }
   protected:
 
     virtual ExprEntityPtr specialOptimisedVersion() const
     {
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1));
       bool const0(c0->isConstant());
       bool const1(c1->isConstant());
       type_arg1 v0 = const0 ? _eval<type_arg1>(c0) : type_arg1();
@@ -731,13 +731,13 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_BooleanOr(){}
     virtual int_type evaluate() const {
-      return _is_true(_eval<type_arg1>(ExprEntityBase::child(0))) ? 1l : _boolify(_eval<type_arg2>(ExprEntityBase::child(1)));
+      return _is_true(_eval<type_arg1>(this->ExprEntityBase::child(0))) ? 1l : _boolify(_eval<type_arg2>(this->ExprEntityBase::child(1)));
     }
   protected:
 
     virtual ExprEntityPtr specialOptimisedVersion() const
     {
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1));
       bool const0(c0->isConstant());
       bool const1(c1->isConstant());
       type_arg1 v0 = const0 ? _eval<type_arg1>(c0) : type_arg1();
@@ -830,7 +830,7 @@ namespace ExprParser {
 
     virtual int_type evaluate() const {
       static_assert(ICMP>=0&&ICMP<=5,"implementation error");
-      const type_arg a = _eval<type_arg>(ExprEntityBase::child(0));
+      const type_arg a = _eval<type_arg>(this->ExprEntityBase::child(0));
       if (ICMP==0) return a == m_cmpval ? 1l : 0l;
       if (ICMP==1) return a != m_cmpval ? 1l : 0l;
       if (ICMP==2) return a  < m_cmpval ? 1l : 0l;
@@ -914,8 +914,8 @@ namespace ExprParser {
 
     virtual int_type evaluate() const {
       static_assert(ICMP>=0&&ICMP<=5,"implementation error");
-      const type_arg1 a1 = _eval<type_arg1>(ExprEntityBase::child(0));
-      const type_arg2 a2 = _eval<type_arg2>(ExprEntityBase::child(1));
+      const type_arg1 a1 = _eval<type_arg1>(this->ExprEntityBase::child(0));
+      const type_arg2 a2 = _eval<type_arg2>(this->ExprEntityBase::child(1));
       if (ICMP==0) return a1 == a2 ? 1l : 0l;
       if (ICMP==1) return a1 != a2 ? 1l : 0l;
       if (ICMP==2) return a1  < a2 ? 1l : 0l;
@@ -936,7 +936,7 @@ namespace ExprParser {
 
     virtual ExprEntityPtr specialOptimisedVersion() const
     {
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1));
       bool const0(c0->isConstant());
       bool const1(c1->isConstant());
       assert_logic(! (const0 && const1) );//no need to call this method then...
@@ -1015,8 +1015,8 @@ namespace ExprParser {
 
     virtual int_type evaluate() const {
       static_assert(IBITWISE>=0&&IBITWISE<=4,"implementation error");
-      const std::uint64_t a1 = (std::uint64_t)_eval<int_type>(ExprEntityBase::child(0));
-      const std::uint64_t a2 = (std::uint64_t)_eval<int_type>(ExprEntityBase::child(1));
+      const std::uint64_t a1 = (std::uint64_t)_eval<int_type>(this->ExprEntityBase::child(0));
+      const std::uint64_t a2 = (std::uint64_t)_eval<int_type>(this->ExprEntityBase::child(1));
       if (IBITWISE==0) return (int_type) ( a1 & a2 );
       if (IBITWISE==1) return (int_type) ( a1 | a2 );
       if (IBITWISE==2) return (int_type) ( a1 ^ a2 );
@@ -1060,7 +1060,7 @@ namespace ExprParser {
     }
 
     virtual int_type evaluate() const {
-      const std::uint64_t val = (std::uint64_t)_eval<int_type>(ExprEntityBase::child(0));
+      const std::uint64_t val = (std::uint64_t)_eval<int_type>(this->ExprEntityBase::child(0));
       return (int_type) ( ~val );
     }
   };
@@ -1109,8 +1109,8 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_MinMax(){}
     virtual type_res evaluate() const {
-      type_arg1 a1 = _eval<type_arg1>(ExprEntityBase::child(0));
-      type_arg2 a2 = _eval<type_arg2>(ExprEntityBase::child(1));
+      type_arg1 a1 = _eval<type_arg1>(this->ExprEntityBase::child(0));
+      type_arg2 a2 = _eval<type_arg2>(this->ExprEntityBase::child(1));
       if (ismin)
         return a1 < a2 ? a1 : a2;
       else
@@ -1243,7 +1243,7 @@ namespace ExprParser {
     virtual ~ExprEntity_Abs(){}
     virtual type_res evaluate() const {
       //need f2f, i2f, i2i not f2i
-      type_arg a = _eval<type_arg>(ExprEntityBase::child(0));
+      type_arg a = _eval<type_arg>(this->ExprEntityBase::child(0));
       if (exprType<type_arg>()==ET_FLOAT && exprType<type_res>()==ET_FLOAT)
         return fabs((float_type)a);//f2f
       if (exprType<type_arg>()==ET_INT && exprType<type_res>()==ET_FLOAT)
@@ -1310,7 +1310,7 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_InConstRangeFunc(){}
     virtual int_type evaluate() const {
-      type_arg0 v = _eval<type_arg0>(ExprEntityBase::child(0));
+      type_arg0 v = _eval<type_arg0>(this->ExprEntityBase::child(0));
       return (v >= m_v1 && v < m_v2) ? 1 : 0;
     }
   private:
@@ -1347,15 +1347,15 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_InRangeFunc(){}
     virtual int_type evaluate() const {
-      type_arg0 v = _eval<type_arg0>(ExprEntityBase::child(0));
-      return v >= _eval<type_arg1>(ExprEntityBase::child(1))
-        ? (v <= _eval<type_arg2>(ExprEntityBase::child(2))?1:0)
+      type_arg0 v = _eval<type_arg0>(this->ExprEntityBase::child(0));
+      return v >= _eval<type_arg1>(this->ExprEntityBase::child(1))
+        ? (v <= _eval<type_arg2>(this->ExprEntityBase::child(2))?1:0)
         : 0;
     }
 
     virtual ExprEntityPtr specialOptimisedVersion() const
     {
-      ExprEntityPtr c0(ExprEntityBase::child(0)), c1(ExprEntityBase::child(1)), c2(ExprEntityBase::child(2));
+      ExprEntityPtr c0(this->ExprEntityBase::child(0)), c1(this->ExprEntityBase::child(1)), c2(this->ExprEntityBase::child(2));
 
       if (!c1->isConstant() || !c2->isConstant())
         return 0;//we dont implement any optimisations in this case
@@ -1431,7 +1431,7 @@ namespace ExprParser {
     virtual str_type name() const { return m_name; }
     virtual ~ExprEntity_UnaryFunction(){}
     virtual type_res evaluate() const {
-      return the_function((type_funcarg)_eval<type_arg>(ExprEntityBase::child(0)));
+      return the_function((type_funcarg)_eval<type_arg>(this->ExprEntityBase::child(0)));
     }
   private:
     str_type m_name;
