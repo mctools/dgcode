@@ -19,7 +19,10 @@ import re
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
 
-from six import u, iteritems, PY2
+#TK removed: from six import u, iteritems, PY2
+iteritems = lambda x : x.items()
+u = lambda x : x
+PY2=False
 
 try:
     # Python 2
