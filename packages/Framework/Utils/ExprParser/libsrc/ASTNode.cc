@@ -89,8 +89,7 @@ namespace ExprParser {
     }
     virtual ~ExprEntity_TypeCast(){}
     virtual type_res evaluate() const {
-      const ExprEntity_TypeCast * constthis = const_cast<const ExprEntity_TypeCast *>(this);
-      return _eval<type_arg>(constthis->ExprEntityBase::child(0));
+      return _eval<type_arg>(this->ExprEntityBase::child(0));
     }
   };
 
