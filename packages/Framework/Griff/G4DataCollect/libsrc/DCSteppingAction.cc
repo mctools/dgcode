@@ -220,7 +220,7 @@ namespace G4DataCollectInternals {
     std::vector<Track_> tracks;
     tracks.reserve(std::min<unsigned>(1024,4*(m_steps.size()/12)));//fixme: cache tracks object?
     std::map<G4int,std::set<G4int> > trkid2daughters;//todo: benchmark unordered_map.
-    unsigned ndaughterfields_tot(0);
+    // unsigned ndaughterfields_tot(0);
     std::set<G4int> unique_pdgcodes;
     G4int pdgcode_prev = std::numeric_limits<G4int>::max();
     EvtFile::index_type prev_volidx(EvtFile::INDEX_MAX);
@@ -259,12 +259,13 @@ namespace G4DataCollectInternals {
           if (it == trkid2daughters.end()) {
             std::set<G4int> daughters;
             daughters.insert(s.trkId);
-            ++ndaughterfields_tot;
+            // ++ndaughterfields_tot;
             trkid2daughters[s.parentId] = daughters;//inefficient std::set copy?
           } else {
-            auto res = it->second.insert(s.trkId);
-            if (res.second)
-              ++ndaughterfields_tot;
+            it->second.insert(s.trkId);
+            // auto res = it->second.insert(s.trkId);
+            // if (res.second)
+            //   ++ndaughterfields_tot;
           }
         }
       }//endif new-track
