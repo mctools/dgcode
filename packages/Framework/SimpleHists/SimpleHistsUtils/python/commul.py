@@ -7,8 +7,8 @@ def commul_curve(h1,relative=True,above=True,counting_errors=False):
     the bin edges of the passed in histogram"""
     if not isinstance(h1,SimpleHists.Hist1D):
         raise TypeError("Only accepts SimpleHists.Hist1D objects")
-    under=h1.underflow
-    over=h1.overflow
+    # under=h1.underflow
+    # over=h1.overflow
     x=h1.binedges()
     y=numpy.zeros(len(x))
     y[0] = h1.underflow

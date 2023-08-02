@@ -9,7 +9,6 @@ def run(cmd):
         output = p.communicate()[0]
     except:
         return (1,'')
-        pass
     return (p.returncode,output)
 
 

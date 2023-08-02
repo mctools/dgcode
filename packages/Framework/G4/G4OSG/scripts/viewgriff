@@ -81,7 +81,7 @@ def create_geo_like_in_griff(griff_file):
     #todo: Option for generator instead of geo!!
     import importlib
     import GriffDataRead
-    om=GriffDataRead.GriffDataReader.openMsg()
+    GriffDataRead.GriffDataReader.openMsg()
     GriffDataRead.GriffDataReader.setOpenMsg(False)
     dr=GriffDataRead.GriffDataReader(griff_file)
     griff_geo = dr.setup().geo()
@@ -162,7 +162,7 @@ else:
         print('='*80)
         print("==  Launching viewer!")
         print('='*80)
-        ec=G4OSG.Viewer.run(fn,opt_selectevents)
+        G4OSG.Viewer.run(fn,opt_selectevents)
         print('='*80)
         print("==  Viewer done! Hope you enjoyed the experimental event data visualisation :-)")
         print('='*80)

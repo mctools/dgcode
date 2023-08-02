@@ -3,7 +3,7 @@
 def parse():
     import os
     import argparse as AP
-    sumflag='--summary'
+    # sumflag='--summary'
 
     descr="""Browse contents of FILE which must be a .mesh3d file, such as those produced
     by the --heatmap option to Geant4 simulation scripts. Default behaviour is

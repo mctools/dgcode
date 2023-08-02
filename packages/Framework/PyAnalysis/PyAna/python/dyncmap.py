@@ -57,7 +57,7 @@ def dynamic_2d_colormap(data,imgobj=None,ncols=65536):
         eps=(k*(datamax-datamin)-hpncols*m)/(hpncols-k)
         if datamax > -datamin: datamin -= eps
         else: datamax += eps
-        d=(datamax-datamin)/hpncols
+        # d=(datamax-datamin)/hpncols
 
     #relative root-mean-square clipped to [0.0001,0.3]:
     npmean=np.mean(np.square(data))

@@ -606,7 +606,7 @@ def statsText(hist1d):
 
 def formatStatsText(stats):
     statwidth0 = max(len(s[0]) for s in stats)
-    statwidth1 = max(len(s[1]) for s in stats)
+    # statwidth1 = max(len(s[1]) for s in stats)
     return '\n'.join('%s = %s'%(s[0].ljust(statwidth0),s[1]) for s in stats)
 
 def plot1d(hist,show=True,statbox=True,statbox_exactcorner=False,figure=None,axes=None,skip_backend_check=False):

@@ -67,7 +67,6 @@ def _plot_end(show,save_fig,wl,mfp,logx,logy,extra=None,mfpunit='cm',softbracket
     except (AttributeError, ValueError):
         print("ERROR: tight_layout failed!")
         plt.subplots_adjust(bottom=0.15, right=0.9, top=0.9, left = 0.15)
-        pass
     if save_fig:
         plt.savefig(save_fig)
     if (show==None and not save_fig) or show:

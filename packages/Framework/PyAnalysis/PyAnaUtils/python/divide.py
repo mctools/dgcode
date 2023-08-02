@@ -17,7 +17,7 @@ def divide_histograms(h1,h2):
     contents2=h2.contents()
     bins=h1.binedges()
     bins2=h2.binedges()
-    assert numpy.array_equal(bins,h2.binedges())#not so efficient, but could catch stupid bugs.
+    assert numpy.array_equal(bins,bins2)#not so efficient, but could catch stupid bugs.
     return divide(contents1,errors1,contents2,errors2)
 
 def plot_histogram_division(h1,h2,scale=1.0,axes=None,style=True,kwargs={}):

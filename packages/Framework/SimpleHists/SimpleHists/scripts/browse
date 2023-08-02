@@ -6,7 +6,7 @@ from SimpleHists._util import selected_keys
 
 def parse_cmd_line():
     import argparse as AP
-    import sys, os
+    import os #, sys
     parser = AP.ArgumentParser(description='Browse an .shist file saved from a SimpleHists::HistCollection.'
                                +' Unless overridden by -p, -d or -i this launches an interactive browser.'
                                +' Supply histogram indices or keys to narrow the selection to a subset of all'

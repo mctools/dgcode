@@ -124,7 +124,7 @@ def system_throw(cmd,catch_output=False,env=None):
 
 def recursive_find(searchdir,filenamepattern):
     import os,fnmatch
-    matches=set()
+    # matches=set()
     for root, dirnames, filenames in os.walk(searchdir):
         for filename in fnmatch.filter(filenames+dirnames, filenamepattern):
             yield os.path.join(root, filename)

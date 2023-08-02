@@ -12,7 +12,7 @@ def resubmit_jobdir(d,onlynonsuccessful=True,quiet=False,prefix='',excludenodes=
     bn=os.path.basename(d)
     ecf=os.path.join(d,'exitcode.txt')
     runf=os.path.join(d,'run.sh')
-    commentf=os.path.join(d,'comment.txt')
+    # commentf=os.path.join(d,'comment.txt')
     if not os.path.exists(runf):
         pr("Ignoring what does not look like a jobdir: %s"%bn)
         return

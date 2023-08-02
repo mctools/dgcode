@@ -7,7 +7,7 @@ matplotlib widgets and layouts done with Qt designer
 
 __all__ = [ 'MyGuiAppBase','launch_qtapp' ]
 
-import os
+# import os
 import sys
 
 #better support for 4k displays:

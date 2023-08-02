@@ -34,7 +34,6 @@ def summarise_params(parambase_list,ignore_same=False):
                 vclines+=['%s [%i]'%(str(v),c)]
             vclines.sort()
             pardifflines+=['     DIFF %s = %s'%(parname,' '.join(vclines))]
-            pass
     if not ignore_same:
         for sameline in parsamelines:
             print(sameline)

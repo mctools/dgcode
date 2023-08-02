@@ -21,7 +21,7 @@
 import Utils.PathUtils as PU
 import base64
 import pathlib
-import stat
+# import stat
 
 class _TextBallDefs:
     magic_common='\n\n#~~~'#NOTE: '~' is neither used in base64 or ascii85 encodings!

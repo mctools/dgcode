@@ -40,7 +40,7 @@ def set_install_names_to_abs_path(libdir,prefix='',verbose=False):
             assert self.install_name_new is not None
             return self.install_name_orig != self.install_name_new
 
-    libs=[]
+    # libs=[]
     rbn2lib={}#basename of real lib files -> Lib objects
     #abn2lib={}#basename of both sym links and real libs -> Lib objects
 

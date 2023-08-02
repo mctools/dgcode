@@ -46,7 +46,7 @@ def main():
     try:
         while tbrowse:
             time.sleep(1)
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         print("")
 
 sys.exit(main())
