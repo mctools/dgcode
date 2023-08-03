@@ -69,7 +69,8 @@ if pyversion < _minpy2 or (pyversion >= (3,0,0) and pyversion < _minpy3):
 __metaclass__ = type  #classes are new-style without inheriting from "object"
 
 if pyversion < (3,0,0):
-    range = xrange #in py3, range is py2's xrange
+    #in py3, range is py2's xrange (n-o-q-a in next line is to disable false positive with ruff):
+    range = xrange # noqa: F821
 
 #For raw output of byte-array contents to stdout, without any troubles depending
 #on encoding or python versions:

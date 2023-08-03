@@ -171,7 +171,7 @@ def textball_create( topdir,
         try:
             relpath_str.encode('utf8')
         except UnicodeEncodeError:
-            parser.error(f'File name can not be encoded in UTF8: {relpath_str}')
+            raise RuntimeError(f'File name can not be encoded in UTF8: {relpath_str}')
         if '\n' in relpath_str:
             raise RuntimeError(f'New line characters not allowed in file name: {relpath}')
         if not path_filter(f):
@@ -219,7 +219,7 @@ def textball_unpack( textball,
         if dest.exists():
             raise RuntimeError(f'Error while unpacking - file already exists: {dest}')
         dest.parent.mkdir(parents=True,exist_ok=True)
-        _write_file_preserve_newlines(dest,content)
+        PU.write_file_preserve_newlines(dest,content)
 
 #if __name__=='__main__':
 #    import os

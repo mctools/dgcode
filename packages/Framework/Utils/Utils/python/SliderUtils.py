@@ -59,9 +59,9 @@ def argumentExplorer(f, sliders_properties, wait_for_validation = False):
             print(res)
      
     def on_key_press(event):         
-        if event.key is 'enter':
+        if event.key == 'enter':
             on_changed(event)  
-			     
+
     figure.canvas.mpl_connect('key_press_event', on_key_press)
      
     # AUTOMATIC UPDATE ?

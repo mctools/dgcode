@@ -231,17 +231,17 @@ class HistMgr:
     def __init__(self):
         self.__allhists=[]
 
-    def book1d(*args):
+    def book1d(self,*args):
         h=ROOT.TH1D(*args)
         self.__allhists+=[h]
         return h
 
-    def book2d(*args):
+    def book2d(self,*args):
         h=ROOT.TH2D(*args)
         self.__allhists+=[h]
         return h
 
-    def write(filename):
+    def write(self,filename):
         f=ROOT.TFile(filename,"RECREATE")
         for h in self.__all_hists:
             h.Write()

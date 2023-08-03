@@ -9,7 +9,7 @@ def _strbytes2path(strbytes_path):
         fpath = pathlib.Path(s)
         str(fpath).encode('utf8')#check that it can be encoded in utf8 (TODO: Require ASCII?)
     except (UnicodeDecodeError,UnicodeEncodeError):
-        raise SystemExit('Forbidden characters in filename detected! : "%s"'%fn)
+        raise SystemExit('Forbidden characters in filename detected! : "%s"'%strbytes_path)
     return fpath
 
 #Duplicated from .githooks/hooks.py: We set GIT_CONFIG=/dev/null to avoid

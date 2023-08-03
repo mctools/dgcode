@@ -52,35 +52,35 @@ def summarise_geogenpars(scanjobs,ignore_same=False):
     print("==============================================")
     return (geosame,geodiff,gensame,gendiff)
 
-def geo_parvals(parname):
-    vals=set()
-    for j in scanjobs:
-        eval('vals.add(j.setup().geo().%s)'%parname)
-    l=list(vals)
-    l.sort()
-    return l
+#unused? def geo_parvals(scanjobs,parname):
+#unused?     vals=set()
+#unused?     for j in scanjobs:
+#unused?         eval('vals.add(j.setup().geo().%s)'%parname)
+#unused?     l=list(vals)
+#unused?     l.sort()
+#unused?     return l
 
-def select(selector):
-    out=[]
-    for j in scanjobs:
-        if selector(j.setup()):
-            out+=[j]
-    return out
+#unused? def select(selector):
+#unused?     out=[]
+#unused?     for j in scanjobs:
+#unused?         if selector(j.setup()):
+#unused?             out+=[j]
+#unused?     return out
 
-def scanjobs_groups(pars_varying_within_group,jobfilter=None):
-    groups2jobs={}
-    for j in scanjobs:
-        if jobfilter and not jobfilter(j):
-            continue
-        groupkey=tuple(sorted((k,v) for k,v in j.opts.items() if not k in pars_varying_within_group))
-        if groupkey in groups2jobs: groups2jobs[groupkey] += [j]
-        else: groups2jobs[groupkey] = [j]
-    if jobfilter and not groups2jobs:
-        import inspect
-        print("ERROR: No jobs selected by filter!!")
-        print(inspect.getsource(jobfilter))
-        assert False
-    return groups2jobs
+#unused? def scanjobs_groups(pars_varying_within_group,jobfilter=None):
+#unused?     groups2jobs={}
+#unused?     for j in scanjobs:
+#unused?         if jobfilter and not jobfilter(j):
+#unused?             continue
+#unused?         groupkey=tuple(sorted((k,v) for k,v in j.opts.items() if not k in pars_varying_within_group))
+#unused?         if groupkey in groups2jobs: groups2jobs[groupkey] += [j]
+#unused?         else: groups2jobs[groupkey] = [j]
+#unused?     if jobfilter and not groups2jobs:
+#unused?         import inspect
+#unused?         print("ERROR: No jobs selected by filter!!")
+#unused?         print(inspect.getsource(jobfilter))
+#unused?         assert False
+#unused?     return groups2jobs
 
 def group(jobs,groupfunc,selectfunc=None):
     d={}

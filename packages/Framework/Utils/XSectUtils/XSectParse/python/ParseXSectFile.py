@@ -17,6 +17,7 @@ def parse(fh):
     storagetrf = lambda x : np.asarray(x)
 
     currentproc=None
+    currentprocdata=[]
     for l in fh:
         l=l.strip()
         if l.startswith('#'):
