@@ -102,7 +102,7 @@ def chain(g4sim_exec_name,griffana_exec_name,griff_mode=None):
         if do_cleanup:
             ec=system("rm -f %s/sim*.griff"%pipes.quote(os.path.join(rundir,dirname)))
             if ec!=0:
-                print("ERROR: Failure during cleanup"%step)
+                print("ERROR: Failure during cleanup")
                 sys.exit(ec if ec<127 else 127)
     run('runsample')
     if chainmult==1:
