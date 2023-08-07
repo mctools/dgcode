@@ -15,11 +15,15 @@ namespace G4Launcher_py {
 
   G4ThreeVector pytuple2g4vect(const py::tuple&t)
   {
+    if ( py::len(t) != 3 )
+      throw std::runtime_error("pytuple2g4vect got tuple of invalid length.");
     assert(py::len(t)==3);
-    float x = py::extract<float>(t[0]);
-    float y = py::extract<float>(t[1]);
-    float z = py::extract<float>(t[2]);
-    return G4ThreeVector(x,y,z);
+    auto x = py::extract<float>(t[0]);
+    auto y = py::extract<float>(t[1]);
+    auto z = py::extract<float>(t[2]);
+    if ( !x.check() || !y.check() || !z.check() )
+      throw std::runtime_error("pytuple2g4vect got tuple of invalid content (must be floats).");
+    return G4ThreeVector(x(),y(),z());
   }
 
   void Launcher_setParticleGun1(G4Launcher::Launcher* l,int pdgcode, double eKin,

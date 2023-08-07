@@ -89,9 +89,14 @@ public:
     std::size_t ntot;
     NumpyUtils::decodeBuffer(m_data,buf,ntot);
     assert(buf);
-    long nx = py::extract<long>(m_cells[0][0]);
-    long ny = py::extract<long>(m_cells[1][0]);
-    long nz = py::extract<long>(m_cells[2][0]);
+    auto try_nx = py::extract<long>(m_cells[0][0]);
+    auto try_ny = py::extract<long>(m_cells[1][0]);
+    auto try_nz = py::extract<long>(m_cells[2][0]);
+    if ( !try_nx.check() || !try_ny.check() || !try_nz.check() )
+      throw std::runtime_error("Could not extract long from m_cells[0..2][0]");
+    long nx = try_nx();
+    long ny = try_ny();
+    long nz = try_nz();
     assert(std::size_t(nx*ny*nz)==ntot);
     for (long ix = 0; ix < nx; ++ix)
       for (long iy = 0; iy < ny; ++iy)

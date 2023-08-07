@@ -426,11 +426,18 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
       }
       py::ensurePyInit();
       py::object mod = py::import("NCrystalPreview");
-      py::object pyg4mat = mod.attr("createMaterial")(py::str(cfgstr));
-      boost::shared_ptr<G4Material> bpmat = py::extract<boost::shared_ptr<G4Material> >(pyg4mat);
-      mat = bpmat.get();
-      //Nasty trick to get boost::shared_ptr to release the material ptr:
-      new(&bpmat) boost::shared_ptr<G4Material>();
+      py::object py_g4mat_str = mod.attr("createMaterial_AsSafeStr")(py::str(cfgstr));
+      auto try_g4mat_str =  py::extract<std::string>( py_g4mat_str );
+      if ( !try_g4mat_str.check() )
+        throw std::runtime_error("Unexpected problem getting G4Material pointer for NCrystalDev material.");
+      std::string g4mat_str = try_g4mat_str();
+      std::stringstream ss_int;
+      ss_int << g4mat_str;
+      std::uintptr_t g4mat_int;
+      ss_int >> g4mat_int;
+      mat = reinterpret_cast<G4Material*>(g4mat_int);
+      if (!mat)
+        throw std::runtime_error("Got null G4Material pointer for NCrystalDev material.");
     }
   } else if (matinfo.name=="NCrystal") {
     const std::string& overridebaseg4mat = matinfo.propertyAsString("overridebaseg4mat","");
