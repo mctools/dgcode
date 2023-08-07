@@ -3,7 +3,7 @@
 = License and copyright info concerning code in the External/NCrystal subdirectory =
 ====================================================================================
 
-This subdirectory contains an import of the offical NCrystal code (v3.6.1)
+This subdirectory contains an import of the offical NCrystal code (v3.7.1)
 from github. NCrystal is a library and associated tools which enables
 calculations for Monte Carlo simulations of thermal neutrons in crystals and
 other materials. More info at https://mctools.github.io/ncrystal/

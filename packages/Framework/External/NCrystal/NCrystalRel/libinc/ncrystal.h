@@ -393,12 +393,12 @@ extern "C" {
 
   /*If not halting on error, these functions can be used to access information     */
   /*about errors encountered:                                                      */
-  NCRYSTAL_API int ncrystalrel_error();/* returns 1 if an error condition occurred. */
-  NCRYSTAL_API const char * ncrystalrel_lasterror();/* returns description of last error (NULL if none) */
-  NCRYSTAL_API const char * ncrystalrel_lasterrortype();/* returns description of last error (NULL if none) */
+  NCRYSTAL_API int ncrystalrel_error(void);/* returns 1 if an error condition occurred. */
+  NCRYSTAL_API const char * ncrystalrel_lasterror(void);/* returns description of last error (NULL if none) */
+  NCRYSTAL_API const char * ncrystalrel_lasterrortype(void);/* returns description of last error (NULL if none) */
   /* TODO: error file/line-no as well? */
 
-  NCRYSTAL_API void ncrystalrel_clearerror();/* clears previous error if any */
+  NCRYSTAL_API void ncrystalrel_clearerror(void);/* clears previous error if any */
 
   /*Another option is to provide a custom error handler which will be called on    */
   /*each error:                                                                    */
@@ -418,11 +418,11 @@ extern "C" {
   /* threaded usage, the caller should ensure that the function is thread-safe and */
   /* returns numbers from different streams in each thread (through suitable usage */
   /* of thread_local objects perhaps).                                             */
-  NCRYSTAL_API void ncrystalrel_setrandgen( double (*rg)() );
+  NCRYSTAL_API void ncrystalrel_setrandgen( double (*rg)(void) );
 
   /* It is also possible to (re) set the RNG to the builtin generator (optionally  */
   /* by state or integer seed) */
-  NCRYSTAL_API void ncrystalrel_setbuiltinrandgen();
+  NCRYSTAL_API void ncrystalrel_setbuiltinrandgen(void);
   NCRYSTAL_API void ncrystalrel_setbuiltinrandgen_withseed(unsigned long seed);
   NCRYSTAL_API void ncrystalrel_setbuiltinrandgen_withstate(const char*);
 
@@ -466,7 +466,7 @@ extern "C" {
 
   /* Add directory to custom search path or clear custom search path:              */
   NCRYSTAL_API void ncrystalrel_add_custom_search_dir( const char * dir );
-  NCRYSTAL_API void ncrystalrel_remove_custom_search_dirs();
+  NCRYSTAL_API void ncrystalrel_remove_custom_search_dirs(void);
 
   /* Enable/disable standard search mechanisms (all enabled by default). For the   */
   /* case of ncrystalrel_enable_stddatalib, provide dir=NULL if you wish to use the   */
@@ -479,7 +479,7 @@ extern "C" {
 
   /* Remove all current data sources (supposedly in order to subsequently enable   */
   /* sources selectively). This also removes virtual files and caches.             */
-  NCRYSTAL_API void ncrystalrel_remove_all_data_sources();
+  NCRYSTAL_API void ncrystalrel_remove_all_data_sources(void);
 
 
   /*============================================================================== */
@@ -525,7 +525,7 @@ extern "C" {
 
   /* Get all (Z,A) values in internal DB (A=0 means natural element). The second   */
   /* fct accepts two preallocated arrays with length given by the first fct:       */
-  NCRYSTAL_API unsigned ncrystalrel_atomdatadb_getnentries();
+  NCRYSTAL_API unsigned ncrystalrel_atomdatadb_getnentries(void);
   NCRYSTAL_API void ncrystalrel_atomdatadb_getallentries( unsigned* zvals,
                                                        unsigned* avals );
 
@@ -550,7 +550,7 @@ extern "C" {
   NCRYSTAL_API char* ncrystalrel_normalisecfg( const char * cfgstr );
 
   /* Clear various caches employed inside NCrystal:                                */
-  NCRYSTAL_API void ncrystalrel_clear_caches();
+  NCRYSTAL_API void ncrystalrel_clear_caches(void);
 
   /* Get list of plugins. Resulting string list must be deallocated by a call to   */
   /* ncrystalrel_dealloc_stringlist by, and contains entries in the format            */
@@ -579,12 +579,12 @@ extern "C" {
 #  undef NCRYSTAL_VERSION_STR
 #endif
 #define NCRYSTAL_VERSION_MAJOR 3
-#define NCRYSTAL_VERSION_MINOR 6
+#define NCRYSTAL_VERSION_MINOR 7
 #define NCRYSTAL_VERSION_PATCH 1
-#define NCRYSTAL_VERSION   3006001 /* (1000000*MAJOR+1000*MINOR+PATCH)             */
-#define NCRYSTAL_VERSION_STR "3.6.1"
-  NCRYSTAL_API int ncrystalrel_version(); /* returns NCRYSTAL_VERSION                  */
-  NCRYSTAL_API const char * ncrystalrel_version_str(); /* returns NCRYSTAL_VERSION_STR */
+#define NCRYSTAL_VERSION   3007001 /* (1000000*MAJOR+1000*MINOR+PATCH)             */
+#define NCRYSTAL_VERSION_STR "3.7.1"
+  NCRYSTAL_API int ncrystalrel_version(void); /* returns NCRYSTAL_VERSION                  */
+  NCRYSTAL_API const char * ncrystalrel_version_str(void); /* returns NCRYSTAL_VERSION_STR */
 
   /* Load raw NCMAT data into JSON structures. Must deallocate with call to        */
   /* ncrystalrel_dealloc_string as usual. (WARNING: JSON is incomplete for now!!!!!)  */
@@ -635,7 +635,7 @@ extern "C" {
   NCRYSTAL_API double ncrystalrel_decodecfg_packfact( const char * cfgstr );
 
   /*Obsolete function which now just is an alias for ncrystalrel_clear_caches above:  */
-  NCRYSTAL_API void ncrystalrel_clear_info_caches();
+  NCRYSTAL_API void ncrystalrel_clear_info_caches(void);
 
   /*Obsolete function. Atom positions are now always available when                */
   /*ncrystalrel_info_natominfo returns a value greater than 0:                        */

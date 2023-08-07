@@ -2,7 +2,7 @@ package(USEPKG NCrystalRel USEEXT Geant4)
 
 #################################################################################################
 
-Import of the offical NCrystal code (v3.6.1) from github.
+Import of the offical NCrystal code (v3.7.1) from github.
 
 More info at https://mctools.github.io/ncrystal/
 

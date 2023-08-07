@@ -104,7 +104,7 @@ def extractKnl( vdos, mass_amu, temperature, vdoslux = 3, scatxs = 1.0,
     If provided, the order_weight_function can be used to assign a weight to
     each order of the expansion (e.g. 0.0 to remove the contribution of that
     order). It must be a function taking a single parameter n (the order), and
-    return a floating point value (the weight). Instead of providing
+    return a floating point value (the weight).
 
     If plot=True, the extracted kernel will be plotted with the
     NCrystal.plot.plot_knl function.
@@ -582,7 +582,6 @@ class PhononDOSAnalyser:
             plot_kwargs['labelfct'] = lambda x : thr_description
             c.plot_xsect( **plot_kwargs )
 
-        #fixme: plt_final?
         if do_legend:
             plt.legend()
         if do_grid:
@@ -849,7 +848,7 @@ class PhononDOSAnalyser:
                         if v is not None:
                             return v *unval
                 if v is None:
-                    raise NCBadInput(f'Invalid threshold string: {s}')
+                    raise NCBadInput(f'Invalid threshold string: {x}')
             if hasattr(x,'__len__') and len(x)==2 and isinstance(x[1],str):
                 _,unitfactor = _parsevdosunit( x[1] )
                 v = _decodeflt( x[0] )

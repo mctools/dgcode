@@ -321,22 +321,22 @@ void ncrystalrel_seterrhandler(void (*handler)(char*,char*))
   ncc::custom_error_handler = handler;
 }
 
-int ncrystalrel_error()
+int ncrystalrel_error(void)
 {
   return ncc::waserror;
 }
 
-const char * ncrystalrel_lasterror()
+const char * ncrystalrel_lasterror(void)
 {
   return ncc::waserror ? ncc::errmsg : 0;
 }
 
-const char * ncrystalrel_lasterrortype()
+const char * ncrystalrel_lasterrortype(void)
 {
   return ncc::waserror ? ncc::errtype : 0;
 }
 
-void ncrystalrel_clearerror()
+void ncrystalrel_clearerror(void)
 {
   ncc::waserror = 0;
 }
@@ -1406,14 +1406,14 @@ ncrystalrel_absorption_t ncrystalrel_create_absorption( const char * cfgstr )
   return {nullptr};
 }
 
-void ncrystalrel_clear_caches()
+void ncrystalrel_clear_caches(void)
 {
   try {
     NC::clearCaches();
   } NCCATCH;
 }
 
-void ncrystalrel_clear_info_caches()
+void ncrystalrel_clear_info_caches(void)
 {
   //deprecated, now simply redirects to ncrystalrel_clear_caches.
   ncrystalrel_clear_caches();
@@ -1432,12 +1432,12 @@ int ncrystalrel_has_factory( const char* name )
   return 0;
 }
 
-int ncrystalrel_version()
+int ncrystalrel_version(void)
 {
   return NCRYSTAL_VERSION;
 }
 
-const char * ncrystalrel_version_str()
+const char * ncrystalrel_version_str(void)
 {
   return NCRYSTAL_VERSION_STR;
 }
@@ -1685,7 +1685,7 @@ ncrystalrel_atomdata_t ncrystalrel_create_atomdata_fromdbstr( const char* name )
   return {nullptr};
 }
 
-unsigned ncrystalrel_atomdatadb_getnentries()
+unsigned ncrystalrel_atomdatadb_getnentries(void)
 {
   try {
     return NC::AtomDB::getAllEntriesCount();
@@ -1768,7 +1768,7 @@ void ncrystalrel_dealloc_string( char* ss )
     delete[] ss;
 }
 
-void ncrystalrel_setrandgen( double (*rg)() )
+void ncrystalrel_setrandgen( double (*rg)(void) )
 {
   try {
     if (rg)
@@ -1778,7 +1778,7 @@ void ncrystalrel_setrandgen( double (*rg)() )
   } NCCATCH;
 }
 
-void ncrystalrel_setbuiltinrandgen()
+void ncrystalrel_setbuiltinrandgen(void)
 {
   try {
     NC::setDefaultRNG( NC::createBuiltinRNG() );
@@ -1961,7 +1961,7 @@ void ncrystalrel_add_custom_search_dir( const char * dir )
   } NCCATCH;
 }
 
-void ncrystalrel_remove_all_data_sources()
+void ncrystalrel_remove_all_data_sources(void)
 {
   try {
     NC::DataSources::removeAllDataSources();
@@ -1969,7 +1969,7 @@ void ncrystalrel_remove_all_data_sources()
 }
 
 
-void ncrystalrel_remove_custom_search_dirs( )
+void ncrystalrel_remove_custom_search_dirs(void)
 {
   try {
     NC::DataSources::removeCustomSearchDirectories();
