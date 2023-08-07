@@ -100,10 +100,16 @@ if (geant4_config_file)
     file(REAL_PATH $ENV{CONDA_PREFIX} real_condaprefix)
     cmake_path(IS_PREFIX real_condaprefix "${real_g4cfg}" NORMALIZE tmp)
     if (tmp)
-      message("Geant4 from conda detected: Adding -Wl,--allow-shlib-undefined to work around missing symbols.")
-      set(ExtDep_Geant4_LINK_FLAGS "${ExtDep_Geant4_LINK_FLAGS} -Wl,--allow-shlib-undefined")
-      #FIXME we could also do a try_compile first perhaps and see if this is needed + works?
+      include(CheckLinkerFlag)
+      check_linker_flag(CXX -Wl,--allow-shlib-undefined tmp)
+      if ( tmp )
+        message("Geant4 from conda detected: Adding -Wl,--allow-shlib-undefined to work around missing symbols.")
+        set(ExtDep_Geant4_LINK_FLAGS "${ExtDep_Geant4_LINK_FLAGS} -Wl,--allow-shlib-undefined")
+        #NB: we could in principle also do a try_compile first perhaps and see if
+        #this is still needed (and works), but it is complicated to replicate here
+        #the exact compilation command that dgbuild will create later, since some
+        #flags might be added elsewhere.
+      endif()
     endif()
   endif()
-
 endif()

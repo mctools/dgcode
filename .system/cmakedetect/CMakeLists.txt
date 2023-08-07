@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.12.4...3.24.2)
-cmake_policy(SET CMP0054 NEW)
+cmake_minimum_required(VERSION 3.25...3.26.4)
 
 if (DG_QUIET)
   #override normal message function and block anything except errors and warnings
