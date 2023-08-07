@@ -144,12 +144,20 @@ def extractenv(tmpdir,cmakedir,cmakeargs,quiet=True,verbose=False,prefix=''):
     if ec!=0: return
     print("%sInspecting environment via CMake"%prefix)#don't silence this even if quiet==true (since cmake will always give a bit of output)
     capture = ' 2>&1|tee cmake_output21_capture.txt; exit ${PIPESTATUS[0]}'
-    ec = utils.system("cd %s/cmake/ && cmake%s%s %s %s%s"%(tmpdir,
-                                                         ' -DDG_QUIET=1' if quiet else '',
-                                                         ' -DDG_VERBOSE=1' if verbose else '',
-                                                         ' '.join('-D'+a for a in cmakeargs),
-                                                         cmakedir,
-                                                         capture))
+
+    #pass on conda cmake args:
+    general_cmake_args=os.environ.get('CMAKE_ARGS','')
+    if general_cmake_args:
+        general_cmake_args = ' '+general_cmake_args
+
+
+    ec = utils.system("cd %s/cmake/ && cmake%s%s%s %s %s%s"%(tmpdir,
+                                                             general_cmake_args,
+                                                             ' -DDG_QUIET=1' if quiet else '',
+                                                             ' -DDG_VERBOSE=1' if verbose else '',
+                                                             ' '.join('-D'+a for a in cmakeargs),
+                                                             cmakedir,
+                                                             capture))
     print("%sEnvironment inspection done"%prefix)#don't silence this even if quiet==true
     if ec!=0: return
     printedinfo = parse_stdouterr(os.path.join(tmpdir,'cmake','cmake_output21_capture.txt'))

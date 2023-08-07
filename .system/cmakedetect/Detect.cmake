@@ -3,7 +3,9 @@
 ###   => all code can implicitly depend on these  ###
 #####################################################
 
+cmake_policy(PUSH)
 include("ExtDep_Python.cmake")
+cmake_policy(POP)
 
 #Declare include dirs added above as -isystem (and remove /usr/include):
 declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_CXX)
@@ -46,7 +48,9 @@ while(extdep_pending)
   if (NOT ${extdep} AND NOT "x${${extdep}}" STREQUAL "x")
     set(HAS_${extdep} 0)
   else()
+    cmake_policy(PUSH)
     include(optional/ExtDep_${extdep}.cmake)
+    cmake_policy(POP)
   endif()
 
   if ("x${HAS_${extdep}}" STREQUAL "xpending")

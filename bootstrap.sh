@@ -140,6 +140,16 @@ function _dgcode_resetdgdepfixerpath() {
     export PATH="$DGCODE_FMWK_DIR/.system/depfix/bld/bin:$PATH"
 }
 
+if [ "x${DGCODE_BOOTSTRAP_SKIP_DGDEPFIXER_CHECK:-}" != x ]; then
+    if [ "x${CONDA_PREFIX:-}" != x ]; then
+        if [ "x${CMAKE_ARGS:-}" == x ]; then
+            echo "ERROR: You have env vars CONDA_PREFIX but no CMAKE_ARGS. Make sure you have both 'cmake' and 'compilers' packages installed in conda (and possibly reactivate the environment)."
+            return 2
+        fi
+    fi
+fi
+
+
 if [ "x${DGCODE_BOOTSTRAP_SKIP_DGDEPFIXER_CHECK:-}" == x ]; then
     #Make sure "compiled" dgdepfixer is up to date:
     python3 "$DGCODE_FMWK_DIR"/.system/depfix/compile.py || echo "ERRORS detected during dgdepfixer compilation!!!!"

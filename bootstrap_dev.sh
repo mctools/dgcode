@@ -10,7 +10,7 @@
 #script named 'bootstrap_dev_extraconf.sh' next to it, and make the changes there.
 
 export DGCODE_FMWK_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export DGCODE_PROJECTS_DIR="/tmp/$USER/"$(cd "$DGCODE_FMWK_DIR"; python3 -c 'import pathlib; print(hash(str(pathlib.Path(".").absolute().resolve())),end="")')
+export DGCODE_PROJECTS_DIR="/tmp/$USER/"$(cd "$DGCODE_FMWK_DIR"; python3 -c 'import pathlib; print(abs(hash(str(pathlib.Path(".").absolute().resolve()))),end="")')
 if [ ! -f $DGCODE_PROJECTS_DIR ]; then
     mkdir -p "$DGCODE_PROJECTS_DIR"
     echo "$DGCODE_FMWK_DIR" > "$DGCODE_PROJECTS_DIR/dgcode_framework.txt"
