@@ -110,9 +110,19 @@ class TargetBinary(target_base.Target):
         if pkg.extraflags_link:
             extra_flags+=pkg.extraflags_link
         pattern = 'create_lib' if shlib else 'create_exe'
-        rpath_pattern = 'rpath_flag_lib' if shlib else 'rpath_flag_exe'
-        extra_flags+=[ langinfo[rpath_pattern]%join('${INST}','lib') ]
-        extra_flags+=[ langinfo[rpath_pattern]%join('${INST}','lib','links') ]
+        rpath_pattern = langinfo['rpath_flag_lib' if shlib else 'rpath_flag_exe']
+        def append_to_rpath( extra_flags, p ):
+            extra_flags += [ rpath_pattern%str(p) ]
+            if '-rpath' in rpath_pattern and not '-rpath-link' in rpath_pattern:
+                extra_flags += [ rpath_pattern.replace('-rpath','-rpath-link')%str(p) ]
+        append_to_rpath( extra_flags, join('${INST}','lib') )
+        append_to_rpath( extra_flags, join('${INST}','lib','links') )
+        conda_prefix =  os.environ.get('CONDA_PREFIX','')#fixme: query elsewhere?
+        if conda_prefix:
+            import pathlib
+            _cp = pathlib.Path(conda_prefix) / 'lib'
+            if _cp.is_dir():
+                append_to_rpath( extra_flags, _cp)
         if not os.path.exists(objlistfile) or open(objlistfile).read()!=sobjs:
             open(objlistfile,'w').write(sobjs)
         d=join('${INST}',instsubdir)
