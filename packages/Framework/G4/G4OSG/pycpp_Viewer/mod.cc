@@ -16,7 +16,10 @@ namespace G4OSG {
     py::ssize_t n = py::len(input);
     for(py::ssize_t i=0;i<n;++i) {
       py::object elem = input[i];
-      uint64_t evt = py::extract<uint64_t>(elem);
+      auto try_evt = py::extract<uint64_t>(elem);
+      if ( !try_evt.check() )
+        throw std::runtime_error("Could not decode element in list as integer");
+      uint64_t evt = try_evt();
       o.insert(evt);
     }
   }
