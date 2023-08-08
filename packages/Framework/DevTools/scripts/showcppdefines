@@ -1,2 +1,2 @@
-#!/bin/bash
+#!/usr/bin/env bash
 cc -x c++ -std=c++17 -dM -E - </dev/null

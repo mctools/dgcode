@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [ "x$ESS_DATA_DIR" == "x" ]; then
     echo "ERROR: ESS_DATA_DIR variable not set."
     exit 2

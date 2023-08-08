@@ -145,11 +145,11 @@ atexit.register(_filecleaner)
 def exec_bash_and_updateenv(cmd):
     """Execute a given bash command and update environment variables in current python process accordingly"""
     import os, sys, subprocess, shlex, json
-    #Execute with /bin/bash and use python3+json to stream the resulting os.environ to stdout, using a well-defined encoding:
+    #Execute with /usr/bin/env bash and use python3+json to stream the resulting os.environ to stdout, using a well-defined encoding:
     import pathlib
     pyintrp = shlex.quote(str(pathlib.Path(sys.executable)))
     pycmd='import os,sys,json;sys.stdout.buffer.write(json.dumps(dict(os.environ)).encode("utf8"))'
-    cmd=['/bin/bash', '-c', '%s && %s -c %s'%(cmd,pyintrp,shlex.quote(pycmd))]
+    cmd=['/usr/bin/env','bash', '-c', '%s && %s -c %s'%(cmd,pyintrp,shlex.quote(pycmd))]
     pipe = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     #Unpack the streamed os.environ, using the same encoding:
     env = json.loads(pipe.stdout.read().decode('utf8'))

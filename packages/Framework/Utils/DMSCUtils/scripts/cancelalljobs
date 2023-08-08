@@ -1,5 +1,4 @@
-#!/bin/bash
-#!/bin/bash
+#!/usr/bin/env bash
 echo "This will cancel all your (running or pending) jobs in the queue."
 echo -n "If you are sure, type \"yes\": "
 read REP

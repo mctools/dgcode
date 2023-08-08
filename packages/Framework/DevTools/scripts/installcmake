@@ -36,7 +36,7 @@ class CMakeInstaller(DevTools._installutils.stdinstaller):
             sys.exit(1)
         install_x = os.path.join(blddir,'install.x')
         with open(install_x,'w') as fh:
-            fh.write('#!/bin/bash\n')
+            fh.write('#!/usr/bin/env bash\n')
             fh.write('mkdir -p %s\n'%Sys.quote(os.path.join(instdir)))
             for subdir in ['bin','doc','man','share']:
                 fh.write('mv %s %s && \\\n'%(Sys.quote(os.path.join(srcdir,subdir)),

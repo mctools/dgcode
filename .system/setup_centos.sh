@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -f /etc/os-release ]; then
     _tmpdetect=$(. /etc/os-release 2>/dev/null && echo x$ID ||echo xunknown)

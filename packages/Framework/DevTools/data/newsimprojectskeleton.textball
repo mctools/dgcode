@@ -300,7 +300,7 @@ G4Utils.chain.chain('ess_skeletonsp_sim','ess_skeletonsp_ana','REDUCED')
 
 #~~~textfile~~~>>> ~executable~ SkeletonSP/scripts/test
 
-#!/bin/bash
+#!/usr/bin/env bash
 
 #Unit test which makes a very simple test of our geometry, simulation and
 #analysis (using an empty physics list for speed). To avoid false positives, it

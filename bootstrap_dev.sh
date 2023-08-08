@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #Special bootstrap file for developers wishing to build the framework without a
 #project, and without needing to edit a local extraconf.sh file (the "projects"

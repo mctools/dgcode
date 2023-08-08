@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ -z "${DGCODE_PROJECTS_DIR}" ]]; then
   echo "ERROR: The DGCODE_PROJECTS_DIR variable must be set before sourcing bootstrap.sh"

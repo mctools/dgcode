@@ -25,7 +25,7 @@ def set_install_names_to_abs_path(libdir,prefix='',verbose=False):
     # The reason for having to do this is that OSX 10.11 (El Capitan) by default
     # does not allow usage of variables such as DYLD_LIBRARY_PATH in scripts run
     # via interpreters in system dirs (including '#!/usr/bin/env python3' and
-    # #!/bin/bash).
+    # #!/usr/bin/env bash).
 
     #First build up a list of all files in the directory (and their symlink aliases):
     class Lib:

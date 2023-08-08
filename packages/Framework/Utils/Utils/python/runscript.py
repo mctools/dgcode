@@ -4,7 +4,7 @@ def create_run_script(filename,cmd, setupsh = None, headerlines=None, extra_prer
     If setupsh is set, it will be sourced from inside the script
     If headerlines are set, they will be added to the top of the script as comments"""
     fh=open(filename,'w')
-    fh.write('#!/bin/bash\n')
+    fh.write('#!/usr/bin/env bash\n')
     if headerlines:
         for h in headerlines:
             fh.write('#%s\n'%h)

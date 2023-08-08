@@ -156,8 +156,8 @@ class stdinstaller:
             setup_cont=['if [ "x${%s:-}" != "x" -a -f "${%s:-}"/unsetup.sh ]; then'%(pev,pev),
                         '    . "${%s:-}"/unsetup.sh'%pev,'fi','']+setup_cont
         unsetup_cont=self.unsetup_file_contents(instdir)
-        setup_cont = '\n'.join(['#!/bin/bash']+fluff+setup_cont+[''])
-        unsetup_cont = '\n'.join(['#!/bin/bash']+fluff+prunepath+unsetup_cont+['','unset prunepath',''])
+        setup_cont = '\n'.join(['#!/usr/bin/env bash']+fluff+setup_cont+[''])
+        unsetup_cont = '\n'.join(['#!/usr/bin/env bash']+fluff+prunepath+unsetup_cont+['','unset prunepath',''])
         return setup_cont,unsetup_cont
 
     def go(self):

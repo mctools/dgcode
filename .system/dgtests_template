@@ -82,7 +82,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         td=join(testdir,bn)
         mkdir_p(td)
         tf=open(join(td,'run.sh'),'w')
-        tf.write('#!/bin/bash\n')
+        tf.write('#!/usr/bin/env bash\n')
         #tf.write('mkdir rundir && cd rundir && touch ../time_start && %s &> ../output.log \n'%bn)
         cmdstr = bn
         if do_pycoverage:

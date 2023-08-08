@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 prog=`which $1`
 if [ $? != 0 ]; then
     echo "Error: Command not found: $1"
