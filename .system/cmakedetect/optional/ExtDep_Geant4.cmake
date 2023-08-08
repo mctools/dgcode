@@ -10,9 +10,11 @@
 # Everything is then based on geant4-config "--cflags", "--libs" and "--has-feature gdml".
 #
 # Results:
-#   Sets HAS_Geant4, ExtDep_Geant4_COMPILE_FLAGS and ExtDep_Geant4_COMPILE_FLAGS
-#   ExtDep_Geant4_COMPILE_FLAGS will contain -DHAS_Geant4_GDML if GDML module is present.
-#
+#   Sets HAS_Geant4, ExtDep_Geant4_COMPILE_FLAGS_CXX and ExtDep_Geant4_LINK_FLAGS
+#   ExtDep_Geant4_COMPILE_FLAGS_CXX will contain -DHAS_Geant4_GDML if GDML module is present.
+#   ExtDep_Geant4_COMPILE_FLAGS_C is left empty, so we are assuming C code does
+#   not need Geant4 headers.
+
 # TODO: Deal with g4py and data files.
 
 set(HAS_Geant4 0)
@@ -38,8 +40,8 @@ if (geant4_config_file)
   message("-- Base Geant4 setup on ${geant4_config_file}")
   execute_process(COMMAND "${geant4_config_file}" "--libs" OUTPUT_VARIABLE ExtDep_Geant4_LINK_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(STRIP "${ExtDep_Geant4_LINK_FLAGS}" ExtDep_Geant4_LINK_FLAGS)
-  execute_process(COMMAND "${geant4_config_file}" "--cflags" OUTPUT_VARIABLE ExtDep_Geant4_COMPILE_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-  string(STRIP "${ExtDep_Geant4_COMPILE_FLAGS}" ExtDep_Geant4_COMPILE_FLAGS)
+  execute_process(COMMAND "${geant4_config_file}" "--cflags" OUTPUT_VARIABLE ExtDep_Geant4_COMPILE_FLAGS_CXX OUTPUT_STRIP_TRAILING_WHITESPACE)
+  string(STRIP "${ExtDep_Geant4_COMPILE_FLAGS_CXX}" ExtDep_Geant4_COMPILE_FLAGS_CXX)
   execute_process(COMMAND "${geant4_config_file}" "--has-feature" "gdml" OUTPUT_VARIABLE tmp OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(STRIP "${tmp}" tmp)
   if ( NOT "x${tmp}" STREQUAL "xyes" )
@@ -65,30 +67,32 @@ if (geant4_config_file)
       message("-- Warning: Geant4 has GDML enabled but XercesC could not be detected! Will pretend Geant4-GDML is absent.")
     else()
       #assuming only one entry in XercesC_INCLUDE_DIRS:
-      set(ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS} -I${XercesC_INCLUDE_DIRS} -isystem${XercesC_INCLUDE_DIRS} -DHAS_Geant4_GDML")
+      set(ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX} -I${XercesC_INCLUDE_DIRS} -isystem${XercesC_INCLUDE_DIRS} -DHAS_Geant4_GDML")
       findpackage_liblist_to_flags("${XercesC_LIBRARIES}" "" tmp)
       set(ExtDep_Geant4_LINK_FLAGS "${ExtDep_Geant4_LINK_FLAGS} ${tmp}")
     endif()
   endif()
   #Make sure G4 does not overrule the standard:
-  string(REPLACE "-std=c++98" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++0x" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++11" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++1y" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++14" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++1z" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++17" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++2a" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++20" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++2b" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
-  string(REPLACE "-std=c++23" "" ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS}")
+  string(REPLACE "-std=c++98" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++0x" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++11" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++1y" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++14" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++1z" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++17" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++2a" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++20" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++2b" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
+  string(REPLACE "-std=c++23" "" ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX}")
   #version:
   execute_process(COMMAND "${geant4_config_file}" "--version" OUTPUT_VARIABLE tmp OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(STRIP "${tmp}" tmp)
   set(ExtDep_Geant4_VERSION "${tmp}")
   #For gcc 8.2.0+G4 10.4.3 we got into trouble with -Woverloaded-virtual. Explicitly disable it for now:
-  set(ExtDep_Geant4_COMPILE_FLAGS "${ExtDep_Geant4_COMPILE_FLAGS} -Wno-overloaded-virtual")
+  set(ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX} -Wno-overloaded-virtual")
 
+  #Leave C flags empty, Geant4 is for C++ only:
+  set(ExtDep_Geant4_COMPILE_FLAGS_C "")
 
   if(DEFINED ENV{CONDA_PREFIX})
     #Sadly, it seems on at least ubuntu 20.04 on August 7 2023, geant4 in
