@@ -12,9 +12,18 @@ file(WRITE ${output_file} "#Dependency information extracted via cmake\n")
 set(oa APPEND ${output_file})
 
 file(${oa} "VAR@${}CMAKE_BUILD_TYPE@${CMAKE_BUILD_TYPE}\n")
+
 file(${oa} "VAR@${}PYTHON_EXECUTABLE@${PYTHON_EXECUTABLE}\n")
 file(${oa} "VAR@${}PYTHON_LIBRARIES@${PYTHON_LIBRARIES}\n")
 file(${oa} "VAR@${}PYTHON_INCLUDE_DIRS@${PYTHON_INCLUDE_DIRS}\n")
+
+file(${oa} "VAR@${}SYSBOOSTPYTHON_FOUND@${SYSTEM_BOOSTPYTHON_FOUND}\n")
+string( JOIN " " tmp ${SYSTEM_BOOSTPYTHON_CFLAGS_LIST} )
+file(${oa} "VAR@${}SYSBOOSTPYTHON_CFLAGS@${tmp}\n")
+string( JOIN " " tmp ${SYSTEM_BOOSTPYTHON_LINKFLAGS_LIST} )
+file(${oa} "VAR@${}SYSBOOSTPYTHON_LINKFLAGS@${tmp}\n")
+file(${oa} "VAR@${}SYSBOOSTPYTHON_INCDIR@${SYSTEM_BOOSTPYTHON_INCDIR}\n")
+
 
 file(${oa} "VAR@${}CMAKE_VERSION@${CMAKE_VERSION}\n")
 file(${oa} "VAR@${}CMAKE_SYSTEM@${CMAKE_SYSTEM}\n")
@@ -92,4 +101,5 @@ endforeach()
 
 file(${oa} "VAR@${}autoreconf_bin_list@${extdep_autoreconf_bin_list}\n")
 file(${oa} "VAR@${}autoreconf_env_list@${extdep_autoreconf_env_list}\n")
+
 

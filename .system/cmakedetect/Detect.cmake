@@ -7,6 +7,12 @@ cmake_policy(PUSH)
 include("ExtDep_Python.cmake")
 cmake_policy(POP)
 
+include( "ExtractFlags.cmake")
+
+cmake_policy(PUSH)
+include("ExtDep_Boost.cmake")
+cmake_policy(POP)
+
 #Declare include dirs added above as -isystem (and remove /usr/include):
 declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_CXX)
 declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_C)
