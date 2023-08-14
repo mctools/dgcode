@@ -1,4 +1,7 @@
-import os,re
+import os
+import re
+import shlex
+import pathlib
 import conf, target_base, env, dirs, langs, utils, includes, col, db, error
 join=os.path.join
 
@@ -28,7 +31,6 @@ class TargetBinaryObject(target_base.Target):
         for extdep in pkg.extdeps():
             extra_flags+=['${CFLAGS_%s_%s}'%(('CXX' if lang=='cxx' else 'C'),extdep)]
             self.deps+=['${EXT}/%s'%extdep]
-
 
         if pkg.extraflags_comp:
             extra_flags+=pkg.extraflags_comp
@@ -109,7 +111,6 @@ class TargetBinary(target_base.Target):
             extra_flags+=['${LDFLAGS_%s} ${LDFLAGS_%s_%s_%s}'%(extdep,extdep,('LIB' if shlib else 'EXE'),lang)]
         if pkg.extraflags_link:
             extra_flags+=pkg.extraflags_link
-        pattern = 'create_lib' if shlib else 'create_exe'
         rpath_pattern = langinfo['rpath_flag_lib' if shlib else 'rpath_flag_exe']
         def append_to_rpath( extra_flags, p ):
             extra_flags += [ rpath_pattern%str(p) ]
@@ -117,9 +118,10 @@ class TargetBinary(target_base.Target):
                 extra_flags += [ rpath_pattern.replace('-rpath','-rpath-link')%str(p) ]
         append_to_rpath( extra_flags, join('${INST}','lib') )
         append_to_rpath( extra_flags, join('${INST}','lib','links') )
+        extra_flags.append( '${DGBOOSTLDFLAGS_LIB}' if shlib else '${DGBOOSTLDFLAGS_EXE}' )
+
         conda_prefix =  os.environ.get('CONDA_PREFIX','')#fixme: query elsewhere?
         if conda_prefix:
-            import pathlib
             _cp = pathlib.Path(conda_prefix) / 'lib'
             if _cp.is_dir():
                 append_to_rpath( extra_flags, _cp)
@@ -127,6 +129,7 @@ class TargetBinary(target_base.Target):
             open(objlistfile,'w').write(sobjs)
         d=join('${INST}',instsubdir)
         contains_message=True
+        pattern = 'create_lib' if shlib else 'create_exe'
         self.code=['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sCreating %s%s"; fi'%(dcol,descr,dcolend),
                    'mkdir -p %s'%d,
                    langinfo[pattern]%(' '.join(extra_flags),
@@ -157,6 +160,7 @@ def create_tfactory_binary(instsubdir=None,pkglib=False,shlib=False,allowed_lang
         shlib=True
         instsubdir='lib'
     blainstsubdir=instsubdir#weird that we need this to propagate the variables into the next function
+
     def tfact_bin(pkg,subdir):
         instsubdir=blainstsubdir
         if '%s' in instsubdir:
@@ -164,12 +168,19 @@ def create_tfactory_binary(instsubdir=None,pkglib=False,shlib=False,allowed_lang
         srcs=[]
         hdrs=[]
         langspresent=set()
+        skip_fct = None
+
+        if pkg.name=='DGBoost' and env.env['system']['general']['sysboostpython_use']:
+            skip_fct = lambda basename : basename.startswith('dgboostpython_')
+
         for f in utils.listfiles(dirs.pkg_dir(pkg,subdir),ignore_logs=subdir.startswith('app_')):
             n,e=os.path.splitext(f)
             assert n
             langsrc = langs.srcext2lang.get(e,None)
             if langsrc:
                 langspresent.add(langsrc)
+                if skip_fct and skip_fct(n):
+                    continue
                 srcs+=[(n,e,langsrc)]
                 continue
             langhdr = None if langsrc else langs.hdrext2lang.get(e,None)

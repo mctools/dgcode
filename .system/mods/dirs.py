@@ -20,9 +20,9 @@ testdir = conf.test_dir()
 projdir = conf.projects_dir()
 cmakedetectdir = join(sysdir,'cmakedetect')
 incdirname='include'
-libdirname='libs'
+#libdirname='lib'#fixme: unused, 'lib' is simply hardcoded in a few places.
 
-sysinc = join(sysdir,'include')
+sysinc_shippedboost = join(sysdir,'include')
 envcache = blddir / 'env.cache'
 varcache = blddir / 'vars.cache' #dynamic user settings (for pkg filters and cmake flags)
 systimestamp_cache=blddir / 'systimestamp.cache'

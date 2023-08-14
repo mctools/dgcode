@@ -4,6 +4,7 @@ import col
 import env
 import utils
 import pipes
+import shlex
 
 def _write_targets(fh,targets):
     cmdpat='\t${P}%s\n'
@@ -87,10 +88,37 @@ def write_main(global_targets,enabled_pkgnames):
 
     fh.write('\n')
 
+    use_sysboostpy = env.env['system']['general']['sysboostpython_use']
+    if use_sysboostpy:
+        _c = env.env['system']['general']['sysboostpython_cflags'].strip()
+        _ = shlex.quote( str( (dirs.blddir/'sysboostinc').absolute().resolve() ) )
+        _c += ' -DDGCODE_USESYSBOOSTPYTHON -I%s -isystem%s'%(_,_)
+        _l = env.env['system']['general']['sysboostpython_linkflags'].strip()
+    else:
+        _c, _l = '',''
+        if dirs.sysinc_shippedboost:
+            _c = ' -I%s -isystem%s'%(dirs.sysinc_shippedboost,dirs.sysinc_shippedboost)
+    fh.write('DGBOOSTCFLAGS := %s\n'%_c)
+    def finalise_boost_ldflags( flags, shlib ):
+        ra = utils.rpath_appender(lang='cxx',shlib=shlib)
+        cxxldflags = env.env['system']['langs']['cxx']['ldflags']
+        res = []
+        for f in ra.apply_to_flags( shlex.split(flags) ):
+            if not f in cxxldflags:
+                res.append( f )
+        return ' '.join( shlex.quote(f) for f in res )
+
+    fh.write('DGBOOSTLDFLAGS_EXE := %s\n'%finalise_boost_ldflags(_l,shlib=False) )
+    fh.write('DGBOOSTLDFLAGS_LIB := %s\n'%finalise_boost_ldflags(_l,shlib=True) )
+
     for lang,info in env.env['system']['langs'].items():
         if info:#info is only available for available languages:
-            fh.write('CFLAGSLANG_%s := %s\n'%(lang,info['cflags']))
-            fh.write('LDFLAGSLANG_%s := %s\n'%(lang,info['ldflags']))
+            _c, _l = info['cflags'], info['ldflags']
+            if lang=='cxx':
+                _c += ' ${DGBOOSTCFLAGS}'
+                #_l += ' ${DGBOOSTLDFLAGS}'
+            fh.write('CFLAGSLANG_%s := %s\n'%(lang,_c))
+            fh.write('LDFLAGSLANG_%s := %s\n'%(lang,_l))
             fh.write('LDFLAGSPREPENDLANG_%s := %s\n'%(lang,info['ldflags_prepend']))
 
     fh.write('\n')

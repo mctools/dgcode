@@ -211,3 +211,37 @@ def import_modatpath(pathtomodule,modulename=None):
         #python2:
         import imp
         return imp.load_source(modulename,pathtomodule)
+
+class rpath_appender:
+    def __init__( self, lang, shlib ):
+        import env
+        langinfo=env.env['system']['langs'][lang]
+        rpath_pattern = langinfo['rpath_flag_lib' if shlib else 'rpath_flag_exe']
+        self.__patterns = [ rpath_pattern ]
+        if '-rpath' in rpath_pattern and not '-rpath-link' in rpath_pattern:
+            self.__patterns += [ self.__patterns[0].replace('-rpath','-rpath-link') ]
+    def apply_to_dir( self, directory ):
+        return [ p%directory for p in self.__patterns ]
+    def apply_to_flags( self, flag_list ):
+        found_dirs = []
+        for f in flag_list:
+            for p in ['-L','-Wl,rpath,','-Wl,rpath=','-Wl,rpath-link,','-Wl,rpath-link=']:
+                _ = None
+                if f.startswith(p):
+                    _ = f[len(p):]
+                    if not _:
+                        continue
+                elif not f.startswith('-'):
+                    import pathlib
+                    _ = pathlib.Path(f)
+                    if _.exists() and not _.is_dir() and _.parent.is_dir():
+                        _ = str(_.parent.absolute().resolve())#../bla/libfoo.so -> /some/where/bla
+                    elif not _.exists():
+                        _ = None
+                _ = str(_) if _ else None
+                if _ and not _ in found_dirs:
+                    found_dirs.append( _ )
+        res = flag_list[:]
+        for d in found_dirs:
+            res += self.apply_to_dir( d )
+        return res

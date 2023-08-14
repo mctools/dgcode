@@ -22,6 +22,7 @@ def perform_configuration(cmakeargs=[],
     import dynpkg
     import mtime
     import pickle
+    import pathlib
     #Possible external dependencies (based solely on files in ExtDep directory):
 
     possible_extdeps = set(os.path.basename(f)[7:-6] for f in glob.glob(os.path.join(dirs.cmakedetectdir,'optional/ExtDep_*.cmake')))
@@ -110,6 +111,27 @@ def perform_configuration(cmakeargs=[],
                 if os.path.realpath(f)==rp:
                     os.symlink(rp,os.path.join(linkdir,os.path.basename(f)))
 
+
+        #Also symlink the system boost includes as dgboost:
+        if env.env['system']['general']['sysboostpython_use']:
+            sysboostincdir = pathlib.Path(env.env['system']['general']['sysboostpython_incdir'])
+            if sysboostincdir.is_dir():
+                def ensure_dir_link( src, tgt ):
+                    if tgt.is_dir():
+                        if tgt.samefile(src):
+                            return
+                        if tgt.is_symlink():
+                            tgt.unlink()
+                    tgt.parent.mkdir( parents=True, exist_ok = True )
+                    tgt.symlink_to( src.absolute().resolve(),
+                                    target_is_directory=True )
+                ensure_dir_link( sysboostincdir,
+                                 dirs.blddir / 'sysboostinc' / 'dgboost' )
+                #We could consider making this available for downstream usage,
+                #but the correct flags would have to be used as well:
+                # ensure_dir_link( sysboostincdir,
+                #                  pathlib.Path(dirs.installdir)/dirs.incdirname/'dgboost')
+
     #update extdep, language info and runtime files, to trigger makefile target rebuilds as necessary:
     #utils.mkdir_p(os.path.join(dirs.blddir,'extdeps'))
     utils.mkdir_p(dirs.blddir / 'extdeps')
@@ -117,8 +139,11 @@ def perform_configuration(cmakeargs=[],
         utils.update_pkl_if_changed(info,dirs.blddir / 'extdeps' / extdep)
 
     utils.mkdir_p(dirs.blddir / 'langs')
+    boostinfo = dict((k,v) for k,v in env.env['system']['general'].items() if k.startswith('sysboostpython_'))
     for lang,info in envdict['system']['langs'].items():
-        utils.update_pkl_if_changed(info,dirs.blddir / 'langs' / lang)
+        #add boost info as well, to trigger rebuilds when needed.
+        utils.update_pkl_if_changed( {'langinfo':info,'boostinfo':boostinfo},
+                                     dirs.blddir / 'langs' / lang )
 
     #Gracefully disable packages based on missing external dependencies
 

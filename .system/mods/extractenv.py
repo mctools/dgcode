@@ -96,8 +96,7 @@ def parse(filename):
                 cflags = ' '.join([c for c in cflags.split() if not c.startswith('-std=c++')])
             elif lang=='CXX':
                 cflags = ' '.join([c for c in cflags.split() if not (c.startswith('-std=c') and not c.startswith('-std=c++'))])
-                if dirs.sysinc:
-                    cflags+=' -I%s -isystem%s'%(dirs.sysinc,dirs.sysinc)
+                cflags += ' ${DGBOOSTCFLAGS}'
             lvars['cflags'] = cflags
             lvars['ldflags_prepend'] = cmakevars.get('DG_GLOBAL_LINK_FLAGS_PREPENDED','')
             lvars['ldflags'] = ' '.join([cmakevars['CMAKE_%s_LINK_FLAGS'%lang],cmakevars.get('DG_GLOBAL_LINK_FLAGS','')])

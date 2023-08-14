@@ -4,6 +4,7 @@ import os
 import utils
 import col
 import db
+import env
 join=os.path.join
 
 class TargetPrepInc(target_base.Target):
