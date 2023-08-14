@@ -23,8 +23,19 @@
 #endif
 
 #include <dgboost/python.hpp>
+#ifdef DGCODE_USESYSBOOSTPYTHON
+namespace dgboost = boost;
+namespace py = boost::python;
+#else
 namespace py = dgboost::python;
+#endif
+
+#ifndef DGCODE_USESYSBOOSTPYTHON
 namespace dgboost {
+#else
+namespace boost {
+#endif
+
   namespace python {
     typedef return_value_policy<reference_existing_object> return_ptr;
 

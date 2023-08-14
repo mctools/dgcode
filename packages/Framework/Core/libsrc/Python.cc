@@ -1,7 +1,11 @@
 #include "Core/Python.hh"
 #include <stdexcept>
 
+#ifndef DGCODE_USESYSBOOSTPYTHON
 namespace dgboost {
+#else
+namespace boost {
+#endif
   namespace python {
     void raw_pyInit()
     {
