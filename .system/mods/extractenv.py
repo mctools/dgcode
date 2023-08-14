@@ -77,10 +77,10 @@ def parse(filename):
         'pythonexecutable': cmakevars['PYTHON_EXECUTABLE'],
         'pythonlibs': cmakevars['PYTHON_LIBRARIES'],
         'pythonincdirs': cmakevars['PYTHON_INCLUDE_DIRS'],
-        'sysboostpython_found' : bool(cmakevars['SYSBOOSTPYTHON_FOUND'].upper() in ('ON','TRUE','YES','Y','1')),
-        'sysboostpython_cflags' : cmakevars['SYSBOOSTPYTHON_CFLAGS'],
-        'sysboostpython_linkflags' : cmakevars['SYSBOOSTPYTHON_LINKFLAGS'],
-        'sysboostpython_incdir' : cmakevars['SYSBOOSTPYTHON_INCDIR']
+        'sysboostpython_use' : cmakevars['SYSBOOSTPYTHON_USE']=='1',
+        'sysboostpython_cflags' : cmakevars.get('SYSBOOSTPYTHON_CFLAGS','notavailable'),
+        'sysboostpython_linkflags' : cmakevars.get('SYSBOOSTPYTHON_LINKFLAGS','notavailable'),
+        'sysboostpython_incdir' : cmakevars.get('SYSBOOSTPYTHON_INCDIR','notavailable')
     }
 
     for lang in ['CXX','C','Fortran']:
@@ -128,7 +128,7 @@ def parse(filename):
     #makefiles):
     non_volatile=set(['cflags','ldflags','ldflags_prepend','compiler_version_long','compiler_version_short','dep_versions'])
     sysvars['volatile'] = dict((lang,dict((k,v) for k,v in info.items() if not k in non_volatile)) for lang,info in sysvars['langs'].items())
-    sysvars['volatile']['sysboostpython'] = dict( (k,v) for k,v in sysvars.items() if k.startswith('sysboostpython') )
+    sysvars['volatile']['sysboostpython'] = dict( (k,v) for k,v in sysvars['general'].items() if k.startswith('sysboostpython') )
 
     sysvars['runtime']={'extra_lib_path':[e for e in cmakevars['DG_EXTRA_LDLIBPATHS'].split(';') if e],
                         'extra_bin_path':[e for e in cmakevars['DG_EXTRA_PATHS'].split(';') if e],

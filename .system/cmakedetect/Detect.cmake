@@ -1,7 +1,7 @@
-#####################################################
-###   Standard packages which we always require   ###
-###   => all code can implicitly depend on these  ###
-#####################################################
+######################################################
+###   Standard packages which we always require    ###
+###   => all code can implicitly depend on these   ###
+######################################################
 
 cmake_policy(PUSH)
 include("ExtDep_Python.cmake")
@@ -9,24 +9,28 @@ cmake_policy(POP)
 
 include( "ExtractFlags.cmake")
 
-set( strategy_syspyboost "$ENV{DGCODE_USECONDABOOSTPYTHON}")
-string( TOLOWER "${strategy_syspyboost}" strategy_syspyboost )
+##########################################################
+###   boost-python can either come from our shipped    ###
+###   version, or optionally from conda-boost-python   ###
+##########################################################
 
-if ( NOT "${strategy_syspyboost}" )
+set( strategy_syspyboost "$ENV{DGCODE_USECONDABOOSTPYTHON}" )
+string( TOUPPER "${strategy_syspyboost}" strategy_syspyboost )
+
+if ( "x${strategy_syspyboost}" STREQUAL "x" )
   #Default value ( TODO: Change to "auto" at some point in the future ):
-  set( strategy_syspyboost never )
+  set( strategy_syspyboost NEVER )
 endif()
-set( strategy_syspyboost_allowed_values auto always never )
+
+set( strategy_syspyboost_allowed_values AUTO ALWAYS NEVER )
 if ( NOT strategy_syspyboost IN_LIST strategy_syspyboost_allowed_values )
   message( FATAL_ERROR "Invalid value of DGCODE_USECONDABOOSTPYTHON env var."
-    "Must be unset or one of: ${strategy_syspyboost_allowed_values}")
+    " Must be unset or one of: ${strategy_syspyboost_allowed_values}")
 endif()
 
-if ( NOT strategy_syspyboost STREQUAL "never" )
-  cmake_policy(PUSH)
-  include("ExtDep_Boost.cmake")
-  cmake_policy(POP)
-endif()
+cmake_policy(PUSH)
+include("ExtDep_Boost.cmake")
+cmake_policy(POP)
 
 #Declare include dirs added above as -isystem (and remove /usr/include):
 declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_CXX)
