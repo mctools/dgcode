@@ -9,9 +9,24 @@ cmake_policy(POP)
 
 include( "ExtractFlags.cmake")
 
-cmake_policy(PUSH)
-include("ExtDep_Boost.cmake")
-cmake_policy(POP)
+set( strategy_syspyboost "$ENV{DGCODE_USECONDABOOSTPYTHON}")
+string( TOLOWER "${strategy_syspyboost}" strategy_syspyboost )
+
+if ( NOT "${strategy_syspyboost}" )
+  #Default value ( TODO: Change to "auto" at some point in the future ):
+  set( strategy_syspyboost never )
+endif()
+set( strategy_syspyboost_allowed_values auto always never )
+if ( NOT strategy_syspyboost IN_LIST strategy_syspyboost_allowed_values )
+  message( FATAL_ERROR "Invalid value of DGCODE_USECONDABOOSTPYTHON env var."
+    "Must be unset or one of: ${strategy_syspyboost_allowed_values}")
+endif()
+
+if ( NOT strategy_syspyboost STREQUAL "never" )
+  cmake_policy(PUSH)
+  include("ExtDep_Boost.cmake")
+  cmake_policy(POP)
+endif()
 
 #Declare include dirs added above as -isystem (and remove /usr/include):
 declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_CXX)

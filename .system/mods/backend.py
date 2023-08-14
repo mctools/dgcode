@@ -36,7 +36,8 @@ def perform_configuration(cmakeargs=[],
 
 
     volatile_misc = ['DGCODE_PROJECTS_DIR', 'DGCODE_INSTALL_DIR_RESOLVED','DGCODE_BUILD_DIR_RESOLVED',
-                     'DGCODE_EXTRA_PKG_PATH', 'DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','CONDA_PREFIX','CMAKE_ARGS']
+                     'DGCODE_EXTRA_PKG_PATH', 'DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','CONDA_PREFIX','CMAKE_ARGS',
+                     'DGCODE_USECONDABOOSTPYTHON']
 
     #Inspect environment via cmake (caching the result of previous runs).
 
