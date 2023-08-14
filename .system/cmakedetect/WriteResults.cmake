@@ -80,6 +80,15 @@ file(${oa} "VAR@${}DG_EXTRA_LDLIBPATHS@${DG_EXTRA_LDLIBPATHS}\n")
 file(${oa} "VAR@${}DG_EXTRA_PATHS@${DG_EXTRA_PATHS}\n")
 file(${oa} "VAR@${}DG_LIBS_TO_SYMLINK@${DG_LIBS_TO_SYMLINK}\n")
 
+#quick and dirty, not very portable, just enough (hopefully?) for osx/linux/clang/gcc:
+if ( DEFINED CMAKE_SHARED_LIBRARY_RPATH_LINK_C_FLAG
+    AND CMAKE_SHARED_LIBRARY_RPATH_LINK_C_FLAG MATCHES ".*rpath-link.*" )
+  set( compiler_supports_rpathlink 1 )
+else()
+  set( compiler_supports_rpathlink 0 )
+endif()
+file(${oa} "VAR@${}CAN_USE_RPATHLINK_FLAG@${compiler_supports_rpathlink}\n")
+
 foreach(lang ${tmplangs})
   file(${oa} "VAR@${}RULE_${lang}_SHLIB@${CMAKE_${lang}_COMPILER} ${CMAKE_SHARED_LIBRARY_${lang}_FLAGS} [FLAGS] ${CMAKE_SHARED_LIBRARY_CREATE_${lang}_FLAGS} [INPUT] -o [OUTPUT]\n")
   file(${oa} "VAR@${}RULE_${lang}_COMPOBJ@${CMAKE_${lang}_COMPILER} [FLAGS] -c [INPUT] -o [OUTPUT]\n")

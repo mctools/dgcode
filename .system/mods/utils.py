@@ -218,7 +218,7 @@ class rpath_appender:
         langinfo=env.env['system']['langs'][lang]
         rpath_pattern = langinfo['rpath_flag_lib' if shlib else 'rpath_flag_exe']
         self.__patterns = [ rpath_pattern ]
-        if '-rpath' in rpath_pattern and not '-rpath-link' in rpath_pattern:
+        if langinfo['can_use_rpathlink_flag'] and '-rpath' in rpath_pattern and not '-rpath-link' in rpath_pattern:
             self.__patterns += [ self.__patterns[0].replace('-rpath','-rpath-link') ]
     def apply_to_dir( self, directory ):
         return [ p%directory for p in self.__patterns ]

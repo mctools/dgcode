@@ -114,7 +114,7 @@ class TargetBinary(target_base.Target):
         rpath_pattern = langinfo['rpath_flag_lib' if shlib else 'rpath_flag_exe']
         def append_to_rpath( extra_flags, p ):
             extra_flags += [ rpath_pattern%str(p) ]
-            if '-rpath' in rpath_pattern and not '-rpath-link' in rpath_pattern:
+            if langinfo['can_use_rpathlink_flag'] and '-rpath' in rpath_pattern and not '-rpath-link' in rpath_pattern:
                 extra_flags += [ rpath_pattern.replace('-rpath','-rpath-link')%str(p) ]
         append_to_rpath( extra_flags, join('${INST}','lib') )
         append_to_rpath( extra_flags, join('${INST}','lib','links') )

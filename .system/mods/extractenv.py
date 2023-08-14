@@ -83,6 +83,7 @@ def parse(filename):
         'sysboostpython_incdir' : cmakevars.get('SYSBOOSTPYTHON_INCDIR','notavailable')
     }
 
+    compiler_supports_rpathlink_flag = cmakevars['CAN_USE_RPATHLINK_FLAG']=='1'
     for lang in ['CXX','C','Fortran']:
         lvars={}
         if lang!='Fortran' or ('Fortran' in extdeps and extdeps['Fortran']['present']):
@@ -116,9 +117,11 @@ def parse(filename):
 
             lvars['rpath_flag_lib'] = cmakevars['RPATH_FLAG_%s_SHLIB'%lang]
             lvars['rpath_flag_exe'] = cmakevars['RPATH_FLAG_%s_EXECUTABLE'%lang]
-            if lvars['rpath_flag_lib']: lvars['rpath_flag_lib'] += '%s'
-            if lvars['rpath_flag_exe']: lvars['rpath_flag_exe'] += '%s'
-
+            if lvars['rpath_flag_lib']:
+                lvars['rpath_flag_lib'] += '%s'
+            if lvars['rpath_flag_exe']:
+                lvars['rpath_flag_exe'] += '%s'
+            lvars['can_use_rpathlink_flag'] = compiler_supports_rpathlink_flag
         sysvars['langs'][lang.lower()]=lvars
 
     #copy parts of compilation setup into special volatile section to
