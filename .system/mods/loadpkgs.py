@@ -86,10 +86,11 @@ def check_dir_case_insensitive_duplication(dircontent, path):
     seen = set()
     for d in [d.lower() for d in dircontent]:
       if d in seen:
-        raise SystemExit('Directory (and file) names differing only in casing are not allowed, due to being a potential source of error for different file systems. \nProblem occured with %s in the directory'%(d,path))
+        raise SystemExit('Directory (and file) names differing only in casing are not allowed, '
+                         'due to being a potential source of error on some file systems. \n'
+                         'Problem occured with %s in the directory'%(d,path))
       else:
         seen.add(d)
-    
 
 def find_pkg_dirs(dirname):
     if os.path.exists(os.path.join(dirname,conf.package_cfg_file)):
@@ -360,7 +361,7 @@ class PackageLoader:
             pkgdirs.update({d:basedir for d in tmp_dirs})
           elif not basedir==dirs.projdir:
             error.error("No packages found in %s!"%basedir)
-          
+
         #3) Construct Package objects and name->object maps:
         default_enabled = False if select_pkg_filter else True
         n2p={}
