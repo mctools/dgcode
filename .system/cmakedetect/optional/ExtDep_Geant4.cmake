@@ -107,7 +107,7 @@ if (geant4_config_file)
       include(CheckLinkerFlag)
       check_linker_flag(CXX -Wl,--allow-shlib-undefined tmp)
       if ( tmp )
-        message("Geant4 from conda detected: Adding -Wl,--allow-shlib-undefined to work around missing symbols.")
+        message("-- Geant4 from conda detected: Adding -Wl,--allow-shlib-undefined to work around missing symbols.")
         set(ExtDep_Geant4_LINK_FLAGS "${ExtDep_Geant4_LINK_FLAGS} -Wl,--allow-shlib-undefined")
         #NB: we could in principle also do a try_compile first perhaps and see if
         #this is still needed (and works), but it is complicated to replicate here

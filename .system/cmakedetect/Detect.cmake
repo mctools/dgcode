@@ -22,7 +22,7 @@ if ( "x${strategy_syspyboost}" STREQUAL "x" )
   set( strategy_syspyboost NEVER )
 endif()
 
-set( strategy_syspyboost_allowed_values AUTO ALWAYS NEVER )
+set( strategy_syspyboost_allowed_values "AUTO" "ALWAYS" "NEVER" )
 if ( NOT strategy_syspyboost IN_LIST strategy_syspyboost_allowed_values )
   message( FATAL_ERROR "Invalid value of DGCODE_USECONDABOOSTPYTHON env var."
     " Must be unset or one of: ${strategy_syspyboost_allowed_values}")
