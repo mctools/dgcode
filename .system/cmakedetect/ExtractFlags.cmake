@@ -1,5 +1,8 @@
+include_guard()
+
+get_filename_component( EXTRACT_DEPINFO_PYSCRIPT "${CMAKE_CURRENT_LIST_DIR}/extract_flags_helper.py" REALPATH )
+
 function( extract_extdep_flags language find_package_arg_list deptargets_list cmake_args_list resvar_cflags resvar_linkflags )
-  get_filename_component( EXTRACT_DEPINFO_PYSCRIPT "${CMAKE_CURRENT_LIST_DIR}/extract_flags_helper.py" REALPATH )
   set( cmd python3 "${EXTRACT_DEPINFO_PYSCRIPT}"
     --cmakecommand "${CMAKE_COMMAND}" --respectcmakeargs
     -l "${language}"
@@ -16,8 +19,10 @@ function( extract_extdep_flags language find_package_arg_list deptargets_list cm
       endif()
     endforeach()
   endif()
-  #string(JOIN " " cmd_joined ${cmd} )
-  #message( "-- Launching: ${cmd_joined}" )
+  if ( DG_VERBOSE )
+    string( JOIN " " tmp ${cmd} )
+    message("-- About to execute: ${tmp}" )
+  endif()
   execute_process( COMMAND ${cmd} OUTPUT_VARIABLE tmp COMMAND_ERROR_IS_FATAL ANY )
   string(JSON obj_extra GET "${tmp}" "extra")
   string(JSON array_cf GET "${obj_extra}" "compileflags")
