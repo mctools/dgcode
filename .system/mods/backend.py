@@ -23,18 +23,7 @@ def perform_configuration(cmakeargs=[],
     import mtime
     import pickle
     import pathlib
-    #Possible external dependencies (based solely on files in ExtDep directory):
-
-    possible_extdeps = set(os.path.basename(f)[7:-6] for f in glob.glob(os.path.join(dirs.cmakedetectdir,'optional/ExtDep_*.cmake')))
-
-    #Inspect package tree and load the necessary config files, given the filters:
-    pl = loadpkgs.PackageLoader(dirs.pkgsearchpath,
-                                possible_extdeps,
-                                select_filter,
-                                exclude_filter,
-                                autodeps=conf.autodeps,
-                                load_all=load_all_pkgs)
-
+    import pipes
 
     volatile_misc = ['DGCODE_PROJECTS_DIR', 'DGCODE_INSTALL_DIR_RESOLVED','DGCODE_BUILD_DIR_RESOLVED',
                      'DGCODE_EXTRA_PKG_PATH', 'DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','CONDA_PREFIX','CMAKE_ARGS',
@@ -45,7 +34,7 @@ def perform_configuration(cmakeargs=[],
     def current_reconf_environment(envdict):
         from distutils.spawn import find_executable#similar to shell "which"
         return (dict( (b,find_executable(b)) for b in set(envdict['autoreconf']['bin_list'].split(';'))),
-                dict( (e,os.getenv(e)) for e in set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc]))) 
+                dict( (e,os.getenv(e)) for e in set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc])))
 
     assert dirs.blddir.exists()
     assert dirs.blddir_indicator.exists()
@@ -145,6 +134,29 @@ def perform_configuration(cmakeargs=[],
         utils.update_pkl_if_changed( {'langinfo':info,'boostinfo':boostinfo},
                                      dirs.blddir / 'langs' / lang )
 
+    #Possible external dependencies (based solely on files in ExtDep directory):
+
+    possible_extdeps = set(envdict['extdeps'].keys())
+    special_ncrystal_migration_mode = ( 'NoSystemNCrystal' in possible_extdeps and 'NCrystal' in possible_extdeps )
+    if special_ncrystal_migration_mode:
+        #Special migration feature, making sure that the package 'NCrystalRel'
+        #dynamically gets either EXTDEP NCrystal or USEPKG NCrystalBuiltin
+        #depending on whether or not NCrystal is available on the system.
+        if envdict['extdeps']['NCrystal']['present']:
+            loadpkgs.add_dynamic_dependency( 'NCrystalRel', extdep_list = ['NCrystal'] )
+        else:
+            loadpkgs.add_dynamic_dependency( 'NCrystalRel', usepkg_list = ['NCrystalBuiltin'] )
+
+    #Inspect package tree and load the necessary config files, given the filters:
+    pl = loadpkgs.PackageLoader(dirs.pkgsearchpath,
+                                possible_extdeps,
+                                select_filter,
+                                exclude_filter,
+                                autodeps=conf.autodeps,
+                                load_all=load_all_pkgs)
+
+
+
     #Gracefully disable packages based on missing external dependencies
 
     missing_extdeps = set(k for k,v in envdict['extdeps'].items() if not v['present'])
@@ -162,8 +174,8 @@ def perform_configuration(cmakeargs=[],
     import db
 
     #Check if volatile parts of environment changed:
-    volatile=env.env['system']['volatile']
-    if db.db.get('volatile',None)!=volatile:
+    volatile = env.env['system']['volatile']
+    if db.db.get('volatile',None) != volatile:
         db.db['volatile']=volatile
         db.db['pkg2timestamp']={}#make all pkgs "dirty"
 
@@ -221,7 +233,6 @@ def perform_configuration(cmakeargs=[],
             rd[p.name]=p.reldirname#ok to update immediately?
 
     def nuke_pkg(pkgname):
-        import pipes
         conf.uninstall_package(pipes.quote(str(dirs.installdir)),pipes.quote(pkgname))
         utils.rm_rf(dirs.pkg_cache_dir(pkgname))
         utils.rm_rf(dirs.pkg_dir(pkgname))#remove link to pkg or dynamic package contents.
@@ -244,7 +255,7 @@ def perform_configuration(cmakeargs=[],
             err_txt,unclean_exception = None,None
             try:
                 target_builder.create_pkg_targets(p)#this also dumps to pickle!
-            except KeyboardInterrupt as e:
+            except KeyboardInterrupt:
                 err_txt = "Halted by user interrupt (CTRL-C)"
             except Exception as e:
                 err_txt=str(e)
@@ -321,7 +332,6 @@ def perform_configuration(cmakeargs=[],
 
     enabled_pkgnames=set(enabled_pkgnames)
     if 'enabled_pkgnames' in db.db:
-        import pipes
         #Test if any pkgs got disabled compared to last time and remove it from install area:
         for disappeared_pkgname in db.db['enabled_pkgnames'].difference(enabled_pkgnames):
             if not quiet:
@@ -360,29 +370,29 @@ def perform_configuration(cmakeargs=[],
     #Update dynamic python module with information, if needed:
     cfgfile=dirs.blddir / 'cfg.py'
     dinfo = dict((p.name,p.info_as_dict()) for p in pl.pkgs)
-    content='"""File automatically generated by dgbuild"""' 
+    content='"""File automatically generated by dgbuild"""'
     content+=f"""
 import pickle
 cmakeargs = pickle.loads({pickle.dumps(cmakeargs)})
 pkgs = pickle.loads({pickle.dumps(dinfo)})
 import pathlib as _pl
-class Dirs: 
+class Dirs:
 """
-    for k,v in sorted(dirdict.items()): 
+    for k,v in sorted(dirdict.items()):
       val = (f"_pl.Path({repr(str(v))})" if not isinstance(v,list)
              else '['+','.join([f"_pl.Path({repr(str(el))})" for el in v])+']')
       content+=f"""
   @property
   def {k}(self):
-    return {val} 
+    return {val}
 """
     content+="""
 dirs = Dirs()
 if __name__=="__main__":
   import pprint as pp
-  pp.pprint(pkgs) 
+  pp.pprint(pkgs)
   pp.pprint({ p:getattr(dirs,p) for p in dir(dirs) if not p.startswith('_')})
-""" 
+"""
     #TODO: Don't always just overwrite the config file (the pickled state is
     #indeterministic, so can't quickly tell from the serialised data if anything
     #changed or not):

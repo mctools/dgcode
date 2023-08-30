@@ -40,7 +40,6 @@ def parse_stdouterr(filename):
     fh.close()
     assert bool(unused_vars)==bool(n_warnings)
     return {'other_warnings':n_warnings-(1 if unused_vars else 0),'unused_vars':unused_vars}
-    return res
 
 def parse(filename):
     extdeps = {}

@@ -1,7 +1,6 @@
-from __future__ import print_function
-from __future__ import division
-__metaclass__ = type#py2 backwards compatibility
-import os,sys,dirs
+import os
+import sys
+import dirs
 import utils,langs,conf,error
 join=os.path.join
 
@@ -18,8 +17,9 @@ def pkgname_valid(n):
 
 def parse_depfile(pkgdir):
     filename=os.path.join(pkgdir,conf.package_cfg_file)
+    pkg_name = os.path.basename(pkgdir)
     def _err(m=''):
-        error.error('Package "%s" has invalid %s file%s'%(os.path.basename(pkgdir),conf.package_cfg_file,m))
+        error.error('Package "%s" has invalid %s file%s'%(pkg_name,conf.package_cfg_file,m))
     with open(filename,'rt') as fh:
         for iline1,l in enumerate(fh):
             l=l.split('#')[0].strip()
@@ -67,7 +67,14 @@ def parse_depfile(pkgdir):
                     if not dyncodedone:
                         _err(' : Missing dynamic_builder_end() statement.')
                     assert isdynamicpkg == bool(dyncode)
-                return (set(extdeps),set(pkgdeps),extra_cflags,extra_ldflags,extra_incdeps,dyncode,dyncodeoffset)
+                extra_extdeps, extra_pkgdeps = get_dynamic_dependency(pkg_name)
+                return ( set(extdeps + extra_extdeps),
+                         set(pkgdeps + extra_pkgdeps),
+                         extra_cflags,
+                         extra_ldflags,
+                         extra_incdeps,
+                         dyncode,
+                         dyncodeoffset)
         _err(' : missing package() statement.')
 
 from pathlib import Path
@@ -88,7 +95,7 @@ def check_dir_case_insensitive_duplication(dircontent, path):
       if d in seen:
         raise SystemExit('Directory (and file) names differing only in casing are not allowed, '
                          'due to being a potential source of error on some file systems. \n'
-                         'Problem occured with %s in the directory'%(d,path))
+                         'Problem occured with %s in the directory %s'%(d,path))
       else:
         seen.add(d)
 
@@ -286,7 +293,6 @@ class Package:
     def dumpinfo(self,autodeps,prefix=''):
         import col
         import env
-        all_deps=self.deps()
         width=max(75,len(self.dirname)+30)
         prefix+='==='
         def _format(l):
@@ -323,6 +329,20 @@ class Package:
         print('%s   External dependencies : %s'%(prefix,_format(extdeps_indirect)))
         print(prefix+'='*len(l1))
 
+
+_dyndep_map = [ {} ]
+def add_dynamic_dependency( pkgname, extdep_list = None, usepkg_list = None ):
+    d = _dyndep_map[0]
+    if not pkgname in d:
+        d[pkgname] = dict( extdep_list = [], usepkg_list = [] )
+    if extdep_list:
+        d[pkgname]['extdep_list'] += extdep_list[:]
+    if usepkg_list:
+        d[pkgname]['usepkg_list'] += usepkg_list[:]
+
+def get_dynamic_dependency( pkgname ):
+    e = _dyndep_map[0].get(pkgname)
+    return ( e['extdep_list'],e['usepkg_list'] ) if e else ([],[])
 
 class PackageLoader:
 

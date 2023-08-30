@@ -70,7 +70,7 @@ while(extdep_pending)
 
   message("-- Checking for ${extdep} installation")
   #We can explicitly ignore a dependency named SomeExtdep by putting "SomeExtdep=0" or "SomeExtdep=OFF", etc.
-  if (NOT "${extdep}" AND NOT "x${${extdep}}" STREQUAL "x")
+  if ( NOT "x${${extdep}}" STREQUAL "x"  AND NOT "${${extdep}}" )
     set(HAS_${extdep} 0)
   else()
     cmake_policy(PUSH)
