@@ -68,6 +68,10 @@ function(
   set( ncrystal_cxx_cflags "${ncrystal_cxx_cflags} -I${NCrystal_INCDIR}" )
   set( ncrystal_c_cflags "${ncrystal_c_cflags} -I${NCrystal_INCDIR}" )
 
+  #Adding flags, to help with redirection resolution in NCrystalRel headers:
+  set( ncrystal_cxx_cflags "${ncrystal_cxx_cflags} -DDGCODE_USE_SYSTEM_NCRYSTAL" )
+  set( ncrystal_c_cflags "${ncrystal_c_cflags} -DDGCODE_USE_SYSTEM_NCRYSTAL" )
+
   set( ${resvar_found} 1 PARENT_SCOPE )
   set( ${resvar_version} "${NCrystal_VERSION}" PARENT_SCOPE )
   set( ${resvar_cxx_cflags_list} "${ncrystal_cxx_cflags}" PARENT_SCOPE )
