@@ -188,8 +188,15 @@ class DynPkgBuilder:
 
         #create/copy over any non-existing files and dirs:
         def stat_fingerprint(f):
-            #permissions and size must match
+            #permissions and size must match.
+
+            #Update Aug 2023 (TK): This function was returning None by
+            #accident. I am unsure of the original intent, but for now return
+            #st_imode + st_size.
             s=os.stat(f)
+            return ( s.st_imode,#permissions etc.
+                     s.st_size )
+
         def same_contents(f1,f2):
             with open(f1,'rb') as fh1, open(f2,'rb') as fh2:
                 return ( fh1.read() == fh2.read() )
