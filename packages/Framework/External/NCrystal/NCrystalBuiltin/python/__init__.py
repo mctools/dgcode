@@ -29,7 +29,6 @@ For detailed usage conditions and licensing of this open source project, see:
    https://github.com/mctools/ncrystal/blob/master/LICENSE
 
 """
-
 ################################################################################
 ##                                                                            ##
 ##  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   ##

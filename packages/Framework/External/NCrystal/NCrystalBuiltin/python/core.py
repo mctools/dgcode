@@ -1248,7 +1248,7 @@ class Process(RCBase):
         """Convenience method for plotting cross sections. This is the same as
         NCrystal.plot.plot_xsect(material=self,*args,**kwargs), so refer to that
         function for information about allowed arguments."""
-        from NCrystal.plot import plot_xsect
+        from .plot import plot_xsect
         return plot_xsect( self, *args, **kwargs )
 
 class Absorption(Process):
@@ -1524,7 +1524,7 @@ class LoadedMaterial:
         """Convenience method for plotting cross sections. This is the same as
         NCrystal.plot.plot_xsect(material=self,*args,**kwargs), so refer to that
         function for information about allowed arguments."""
-        from NCrystal.plot import plot_xsect
+        from .plot import plot_xsect
         return plot_xsect( self, *args, **kwargs )
 
     def dump(self, verbose=0 ):
