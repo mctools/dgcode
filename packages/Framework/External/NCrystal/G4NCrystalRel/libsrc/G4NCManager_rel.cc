@@ -28,7 +28,7 @@
 #include <iomanip>
 #include <cassert>
 
-namespace NC = NCrystalRel;
+namespace NC = NCrystal;
 namespace NCG4 = G4NCrystalRel;
 
 NCG4::Manager::Manager()
@@ -52,7 +52,7 @@ NC::CachePtr& NCG4::Manager::getCachePtrForCurrentThreadAndProcess( unsigned sca
 #ifdef G4MULTITHREADED //protect thread_local keyword to avoid potential headaches in ST builds
  thread_local
 #endif
-    std::unique_ptr<std::vector<NCrystalRel::CachePtr>> cacheptrs;
+    std::unique_ptr<std::vector<NCrystal::CachePtr>> cacheptrs;
   if ( cacheptrs == nullptr ) {
     cacheptrs = std::make_unique<decltype(cacheptrs)::element_type>();
     cacheptrs->resize( m_scatters.size() );
@@ -61,7 +61,7 @@ NC::CachePtr& NCG4::Manager::getCachePtrForCurrentThreadAndProcess( unsigned sca
   return (*cacheptrs)[scatter_idx];
 }
 
-NCrystalRel::ProcImpl::OptionalProcPtr NCG4::Manager::getScatterPropertyPtr(G4Material*mat) const
+NCrystal::ProcImpl::OptionalProcPtr NCG4::Manager::getScatterPropertyPtr(G4Material*mat) const
 {
   //Returns numeric_limits<unsigned>::max() if not available:
   unsigned scatidx = lookupScatterPropertyIndex(mat);
@@ -70,7 +70,7 @@ NCrystalRel::ProcImpl::OptionalProcPtr NCG4::Manager::getScatterPropertyPtr(G4Ma
   return m_scatters.at(scatidx);
 }
 
-void NCG4::Manager::addScatterProperty(G4Material* mat,NCrystalRel::ProcImpl::ProcPtr&&scat)
+void NCG4::Manager::addScatterProperty(G4Material* mat,NCrystal::ProcImpl::ProcPtr&&scat)
 {
   if ( mat == nullptr || scat == nullptr )
     G4Exception ("NCG4::Manager::addScatterProperty", "NCAddingNull",
@@ -78,7 +78,7 @@ void NCG4::Manager::addScatterProperty(G4Material* mat,NCrystalRel::ProcImpl::Pr
 
   if ( scat->processType() != NC::ProcessType::Scatter )
     G4Exception ("NCG4::Manager::addScatterProperty", "NCAddNonScatter",
-                 JustWarning, "Can only add scattering process (processType() is not NCrystalRel::Process::Scatter).");
+                 JustWarning, "Can only add scattering process (processType() is not NCrystal::Process::Scatter).");
 
   auto matprop = mat->GetMaterialPropertiesTable();
   if (matprop) {

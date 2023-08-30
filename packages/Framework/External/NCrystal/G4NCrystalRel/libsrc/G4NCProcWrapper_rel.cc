@@ -32,7 +32,7 @@
 #include "G4VTouchable.hh"
 #include "G4NavigationHistory.hh"
 
-namespace NC = NCrystalRel;
+namespace NC = NCrystal;
 namespace NCG4 = G4NCrystalRel;
 
 namespace G4NCrystalRel {

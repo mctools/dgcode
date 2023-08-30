@@ -27,8 +27,8 @@
 #include "G4ios.hh"
 #include <atomic>
 
-namespace NC = NCrystalRel;
-namespace NCCU = NCrystalRel::CompositionUtils;
+namespace NC = NCrystal;
+namespace NCCU = NCrystal::CompositionUtils;
 
 namespace G4NCrystalRel {
 
@@ -42,7 +42,7 @@ namespace G4NCrystalRel {
     s_verbose = flag;
   }
 
-  //Function which lets NCrystalRel::CompositionUtils use Geant4's knowledge of
+  //Function which lets NCrystal::CompositionUtils use Geant4's knowledge of
   //natural abundances:
   std::vector<std::pair<unsigned,double>> g4NaturalAbundanceProvider(unsigned zz)
   {
@@ -295,7 +295,7 @@ namespace G4NCrystalRel {
   NCG4ObjectDB& objDB() { static NCG4ObjectDB db; return db; }
 
   //Cache-clearing in accordance with NCrystal's global clearCaches function
-  //(also detects compatibility between libG4NCrystal.so and libPKG__NCrystalRel.so):
+  //(also detects compatibility between libG4NCrystal.so and libPKG__NCrystalBuiltin.so):
   void clearG4ObjCache() {
     auto& db = objDB();
     NCRYSTAL_LOCK_GUARD(db.mtx);
@@ -307,7 +307,7 @@ namespace G4NCrystalRel {
       return;
     first = true;
     //Most client code will call this function, this is a good place to detect
-    //mis-paired libPKG__NCrystalRel.so/libG4NCrystal.so:
+    //mis-paired libPKG__NCrystalBuiltin.so/libG4NCrystal.so:
     NC::libClashDetect();//Detect broken installation
     //Register:
     NC::registerCacheCleanupFunction(clearG4ObjCache);

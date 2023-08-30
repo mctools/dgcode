@@ -26,7 +26,7 @@
 
 namespace G4NCrystalRel {
 
-  using NCrystalRel::MatCfg;
+  using NCrystal::MatCfg;
 
   //Create NCrystal-enabled G4Material directly from an configuration string
   //(see NCMatCfg.hh for format). Note that for oriented crystals (single

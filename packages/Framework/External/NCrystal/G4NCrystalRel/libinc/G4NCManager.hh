@@ -27,32 +27,27 @@
 #include "G4Version.hh"
 #include "G4MaterialPropertiesTable.hh"
 #include "NCrystalRel/NCProcImpl.hh"
-//Manager class tracking indices of NCrystalRel::Scatter instances associated to
+//Manager class tracking indices of NCrystal::Scatter instances associated to
 //G4Materials, via entries in the G4MaterialPropertiesTable's on the materials.
 
 class G4Material;
-namespace NCrystalRel {
-  namespace Error {
-    class Exception;
-  }
-}
 
 namespace G4NCrystalRel {
 
   class Manager {
   public:
 
-    //Methods needed to add NCrystalRel::Scatter* properties to G4Materials (via
+    //Methods needed to add NCrystal::Scatter* properties to G4Materials (via
     //the property tables):
     static Manager * getInstance();//Get the singleton
-    void addScatterProperty(G4Material*, NCrystalRel::ProcImpl::ProcPtr&&);
+    void addScatterProperty(G4Material*, NCrystal::ProcImpl::ProcPtr&&);
 
     //Methods for framework implementers:
-    const NCrystalRel::ProcImpl::Process* getScatterProperty(G4Material*) const;//returns nullptr when absent.
-    NCrystalRel::ProcImpl::OptionalProcPtr getScatterPropertyPtr(G4Material*) const;//returns nullptr when absent.
+    const NCrystal::ProcImpl::Process* getScatterProperty(G4Material*) const;//returns nullptr when absent.
+    NCrystal::ProcImpl::OptionalProcPtr getScatterPropertyPtr(G4Material*) const;//returns nullptr when absent.
 
     //Same but with per-thread per-scatter CachePtr:
-    using ProcAndCache = std::pair<const NCrystalRel::ProcImpl::Process*,NCrystalRel::CachePtr*>;
+    using ProcAndCache = std::pair<const NCrystal::ProcImpl::Process*,NCrystal::CachePtr*>;
     ProcAndCache getScatterPropertyWithThreadSafeCache(G4Material*) const;
 
     //Thoroughly clear caches, manager singleton, and possibly NCrystal
@@ -68,7 +63,7 @@ namespace G4NCrystalRel {
     //Translate thrown NCrystal exceptions to G4Exception(..) calls (id should
     //be unique and fixed for each call location):
     static void handleError( const char*origin, unsigned id,
-                             NCrystalRel::Error::Exception& );
+                             NCrystal::Error::Exception& );
 
   private:
     Manager( const Manager & );
@@ -76,10 +71,10 @@ namespace G4NCrystalRel {
     Manager();
     ~Manager();
     static Manager * s_mgr;
-    std::vector<NCrystalRel::ProcImpl::ProcPtr> m_scatters;
+    std::vector<NCrystal::ProcImpl::ProcPtr> m_scatters;
     std::map<uint64_t,unsigned> m_scat2idx;
     G4String m_key;
-    NCrystalRel::CachePtr& getCachePtrForCurrentThreadAndProcess( unsigned scatter_idx ) const;
+    NCrystal::CachePtr& getCachePtrForCurrentThreadAndProcess( unsigned scatter_idx ) const;
     //Returns numeric_limits<unsigned>::max() if not available:
     unsigned lookupScatterPropertyIndex(G4Material*) const;
 
@@ -89,7 +84,7 @@ namespace G4NCrystalRel {
   // Inline for fast access during event loop: //
   ///////////////////////////////////////////////
 
-  inline std::pair<const NCrystalRel::ProcImpl::Process*, NCrystalRel::CachePtr*>
+  inline std::pair<const NCrystal::ProcImpl::Process*, NCrystal::CachePtr*>
   Manager::getScatterPropertyWithThreadSafeCache(G4Material* mat) const
   {
     //Returns numeric_limits<unsigned>::max() if not available:
@@ -97,7 +92,7 @@ namespace G4NCrystalRel {
     if ( scatidx == std::numeric_limits<unsigned>::max() )
       return {nullptr,nullptr};
     assert(scatidx<m_scatters.size());
-    const NCrystalRel::ProcImpl::Process* sp = m_scatters[scatidx].get();
+    const NCrystal::ProcImpl::Process* sp = m_scatters[scatidx].get();
     return { sp, &getCachePtrForCurrentThreadAndProcess( scatidx ) };
   }
 
@@ -143,7 +138,7 @@ namespace G4NCrystalRel {
 #endif
   }
 
-  inline const NCrystalRel::ProcImpl::Process* Manager::getScatterProperty(G4Material*mat) const
+  inline const NCrystal::ProcImpl::Process* Manager::getScatterProperty(G4Material*mat) const
   {
     //Returns numeric_limits<unsigned>::max() if not available:
     unsigned scatidx = lookupScatterPropertyIndex(mat);
