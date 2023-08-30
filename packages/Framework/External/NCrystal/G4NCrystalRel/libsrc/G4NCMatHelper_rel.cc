@@ -295,7 +295,7 @@ namespace G4NCrystalRel {
   NCG4ObjectDB& objDB() { static NCG4ObjectDB db; return db; }
 
   //Cache-clearing in accordance with NCrystal's global clearCaches function
-  //(also detects compatibility between libG4NCrystal.so and libPKG__NCrystalBuiltin.so):
+  //(also detects compatibility between libG4NCrystal.so and libNCrystal.so):
   void clearG4ObjCache() {
     auto& db = objDB();
     NCRYSTAL_LOCK_GUARD(db.mtx);
@@ -307,7 +307,7 @@ namespace G4NCrystalRel {
       return;
     first = true;
     //Most client code will call this function, this is a good place to detect
-    //mis-paired libPKG__NCrystalBuiltin.so/libG4NCrystal.so:
+    //mis-paired libNCrystal.so/libG4NCrystal.so:
     NC::libClashDetect();//Detect broken installation
     //Register:
     NC::registerCacheCleanupFunction(clearG4ObjCache);
