@@ -1,3 +1,7 @@
+#ifdef NCRYSTAL_STDCMAKECFG_EMBED_DATA_ON
+#undef NCRYSTAL_STDCMAKECFG_EMBED_DATA_ON
+#endif
+#define NCRYSTAL_STDCMAKECFG_EMBED_DATA_ON
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
 //  This file is part of NCrystal (see https://mctools.github.io/ncrystal/)   //
@@ -354,8 +358,8 @@ void NCD::enableStandardDataLibrary( bool doEnable, Optional<std::string> reques
     //Register in-mem factory:
     auto& db = getStdDataLibInMemDB();
     {
-      static std::mutex mtx;
-      NCRYSTAL_LOCK_GUARD(mtx);
+      static std::mutex mtx_embed;
+      NCRYSTAL_LOCK_GUARD(mtx_embed);
       static bool first = true;
       if ( first ) {
         first = false;
