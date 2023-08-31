@@ -8,6 +8,7 @@ db = { 'pkg2timestamp' : {},#to detect when files changed
        'pkg2reldir' : {},#keep track of pkg locations
        'pkg2runnables' : {},#Keep track of runnables (with cmdname, e.g. ess_bla_lala)
        'pkg2reflogs' : {},#Keep track of reference logs (e.g. ess_bla_lala.log)
+       'pkg2directextdeps' : {},#list of extdep's directly used by package.
    }
 
 #initial load:

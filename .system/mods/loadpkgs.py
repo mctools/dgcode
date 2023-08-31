@@ -78,7 +78,7 @@ def parse_depfile(pkgdir):
         _err(' : missing package() statement.')
 
 from pathlib import Path
-def check_case_insensitive_duplication(path_str):
+def _check_case_insensitive_duplication(path_str):
   path = Path(path_str)
   if not path.exists():
     return
@@ -99,7 +99,7 @@ def check_dir_case_insensitive_duplication(dircontent, path):
       else:
         seen.add(d)
 
-def find_pkg_dirs(dirname):
+def _find_pkg_dirs_under_basedir(dirname):
     if os.path.exists(os.path.join(dirname,conf.package_cfg_file)):
         #dir is itself a pkg dir
         return [os.path.realpath(dirname)]
@@ -113,8 +113,19 @@ def find_pkg_dirs(dirname):
         d=os.path.join(dirname, item)
         if os.path.isdir(d):
             if not item in ignore_dirs:
-                pkg_dirs+=find_pkg_dirs(d)
+                pkg_dirs+=_find_pkg_dirs_under_basedir(d)
     return pkg_dirs
+
+def find_pkg_dirs( basedir_list ):
+    pkgdirs={}
+    for basedir in basedir_list:
+      _check_case_insensitive_duplication(basedir)
+      tmp_dirs = _find_pkg_dirs_under_basedir(basedir)
+      if tmp_dirs:
+        pkgdirs.update({d:basedir for d in tmp_dirs})
+      elif not basedir==dirs.projdir:
+        error.error("No packages found in %s!"%basedir)
+    return pkgdirs
 
 class Package:
     #Only construct this with the PackageLoader
@@ -139,6 +150,7 @@ class Package:
         self.__deps_names=None
         self.__incs_updated=False
         self.__runnables=set()#to guard against clashes from scripts and app_, etc.
+        self.__files_in_pkg_changed = False
 
     def register_runnable(self,n):
         if n in self.__runnables:
@@ -240,16 +252,26 @@ class Package:
         for dc in _dc:
             dc.disable()
 
+    def set_files_in_pkg_changed(self):
+        self.__files_in_pkg_changed = True
+        self.__set_parent_changed_recursively()
+        self.__set_files_in_pkg_changed_recursively()
+
+    def files_in_pkg_changed(self):
+        return self.__files_in_pkg_changed
+
     def any_parent_changed(self):
-        #true if any pkg we depend on indirectly or directly has files_changed=True (set from outside this module)
         return self._any_parent_changed
 
-    def set_parent_changed_recursively(self):
-        if self._any_parent_changed:
-            return#already done
+    def __set_parent_changed_recursively(self):
         self._any_parent_changed=True
         for dc in self.direct_clients:
-            dc.set_parent_changed_recursively()
+            dc.__set_parent_changed_recursively()
+
+    def __set_files_in_pkg_changed_recursively(self):
+        self.__files_in_pkg_changed=True
+        for dc in self.direct_clients:
+            dc.__set_files_in_pkg_changed_recursively()
 
     def has_lib(self):
         if self.__haslib is None:
@@ -373,14 +395,7 @@ class PackageLoader:
         #    error.error("Can't exclude packages when simultaneously requesting to enable only certain packages")
 
         #2) Read directory structure in order to find all package directories:
-        pkgdirs={}
-        for basedir in basedirs:
-          check_case_insensitive_duplication(basedir)
-          tmp_dirs = find_pkg_dirs(basedir)
-          if tmp_dirs:
-            pkgdirs.update({d:basedir for d in tmp_dirs})
-          elif not basedir==dirs.projdir:
-            error.error("No packages found in %s!"%basedir)
+        pkgdirs = find_pkg_dirs ( basedirs )
 
         #3) Construct Package objects and name->object maps:
         default_enabled = False if select_pkg_filter else True

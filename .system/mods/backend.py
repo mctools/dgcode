@@ -60,6 +60,9 @@ def perform_configuration(cmakeargs=[],
             print("%sChange in python environment detected => reinspecting via CMake"%prefix)
             envdict=None
 
+    #Pre-inspect package directories, simply finding the package dirs for now (do it already to detect some errors early):
+    all_pkgdirs = loadpkgs.find_pkg_dirs ( dirs.pkgsearchpath )
+
     import env
     if envdict:
         #Can reuse config:
@@ -148,12 +151,12 @@ def perform_configuration(cmakeargs=[],
             loadpkgs.add_dynamic_dependency( 'NCrystalRel', usepkg_list = ['NCrystalBuiltin'] )
 
     #Inspect package tree and load the necessary config files, given the filters:
-    pl = loadpkgs.PackageLoader(dirs.pkgsearchpath,
-                                possible_extdeps,
-                                select_filter,
-                                exclude_filter,
-                                autodeps=conf.autodeps,
-                                load_all=load_all_pkgs)
+    pl = loadpkgs.PackageLoader( all_pkgdirs,
+                                 possible_extdeps,
+                                 select_filter,
+                                 exclude_filter,
+                                 autodeps=conf.autodeps,
+                                 load_all=load_all_pkgs )
 
 
 
@@ -193,6 +196,13 @@ def perform_configuration(cmakeargs=[],
     ts=db.db['pkg2timestamp']
     rd=db.db['pkg2reldir']
 
+    #Force reconfig of pkg+clients if any direct extdep's changed!
+    pkgdb_directextdeps = db.db['pkg2directextdeps']
+    for p in pl.enabled_pkgs_iter():
+        if (pkgdb_directextdeps.get(p.name) or set()) != p.direct_deps_extnames:
+            p.set_files_in_pkg_changed()
+            pkgdb_directextdeps[p.name] = set(e for e in p.direct_deps_extnames)
+
     #TODO: Implement the following for increased safety: We should first check
     #all packages if they moved reldirname or changed isdynamicpkg value. Those
     #packages all have to be nuked for safety, and if any packages are nuked,
@@ -206,15 +216,13 @@ def perform_configuration(cmakeargs=[],
         dynpkgbuilder = dynpkg.DynPkgBuilder(p) if p.isdynamicpkg else None
         if dynpkgbuilder:
             mt = max(mt,dynpkgbuilder.get_mtime_deps())
-        if ts.get(p.name,None)==mt:
-            p.files_changed = False
-        else:
+        if not ( ts.get(p.name,None) == mt ):
             if dynpkgbuilder:
                 dynpkgbuilder.rebuild_dynamic_package(prefix)#NB: this removes any old pkgs/<pkgname> symlink in case package was just made dynamic.
-            p.files_changed = True
-            p.set_parent_changed_recursively()
+            p.set_files_in_pkg_changed()
             ts[p.name]=mt
         if rd.get(p.name,None)!=p.reldirname:
+            p.set_files_in_pkg_changed()#added adhoc for safety
             if not p.isdynamicpkg:
                 #Make sure pkg symlink is in place (refering to the package in
                 #symlinked location allows users to move pkgs around). Dynamic
@@ -248,7 +256,7 @@ def perform_configuration(cmakeargs=[],
     any_enabled=False
     for p in pl.enabled_pkgs_iter():
         any_enabled=True
-        if p.files_changed:
+        if p.files_in_pkg_changed():
             #recreate pkg targets from scratch
             old_parts = db.db['pkg2parts'].get(p.name,set())
             db.db['pkg2parts'][p.name]=set()

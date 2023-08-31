@@ -85,6 +85,7 @@ string( TOUPPER "${strategy_sysncrystal}" strategy_sysncrystal )
 if ( "x${strategy_sysncrystal}" STREQUAL "x" )
   #Default value ( TODO: Change to "auto" at some point in the future ):
   set( strategy_sysncrystal NEVER )
+  message("-- DGCODE_USESYSNCRYSTAL not set. Using DGCODE_USESYSNCRYSTAL=${strategy_sysncrystal}.")
 endif()
 
 set( strategy_sysncrystal_allowed_values "AUTO" "ALWAYS" "NEVER" )
