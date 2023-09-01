@@ -202,10 +202,10 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
 
 
   //Map aliases (only on exact string contents, no other parameters allowed to keep support trivial):
-  if (ss=="ESS_Al") ss = "NCrystal:cfg=NCrystalRel/Al_sg225.ncmat";
-  else if (ss=="ESS_Cu") ss = "NCrystal:cfg=NCrystalRel/Cu_sg225.ncmat";
-  else if (ss=="ESS_Ti") ss = "NCrystal:cfg=NCrystalRel/Ti_sg194.ncmat";
-  else if (ss=="ESS_V") ss = "NCrystal:cfg=NCrystalRel/V_sg229.ncmat";
+  if (ss=="ESS_Al") ss = "NCrystal:cfg=[stdlib::Al_sg225.ncmat]";
+  else if (ss=="ESS_Cu") ss = "NCrystal:cfg=[stdlib::Cu_sg225.ncmat]";
+  else if (ss=="ESS_Ti") ss = "NCrystal:cfg=[stdlib::Ti_sg194.ncmat]";
+  else if (ss=="ESS_V") ss = "NCrystal:cfg=[stdlib::V_sg229.ncmat]";
 
 #if 0
   //Support pure NCrystal cfg strings:
