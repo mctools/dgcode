@@ -102,11 +102,21 @@ namespace G4DataCollectInternals {
     envname.push_back("G4LEDATA");
     envname.push_back("G4LEVELGAMMADATA");
     envname.push_back("G4NEUTRONHPDATA");
-    envname.push_back("G4NEUTRONXSDATA");
+#if G4VERSION_NUMBER < 1100
+    envname.push_back("G4NEUTRONXSDATA"); //Observed absent in 11.0.3, and present in 10.4.3
+#endif
     envname.push_back("G4PIIDATA");
     envname.push_back("G4RADIOACTIVEDATA");
     envname.push_back("G4REALSURFACEDATA");
     envname.push_back("G4SAIDXSDATA");
+#if G4VERSION_NUMBER >= 1100
+    //Introduced at some point between 10.4.3 and 11.0.3:
+    envname.push_back("G4ENSDFSTATEDATA");
+    envname.push_back("G4INCLDATA");
+    envname.push_back("G4PARTICLEXSDATA");
+    envname.push_back("G4ABLADATA");
+#endif
+
     for (unsigned i=0;i<envname.size();++i) {
       const char * env = getenv(envname.at(i).c_str());
       std::string tmpkey("datadir/");
@@ -114,7 +124,16 @@ namespace G4DataCollectInternals {
       if (env) {
         std::vector<std::string> parts;
         Core::split_noempty(parts,env,"/");
-        setMetaData(tmpkey,parts.empty()?"":parts.back().c_str());
+        std::string tmpmd;
+        if (!parts.empty())
+          tmpmd = parts.back();
+        //In conda-forge packages, but not in standalone G4 installations, the
+        //data dirs are "xxx" instead of "G4xxx". For consistency (esp. of
+        //reference log files), we add the prefix manually if missing:
+        std::string compat_prefix("G4");
+        if ( !tmpmd.empty() && !Core::starts_with( tmpmd, compat_prefix) )
+          tmpmd = ( compat_prefix + tmpmd );
+        setMetaData(tmpkey,tmpmd.c_str());
       } else {
         setMetaData(tmpkey,"");
       }
