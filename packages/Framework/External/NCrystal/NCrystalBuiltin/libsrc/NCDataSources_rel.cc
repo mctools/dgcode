@@ -315,7 +315,6 @@ namespace NCRYSTAL_NAMESPACE {
     if (!hardwired.empty())
       return hardwired;
 #endif
-    return std::string(std::getenv("ESS_DATA_DIR"))+"/NCrystalBuiltin";//Fix location for dgcode. <NO-NC-EXPORT>
     //Hmm... we don't know where it is!
     return NullOpt;
   }
@@ -470,7 +469,7 @@ void NCD::enableStandardSearchPath( bool doEnable )
     for ( auto& e : split2(hardwired,0,':') )
       addEntry( e );
 #endif
-    addEntry(std::getenv("ESS_DATA_DIR"));//Make sure <pkgname>/filename works in dgcode <NO-NC-EXPORT>
+    //FIXME: Do not do this anymore, since we can't do it for conda-ncrystal: addEntry(std::getenv("ESS_DATA_DIR"));//Make sure <pkgname>/filename works in dgcode <NO-NC-EXPORT>
     FactImpl::registerFactory( std::make_unique<TDFact_DirList>( std::move(dirs), factNameStdSearchPath, Priority{default_priority_stdpath} ) );
   }
 }
