@@ -6,7 +6,7 @@ class Geant4Installer(DG.installutils.stdinstaller):
     _extraopt_gui, _extraopt_nogdml,_extraopt_nodata,_extraopt_mt = None,None,None,None#For pylint
 
     def name(self): return 'Geant4'
-    def default_version(self): return '10.04.p03'
+    def default_version(self): return '11.0.3'
     def download_url(self,version):
         if version in ['10.00.p03','10.00.p04'] and sys.platform=='darwin':
             #Need specially patched tar-ball to work around mac bug:
