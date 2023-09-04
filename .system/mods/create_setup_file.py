@@ -25,11 +25,14 @@ if [ "x$<pn>_INSTALL_PREFIX" != "x$DIR" ]; then
         ############################################################################
         # Undo effect of sourcing setup file in different location
         function prunepath() {
-            P=$(IFS=:;for p in ${!1:-}; do [[ $p != ${2}* ]] && echo -n ":$p"; done)
-            export $1="${P:1:99999}"
+            if [ "x${!1:-}" != "x" ]; then
+                P=$(IFS=:;for p in ${!1:-}; do [[ $p != ${2}* ]] && echo -n ":$p"; done)
+                export $1="${P:1:99999}"
+            fi
         }
         prunepath PATH $<pn>_INSTALL_PREFIX
         prunepath PYTHONPATH $<pn>_INSTALL_PREFIX
+        prunepath NCRYSTAL_DATA_PATH $<pn>_INSTALL_PREFIX
     fi
 
   ###############################################################################################################
@@ -44,7 +47,7 @@ if [ "x$<pn>_INSTALL_PREFIX" != "x$DIR" ]; then
   # Modify global path variables for our executables, scripts, libraries, python modules, etc. to be available:
   export PATH="${<pn>_INSTALL_PREFIX}/sysbin:${<pn>_INSTALL_PREFIX}/bin:${<pn>_INSTALL_PREFIX}/scripts:%s$PATH"
   export PYTHONPATH="${<pn>_INSTALL_PREFIX}/python:$PYTHONPATH"
-
+  export NCRYSTAL_DATA_PATH="${<pn>_DATA_DIR}:${NCRYSTAL_DATA_PATH}"
 fi
 """
     t=(t%extra_binpath).replace('<pn>',conf.projectname)
