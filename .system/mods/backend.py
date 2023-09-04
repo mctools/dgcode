@@ -11,7 +11,6 @@ def perform_configuration(cmakeargs=[],
                       ):
     import os
     import sys
-    import shutil
     import glob
     import extractenv
     import utils
@@ -73,9 +72,9 @@ def perform_configuration(cmakeargs=[],
         if not envdict:
             utils.rm_f(dirs.envcache)
             error.error('Failure during cmake configuration')
-        assert not '_cmakeargs' in envdict
+        assert '_cmakeargs' not in envdict
         envdict['_cmakeargs']=cmakeargs
-        assert not '_autoreconf_environment' in envdict
+        assert '_autoreconf_environment' not in envdict
         envdict['_autoreconf_environment']=current_reconf_environment(envdict)
         envdict['_pyversion'] = pyversionstr
         envdict['system']['volatile'].update({ 'misc': {**dict((e,os.getenv(e)) for e in volatile_misc)} })
@@ -363,17 +362,17 @@ def perform_configuration(cmakeargs=[],
                 fh.write(l)
         fh.close()
 
-    dir_env_vars = {
-      'includedir': 'ESS_INCLUDE_DIR',
-      'installprefix': 'ESS_INSTALL_PREFIX',
-      'testrefdir': 'ESS_TESTREF_DIR',
-      'datadir': 'ESS_DATA_DIR',
-      'libdir': 'ESS_LIB_DIR'
-    }
-    dirdict = { key: os.environ.get(value) for (key, value) in dir_env_vars.items() if os.environ.get(value, None)}
+#    dir_env_vars = {
+#      'includedir': 'ESS_INCLUDE_DIR',
+#      'installprefix': 'ESS_INSTALL_PREFIX',
+#      'testrefdir': 'ESS_TESTREF_DIR',
+#      'datadir': 'ESS_DATA_DIR',
+#      'libdir': 'ESS_LIB_DIR'
+#    }
+#    dirdict = { key: os.environ.get(value) for (key, value) in dir_env_vars.items() if os.environ.get(value, None)}
 
     dir_names = ('sysdir','fmwkdir','projdir','pkgsearchpath','blddir','installdir','testdir','envcache')
-    dirdict.update(dict(((d, getattr(dirs, d)) for d in dir_names)))
+    dirdict = dict(((d, getattr(dirs, d)) for d in dir_names))
 
     #Update dynamic python module with information, if needed:
     cfgfile=dirs.blddir / 'cfg.py'
@@ -387,7 +386,7 @@ import pathlib as _pl
 class Dirs:
 """
     for k,v in sorted(dirdict.items()):
-      val = (f"_pl.Path({repr(str(v))})" if not isinstance(v,list)
+      val = (f"_pl.Path({repr(str(v))}).absolute()" if not isinstance(v,list)
              else '['+','.join([f"_pl.Path({repr(str(el))})" for el in v])+']')
       content+=f"""
   @property
@@ -395,6 +394,30 @@ class Dirs:
     return {val}
 """
     content+="""
+  @property
+  def instdir(self):
+    return _pl.Path(__file__).parent.parent.parent.absolute()
+
+  @property
+  def testrefdir(self):
+    return self.instdir / 'tests' / 'testref'
+
+  @property
+  def datadir(self):
+    return self.instdir / 'data'
+
+  @property
+  def libdir(self):
+    return self.instdir / 'lib'
+
+  @property
+  def includedir(self):
+    return self.instdir / 'include'
+
+  @property
+  def installprefix(self):
+    return self.instdir
+
 dirs = Dirs()
 if __name__=="__main__":
   import pprint as pp
