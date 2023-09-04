@@ -194,7 +194,7 @@ class DynPkgBuilder:
             #accident. I am unsure of the original intent, but for now return
             #st_imode + st_size.
             s=os.stat(f)
-            return ( s.st_inode,#permissions etc.
+            return ( s.st_mode,#permissions etc.
                      s.st_size )
 
         def same_contents(f1,f2):
