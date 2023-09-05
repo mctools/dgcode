@@ -1,9 +1,9 @@
-import target_base
-import utils
-import dirs
-import db
-import col
-import os
+from . import target_base
+from . import utils
+from . import dirs
+from . import db
+from . import col
+import os.path
 join = os.path.join
 
 def _ensure_create_pyinit(pkg,compinit):

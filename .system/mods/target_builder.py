@@ -1,10 +1,10 @@
-import target_base
-import col
+from . import target_base
+from . import col
 import os
 import re
-import dirs
-import utils
-import error
+from . import dirs
+from . import utils
+from . import error
 
 patterns=[]
 dirtypes=set()
@@ -16,7 +16,7 @@ def register_pattern(pattern,target_factory):
     dirtype_info[dt] = (re.compile('^'+pattern+'$').match,target_factory)
     assert len(dirtype_info)==len(patterns),"patterns not uniquely defined by first 4 chars"
 
-import conf
+from . import conf
 for p,f in conf.target_factories_for_patterns():
     register_pattern(p,f)
 nonpattern_tfacts=conf.target_factories()
@@ -72,7 +72,7 @@ class TargetGlobalSysModules(target_base.Target):
     isglobal=True
     contains_message=True
     def __init__(self):
-        import env
+        from . import env
         self.name='global__sysmods'
         self.pkgname = None
         exported_mods = ['junit_xml.py']#TODO: Add more, including utilities reimplemented in Framework/Core. Also, glob for these rather than hardcode list.
@@ -88,7 +88,7 @@ class TargetGlobalScripts(target_base.Target):
     isglobal=True
     contains_message=True
     def __init__(self):
-        import env
+        from . import env
         self.name='global__scripts'
         self.pkgname=None
         self.deps=['${BLD}/dgtests','${SYS}/dginstall','${SYS}/dgenv']

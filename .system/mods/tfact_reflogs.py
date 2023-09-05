@@ -1,5 +1,13 @@
-import os,sys,glob
-import target_base, utils, dirs, conf, col, error, db
+import os
+import sys
+import glob
+from . import target_base
+from . import utils
+from . import dirs
+from . import conf
+from . import col
+from . import error
+from . import db
 join = os.path.join
 basename=os.path.basename
 

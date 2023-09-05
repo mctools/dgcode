@@ -1,8 +1,8 @@
 import os
-import dirs
-import col
-import env
-import utils
+from . import dirs
+from . import col
+from . import env
+from . import utils
 import pipes
 import shlex
 

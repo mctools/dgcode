@@ -1,4 +1,3 @@
-__metaclass__ = type#py2 backwards compatibility
 
 # We have per-package make-files and targets. We also have a global DB to
 # communicate header files and libraries between packages. In the same file as the
@@ -55,7 +54,7 @@ class Target:
         assert isinstance(self.deps,list)#names of other targets which we depend on
         assert isinstance(self.code,list)#The code to run
 
-import col
+from . import col
 
 class TargetPkgDone(Target):
     def __init__(self,pkg,pkgtargets):

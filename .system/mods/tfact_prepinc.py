@@ -1,10 +1,10 @@
-import dirs
-import target_base
-import os
-import utils
-import col
-import db
-import env
+from . import dirs
+from . import target_base
+import os.path
+from . import utils
+from . import col
+from . import db
+from . import env
 join=os.path.join
 
 class TargetPrepInc(target_base.Target):

@@ -2,7 +2,17 @@ import os
 import re
 import shlex
 import pathlib
-import conf, target_base, env, dirs, langs, utils, includes, col, db, error
+from . import conf
+from . import target_base
+from . import env
+from . import dirs
+from . import langs
+from . import utils
+from . import includes
+from . import col
+from . import db
+from . import error
+
 join=os.path.join
 
 has_realpath = os.path.exists('/usr/bin/realpath')
@@ -150,7 +160,7 @@ class TargetBinary(target_base.Target):
             l.insert(0, '-L${INST}/lib')
         self.code[-1]=self.code[-1]%(' '.join(l))
 
-import tfact_headerdeps
+from . import tfact_headerdeps
 
 
 def create_tfactory_binary(instsubdir=None,pkglib=False,shlib=False,allowed_langs=None,namefct=None,flagfct=None,descrfct=None,checkfct=None):

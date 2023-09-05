@@ -12,14 +12,14 @@ def perform_configuration(cmakeargs=[],
     import os
     import sys
     import glob
-    import extractenv
-    import utils
-    import loadpkgs
-    import dirs
-    import conf
-    import error
-    import dynpkg
-    import mtime
+    from . import extractenv
+    from . import utils
+    from . import loadpkgs
+    from . import dirs
+    from . import conf
+    from . import error
+    from . import dynpkg
+    from . import mtime
     import pickle
     import pathlib
     import pipes
@@ -62,7 +62,7 @@ def perform_configuration(cmakeargs=[],
     #Pre-inspect package directories, simply finding the package dirs for now (do it already to detect some errors early):
     all_pkgdirs = loadpkgs.find_pkg_dirs ( dirs.pkgsearchpath )
 
-    import env
+    from . import env
     if envdict:
         #Can reuse config:
         env.env=envdict
@@ -82,7 +82,7 @@ def perform_configuration(cmakeargs=[],
         #configuration fully extracted:
         env.env=envdict
         #(re)create setup file whenever extracting env via cmake:
-        import create_setup_file
+        from . import create_setup_file
         create_setup_file.recreate()
         #(re)create any libs_to_symlink whenever extracting env via cmake:
         dirs.create_install_dir()
@@ -173,7 +173,7 @@ def perform_configuration(cmakeargs=[],
             error.error('Selected packages have missing external dependencies: "%s"'%'", "'.join(missing_needed))
 
     #Load old contents of global db:
-    import db
+    from . import db
 
     #Check if volatile parts of environment changed:
     volatile = env.env['system']['volatile']
@@ -251,7 +251,7 @@ def perform_configuration(cmakeargs=[],
                                              #conf.py).
         db.clear_pkg(pkgname)
 
-    import target_builder
+    from . import target_builder
     any_enabled=False
     for p in pl.enabled_pkgs_iter():
         any_enabled=True
@@ -324,7 +324,7 @@ def perform_configuration(cmakeargs=[],
 
     #setup makefiles:
     utils.mkdir_p(dirs.makefiledir)
-    import makefile
+    from . import makefile
 
     #package makefiles:
 

@@ -1,7 +1,12 @@
-from __future__ import print_function
+import sys
+import pathlib
+sys.path.insert(0,str((pathlib.Path(__file__).parent.parent / 'pypath').absolute().resolve()))
+
 def go():
-    import os,sys,errno
-    import utils
+    import os
+    import errno
+    import ess_dgbuild_internals.utils as utils
+    #from . import utils
     join=os.path.join
 
     fn=sys.argv[1]
@@ -88,10 +93,6 @@ except KeyboardInterrupt:
     sys.stderr.flush()
     import time
     time.sleep(0.2)
-    if hasattr(sys,'exc_clear'):
-        sys.exc_clear()#python2 only
     sys.exit(1)
 import sys
-if hasattr(sys,'exc_clear'):
-    sys.exc_clear()#python2 only
 sys.exit(0)

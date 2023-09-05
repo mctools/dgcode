@@ -1,7 +1,6 @@
-from __future__ import print_function
 import os
-import utils
-import dirs
+from . import utils
+from . import dirs
 
 def parse_stdouterr(filename):
     #Errors causes ec!=0 so are noticed by the user. But we want to capture

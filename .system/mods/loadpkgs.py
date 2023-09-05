@@ -1,7 +1,10 @@
 import os
 import sys
-import dirs
-import utils,langs,conf,error
+from . import dirs
+from . import utils
+from . import langs
+from . import conf
+from . import error
 join=os.path.join
 
 ignore_dirs=set(['install'])
@@ -161,7 +164,7 @@ class Package:
         if not self.__incs_updated:
             self.__incs_updated = True
             d=dirs.pkg_dir(self,'libinc')
-            import db
+            from . import db
             db.db['pkg2inc'][self.name]= langs.headers_in_dir(d) if os.path.isdir(d) else set()
 
     def setup(self,name2object,extdeps,autodeps,enable_and_recurse_to_deps=False):
@@ -295,7 +298,7 @@ class Package:
               'enabled' : self.enabled }
         if not self.enabled:
             return d
-        import db
+        from . import db
         d.update({ 'deps_pkgs' : self.deps_names(),
                    'deps_pkgs_direct' : self.direct_deps_pkgnames,
                    'deps_ext' : self.extdeps(),
@@ -313,14 +316,14 @@ class Package:
         return d
 
     def dumpinfo(self,autodeps,prefix=''):
-        import col
-        import env
+        from . import col
+        from . import env
         width=max(75,len(self.dirname)+30)
         prefix+='==='
         def _format(l):
             if not l:
                 return col.darkgrey+'<none>'+col.end
-            import formatlist
+            from . import formatlist
             return '\n'.join(formatlist.formatlist([(n,col.ok if b else col.bad) for n,b in sorted(l)],width-40,indent_first='',indent_others=prefix+' '*27))
         extdeps_direct = [(e,env.env['extdeps'][e]['present']) for e in self.direct_deps_extnames]
         extdeps_indirect = [(e,env.env['extdeps'][e]['present']) for e in self.extdeps() if not e in self.direct_deps_extnames]

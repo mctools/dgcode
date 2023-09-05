@@ -1,5 +1,5 @@
 def formatlist(l,width,colour=None,indent_first='',indent_others='',nonetext='<none>'):
-    import col
+    from . import col
     #entries in input list are either in format (text,color) or simply
     #(text). colour will be used to override all colours (colour='' will turn
     #all colours off).

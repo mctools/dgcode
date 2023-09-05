@@ -1,9 +1,14 @@
-from __future__ import print_function
-import os,sys
-import utils,langs,col,includes,conf,error
-import dirs
+import os
+import sys
+from . import utils
+from . import langs
+from . import col
+from . import includes
+from . import conf
+from . import error
+from . import dirs
 path=os.path
-from grep import pkgdir_for_search
+from .grep import pkgdir_for_search
 
 ccxx_extensions = set(ext for ext,lang in langs.hdrext2lang.items() if lang in ('cxx','c'))
 ccxx_extensions.update(set(ext for ext,lang in langs.srcext2lang.items() if lang in ('cxx','c')))

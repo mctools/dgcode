@@ -1,5 +1,5 @@
-import utils
-import langs
+from . import utils
+from . import langs
 
 def create_include_decoder(exts):
     #decodes c++ include statements to look for possible includes to private header files (in same dir) or in libinc of own or other package.
@@ -48,7 +48,7 @@ def find_includes(cfile,pkg):
                 possible_privincs.add(py23bytes2str(fn))
     if pkg.extra_include_deps:
         if pkg.isdynamicpkg:
-            import error
+            from . import error
             error.error('EXTRA_INCDEPS not currently supported for dynamic packages')
         from os.path import relpath
         rp=relpath(cfile,pkg.dirname)#todo: this will have to be changed if we want to support dynamic packages (but perhaps we should rather obsolete the EXTRA_INCDEPS flag?)

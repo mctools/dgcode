@@ -1,7 +1,7 @@
 #global variables
 from os import path
 join=path.join
-import conf#project specific configuration
+from . import conf#project specific configuration
 
 #system dir is one up from the modules dir:
 sysdir = path.realpath(join(path.dirname(__file__),'..'))
@@ -70,7 +70,7 @@ pkgdir_aliases = {
   "extra": extrapkgpath
   }
 
-from utils import mkdir_p,touch
+from .utils import mkdir_p,touch
 
 def create_bld_dir():
   mkdir_p(blddir)

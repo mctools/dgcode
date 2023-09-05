@@ -1,6 +1,6 @@
-import target_base
-import dirs
-import utils
+from . import target_base
+from . import dirs
+from . import utils
 import os
 
 class TargetLibAvail(target_base.Target):

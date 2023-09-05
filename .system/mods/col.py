@@ -1,4 +1,3 @@
-from __future__ import print_function
 black = '\033[30m'
 red = '\033[31m'
 green = '\033[32m'

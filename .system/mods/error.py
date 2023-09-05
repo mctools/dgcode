@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 # Custom Exception class to distinguish exceptions thrown by our code from other exceptions.
 #
 # Intended usage:

@@ -1,4 +1,4 @@
-import conf
+from . import conf
 
 def dotgen(pkgloader,outfile,enabled_only=True):
     fh=open(outfile,'w')

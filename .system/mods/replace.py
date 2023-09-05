@@ -1,6 +1,5 @@
-from __future__ import print_function
 import os
-from grep import pkgfiles
+from .grep import pkgfiles
 pjoin=os.path.join
 
 def decode_pattern(p):

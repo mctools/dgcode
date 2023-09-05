@@ -1,10 +1,8 @@
-from __future__ import print_function
-
 import os
 import errno
 import sys
 import re
-import conf
+from . import conf
 import shutil
 
 def err(msg):
@@ -112,7 +110,7 @@ def listfiles(d,filterfnc=0,error_on_no_match=True,ignore_logs=False):
                 if filterfnc(f):
                     yield f
                 elif error_on_no_match:
-                    import error
+                    from . import error
                     error.error("Forbidden file %s/%s"%(d,f))
             else:
                 yield f
@@ -120,19 +118,8 @@ def listfiles(d,filterfnc=0,error_on_no_match=True,ignore_logs=False):
 def is_executable(fn):
     return os.access(fn,os.X_OK)
 
-#python3's pickle is python2's cPickle:
-try:
-    import cPickle as _pklmod
-except ImportError:
-    import pickle as _pklmod
-
-try:
-    from pathlib import Path as _Path
-except ImportError:
-    #python2 workaround:
-    class _Path:
-        def __init__(self,fn): self._fn=fn
-        def open(self,mode): return open(self._fn,mode)
+import pickle as _pklmod
+from pathlib import Path as _Path
 
 def pkl_load(fn_or_fh):
     if hasattr(fn_or_fh,'read'):
@@ -214,7 +201,7 @@ def import_modatpath(pathtomodule,modulename=None):
 
 class rpath_appender:
     def __init__( self, lang, shlib ):
-        import env
+        from . import env
         langinfo=env.env['system']['langs'][lang]
         rpath_pattern = langinfo['rpath_flag_lib' if shlib else 'rpath_flag_exe']
         self.__patterns = [ rpath_pattern ]

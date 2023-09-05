@@ -1,5 +1,6 @@
-import os,glob
-import conf
+import os
+import glob
+from . import conf
 
 _islink=os.path.islink
 _osstat=os.stat
@@ -62,7 +63,7 @@ def mtime_pkg(pkg):
     return mt
 
 def mtime_cmake():
-    import dirs
+    from . import dirs
     c=os.path.join(dirs.sysdir,'cmakedetect')
     files=glob.glob(c+'/*.cmake')+glob.glob(c+'/optional/*.cmake')+[c+'/CMakeLists.txt',c,c+'/optional']
     mt=-1
@@ -71,7 +72,7 @@ def mtime_cmake():
     return mt
 
 def mtime_pymods():
-    import dirs
+    from . import dirs
     files = glob.glob(os.path.join(dirs.sysdir,'mods/*.py'))
     files += glob.glob(os.path.join(dirs.sysdir,'publicmods/dgbuild/*.py'))
     files += [os.path.join(dirs.sysdir,'bin/dgbuild'),

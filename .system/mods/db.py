@@ -12,7 +12,8 @@ db = { 'pkg2timestamp' : {},#to detect when files changed
    }
 
 #initial load:
-import dirs,utils
+from . import dirs
+from . import utils
 dbfile=dirs.blddir / 'globdb.pkl'
 
 if os.path.exists(dbfile):#fixme: utils should have pkl_load safe which returns None if file does not exists (avoids potential race conds)

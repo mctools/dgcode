@@ -1,8 +1,10 @@
 import os
-import db
-import col
-import error
-import dirs,utils,target_base
+from . import db
+from . import col
+from . import error
+from . import dirs
+from . import utils
+from . import target_base
 join=os.path.join
 
 class TargetSymlinks(target_base.Target):

@@ -9,7 +9,10 @@
 # Most importantly, it is intended that minimal cpu time is used to needless redo work in steps 1-4
 # above when user changes code or configuration.
 
-import sys,os,glob,pipes
+import sys
+import os
+import glob
+import pipes
 
 progname=os.path.basename(sys.argv[0])
 prefix=progname+': '
@@ -29,7 +32,10 @@ osx=not isfile('/proc/cpuinfo')
 ### Parse arguments  ####
 #########################
 
-import dirs,utils,error
+from . import dirs
+from . import utils
+from . import error
+
 rel_blddir=os.path.relpath(dirs.blddir)
 rel_instdir=os.path.relpath(dirs.installdir)
 rel_testdir=os.path.relpath(dirs.testdir)
@@ -290,13 +296,13 @@ utils.touch(dirs.lockfile)
 assert dirs.lockfile.exists()
 def unlock():
     from os import remove
-    from dirs import lockfile
+    from .dirs import lockfile
     if lockfile.exists():
         remove(lockfile)
 import atexit
 atexit.register(unlock)
 
-from conf import check_install_dir_indicator, check_build_dir_indicator
+from .conf import check_install_dir_indicator, check_build_dir_indicator
 
 if opt.clean:
     if dirs.blddir.is_dir() or dirs.installdir.is_dir() or dirs.testdir.is_dir():
@@ -344,7 +350,7 @@ if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
 #    parser.error('Can not set both ONLY and NOT variables simultaneously. Unset at least one by ONLY="" or NOT=""')
 
 #Detect changes to system cmake or python files and set opt.examine or opt.insist as appropriate.
-import mtime
+from . import mtime
 systs = (mtime.mtime_cmake(),mtime.mtime_pymods())
 try:
     oldsysts = utils.pkl_load(dirs.systimestamp_cache)
@@ -466,7 +472,7 @@ cmakeargs=[pipes.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if not k in set
 cmakeargs.sort()
 autodisable = True
 
-import backend
+from . import backend
 
 err_txt,unclean_exception = None,None
 try:
@@ -497,7 +503,7 @@ if err_txt:
     pr="\n\nERROR during configuration:\n\n  %s\n\nAborting."%(err_txt.replace('\n','\n  '))
     print (pr.replace('\n','\n%s'%prefix))
     #make all packages need reconfig upon next run:
-    import db
+    from . import db
     db.db['pkg2timestamp']={}
     db.save_to_file()
     #exit (with ugly traceback if unknown type of exception):
@@ -521,7 +527,7 @@ if opt.grep:
     qp=query_pkgs()
     print ("Grepping %i packages for pattern %s\n"%(len(qp),opt.grep))
     n=0
-    import grep
+    from . import grep
     for pkg in qp:
         n+=grep.grep(pkg,opt.grep,countonly=opt.grepc)
     print ("\nFound %i matches"%n)
@@ -530,7 +536,7 @@ if opt.grep:
 if opt.replace:
     qp=query_pkgs()
     p=opt.replace
-    import replace
+    from . import replace
     search_pat,replace_pat = replace.decode_pattern(opt.replace)
     if not search_pat:
         parser.error("Bad syntax in replacement pattern: %s"%p)
@@ -545,7 +551,7 @@ if opt.replace:
 if opt.find:
     qp=query_pkgs()
     p=opt.find
-    import find#fnmatch!!
+    from . import find#fnmatch!!
     print ("\nFinding all files and paths matching \"%s\"\n"%(p))
     n = 0
     for pkg in qp:
@@ -576,7 +582,7 @@ if opt.incinfo:
         #if not fn.startswith(os.path.abspath(dirs.codedir)):#TODO: This currently fails for dynamic packages!
             parser.error("File must be located under %s"%dgcode_invoke_dirs)
         return [fn]#expands to a single file
-    import incinfo
+    from . import incinfo
     fnsraw = opt.incinfo.split(',') if ',' in opt.incinfo else [opt.incinfo]
     fns = sum((_val_incinfofn(fnraw) for fnraw in fnsraw),[])
     #remove duplicates (relies on seen.add returning None)
@@ -599,7 +605,7 @@ if opt.pkginfo:
 
 if opt.pkggraph:
     dotfile=dirs.blddir / 'pkggraph.dot'
-    import dotgen
+    from . import dotgen
     dotgen.dotgen(pkgloader,dotfile,enabled_only=opt.pkggraph_activeonly)
     if not opt.quiet:
         print ('%sPackage dependencies in graphviz DOT format has been generated in %s'%(prefix,dotfile))
@@ -621,7 +627,7 @@ if opt.pkggraph:
 
 
 if not opt.njobs:
-    import cpudetect
+    from . import cpudetect
     opt.njobs=cpudetect.auto_njobs(prefix)
 
 #VERBOSE:
@@ -649,7 +655,7 @@ if not opt.quiet:
     print (prefix+'  Installation directory           : %s'%dirs.installdir)
     print (prefix+'  Build directory                  : %s'%dirs.blddir)
 
-    import col
+    from . import col
     col_ok = col.ok
     col_bad = col.bad
     col_end = col.end
@@ -698,7 +704,7 @@ if not opt.quiet:
     if not opt.verbose and n_disabled>nmax:
         limittxt[1] = lm2%(n_disabled-nmax)
         pkg_disabled = pkg_disabled[0:nmax]+limittxt
-    import env
+    from . import env
     extdeps_avail = sorted(k for (k,v) in env.env['extdeps'].items() if v['present'])
     extdeps_missing = sorted(k for (k,v) in env.env['extdeps'].items() if not v['present'])
 
@@ -774,7 +780,7 @@ if opt.install:
 
 if not opt.quiet:
     if cfgvars.get('ONLY','')=='Framework::*' and not 'NOT' in cfgvars:
-        import col
+        from . import col
         print (prefix+"%sNote that only Framework packages were enabled by default:%s"%(col.bldmsg_notallselectwarn,col.end))
         print (prefix)
         print (prefix+"%s  - To enable pkgs for a given project do: dgbuild -p<projectname>%s"%(col.bldmsg_notallselectwarn,col.end))

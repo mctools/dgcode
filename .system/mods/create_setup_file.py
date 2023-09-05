@@ -1,8 +1,8 @@
 import os
-import dirs
-import conf
-import utils
-import env
+from . import dirs
+from . import conf
+from . import utils
+from . import env
 
 def recreate():
     fn=dirs.blddir / 'setup.sh'

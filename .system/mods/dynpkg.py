@@ -1,24 +1,20 @@
-from __future__ import print_function
-from __future__ import absolute_import
-__metaclass__ = type#py2 backwards compatibility
-
 import os
 import sys
 import shutil
 import glob
 
-import conf
-import col
-import utils
-import dirs
-import error
-import dirs
-import mtime
+from . import conf
+from . import col
+from . import utils
+from . import dirs
+from . import error
+from . import dirs
+from . import mtime
 
-_dynpreamble="""from __future__ import print_function,absolute_import,division
-__metaclass__ = type#py2 backwards compatibility
-import os,sys,shutil
-from utils import mkdir_p as __mkdir_p
+_dynpreamble="""import os,sys,shutil
+def __mkdir_p( p ):
+    import pathlib
+    pathlib.Path(p).mkdir(parents=True,exist_ok=True)
 __targetblddir=['/non/existing/dir']
 def _set_targetblddir(d):
     __targetblddir[0] = d

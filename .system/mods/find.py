@@ -1,9 +1,8 @@
-from __future__ import print_function
 import os
 import fnmatch
-import col
-import conf
-from grep import pkgfiles,pkgdir_for_search
+from . import col
+from . import conf
+from .grep import pkgfiles, pkgdir_for_search
 pjoin=os.path.join
 
 def find(pkg,pattern):

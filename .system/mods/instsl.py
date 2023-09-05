@@ -1,7 +1,13 @@
-from __future__ import print_function
+import sys
+import pathlib
+sys.path.insert(0,str((pathlib.Path(__file__).parent.parent / 'pypath').absolute().resolve()))
+
 def go():
-    import os,sys,errno
-    import utils
+    import os
+    import sys
+    import errno
+    import ess_dgbuild_internals.utils as utils
+    #from . import utils
 
     fn=sys.argv[1]
     verbose=int(sys.argv[2]) if len(sys.argv)>=3 else 0
@@ -34,7 +40,6 @@ def go():
                     raise
         if not needed:
             #we removed all of our files, remove dir if not empty:
-            import utils
             if utils.isemptydir(destdir):
                 try:
                     os.rmdir(destdir)
@@ -49,7 +54,6 @@ def go():
 
     if len(files)>len(current):
         if not os.path.isdir(destdir):
-            import utils
             utils.mkdir_p(destdir)
         for s,t in files:
             if not t in current:
@@ -73,10 +77,6 @@ except KeyboardInterrupt:
     sys.stderr.flush()
     import time
     time.sleep(0.2)
-    if hasattr(sys,'exc_clear'):
-        sys.exc_clear()#python2 only
     sys.exit(1)
 import sys
-if hasattr(sys,'exc_clear'):
-    sys.exc_clear()#python2 only
 sys.exit(0)

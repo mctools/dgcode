@@ -35,7 +35,7 @@ def checkfct_pycpp(pkg,subdir,name):
     if os.path.exists(cf):
         return 'Python module %s.%s is provided in both pure (python/%s.py) and compiled (pycpp_%s/) forms'%(pkg.name,n,n,n)
 
-import col
+from . import col
 def descrfct_lib(pkg,subdir,name): return col.bldcol('shlib'),'shared library for package %s'%pkg.name
 def descrfct_pycpp(pkg,subdir,name): return col.bldcol('pymod'),'python module %s.%s'%(pkg.name,subdir[6:])
 def descrfct_app(pkg,subdir,name): return col.bldcol('app'),'application %s'%name
@@ -43,7 +43,7 @@ def descrfct_app(pkg,subdir,name): return col.bldcol('app'),'application %s'%nam
 def uninstall_package(d,pn):
     #completely remove all traces of a pkg from the install area:
     #a few sanity checks since we are about to use rm -rf:
-    import utils
+    from . import utils
     assert d and not ' ' in d
 
     check_install_dir_indicator(d)
@@ -130,9 +130,9 @@ def check_install_dir_indicator(inst_dir):
 
 
 def target_factories_for_patterns():
-    import tfact_symlink as tfs
-    import tfact_headerdeps as tfh
-    import tfact_binary as tfb
+    from . import tfact_symlink as tfs
+    from . import tfact_headerdeps as tfh
+    from . import tfact_binary as tfb
     l=[]
     l += [('data',   tfs.create_tfactory_symlink('','data/%s',chmodx=False))]
     l += [('scripts',tfs.create_tfactory_symlink('','scripts',chmodx=True,
@@ -158,10 +158,10 @@ def ignore_file(f):
 
 def target_factories():
     #non-pattern factories:
-    import tfact_prepinc
-    import tfact_pyinit
-    import tfact_reflogs
-    import tfact_libavail
+    from . import tfact_prepinc
+    from . import tfact_pyinit
+    from . import tfact_reflogs
+    from . import tfact_libavail
     l = []
     l += [tfact_prepinc.tfactory_prepinc]
     l += [tfact_pyinit.tfactory_pyinit]
@@ -175,7 +175,8 @@ def _del_pattern(thedir,pattern):
         os.remove(f)
 
 def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
-    import utils,dirs
+    from . import utils
+    from . import dirs
     d=disappeared_parts
     i=instdir
     unused=set()

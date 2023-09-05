@@ -1,5 +1,4 @@
-from __future__ import print_function
-import utils
+from . import utils
 
 def cluster_ncpus():
     #if running at cluster via slurm, respect SLURM_CPUS_PER_TASK limit

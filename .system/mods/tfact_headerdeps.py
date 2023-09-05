@@ -1,10 +1,10 @@
-import target_base
-import includes
-import utils
-import dirs
-import db
+from . import target_base
+from . import includes
+from . import utils
+from . import dirs
+from . import db
 import os
-import langs
+from . import langs
 
 class TargetIncDep(target_base.Target):
     #for header files not part of an inderdependent circular group or for such a circular group.
@@ -83,7 +83,7 @@ def tfactory_headerdeps(pkg,subdir):
     hhs = langs.headers_in_dir(dirs.pkg_dir(pkg,subdir))
     hh2deps=dict((hh,includes.find_includes(dirs.pkg_dir(pkg,subdir,hh),pkg)) for hh in hhs)
     if not hh2deps and subdir=='libinc':
-        import error
+        from . import error
         error.error("No header files found in %s/%s (remove this directory if not needed)"%(pkg.name,subdir))
     #It is possible to have valid circular dependencies between header files in
     #the same dir. To solve this we must first detect such groups of interdependant files and
