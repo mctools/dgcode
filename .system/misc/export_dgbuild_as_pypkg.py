@@ -49,7 +49,7 @@ dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main"
 
 """)
 
-def extract_py_file_content( f ):
+def extract_file_content( f ):
     res = ''
     for l in f.read_text().splitlines():
         if 'DGBUILD-NO-EXPORT' in l:
@@ -60,11 +60,24 @@ def extract_py_file_content( f ):
     return res
 
 def create_pymodfiles( srcdir, tgtdir ):
-    outsrc = tgtdir / 'src'
-    outmod = tgtdir / 'src' / 'ess_dgbuild_internals'
-    outmod.mkdir( parents = True )
+    tgtdir.mkdir( parents = True )
     for f in sorted(srcdir.glob('*.py')):
-        ( outmod / f.name ).write_text( extract_py_file_content(f) )
+        ( tgtdir / f.name ).write_text( extract_file_content(f) )
+
+def create_cmakefiles( srcdir, tgtdir ):
+    tgtdir.mkdir( parents = True )
+    for f in sorted(srcdir.glob('*')):
+        if '~' in f.name:
+            continue
+        if f.is_dir():
+            if f.name in ('optional','extras'):
+                create_cmakefiles( f, tgtdir / f.name )
+                continue
+        else:
+            if f.suffix in ('.cmake','.txt','.py'):
+                ( tgtdir / f.name ).write_text( extract_file_content(f) )
+                continue
+        print("WARNING: Ignoring %s"%f)
 
 def main():
     opt = parse()
@@ -75,7 +88,12 @@ def main():
     print('Extracting to %s'%opt.targetdir)
     opt.targetdir.mkdir( parents=True )
     create_metadata_files( opt.targetdir )
-    create_pymodfiles( opt.srcdir / 'mods' , opt.targetdir )
+    destdir_mods = opt.targetdir / 'src' / 'ess_dgbuild_internals'
+    destdir_data = destdir_mods / 'data'
+    destdir_cmake = destdir_data / 'cmake'
+
+    create_pymodfiles( opt.srcdir / 'mods' , destdir_mods )
+    create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
 
 if __name__ == '__main__':
     main()

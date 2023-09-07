@@ -19,7 +19,7 @@ class TargetPrepInc(target_base.Target):
         self._pklfile = join(self._cachedir,'prepinc.pkl')
         mpf=dirs.makefile_blddir(self._pklfile)
         self.deps=[mpf]
-        self.code = ['python3 ${SYS}/mods/instsl2.py %s ${VERBOSE}'%(mpf)]
+        self.code = ['python3 -mess_dgbuild_internals.instsl2 %s ${VERBOSE}'%(mpf)]
         utils.mkdir_p(self._cachedir)
         self._neededlinks=set()
         if self._has_libinc:

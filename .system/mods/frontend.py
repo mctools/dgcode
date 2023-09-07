@@ -160,9 +160,9 @@ def parse_args():
     group_other.add_option("--replace",
                            action="store", dest="replace", default=None, metavar='PATTERN',
                            help="Global search and replace in packages via pattern like '/OLDCONT/NEWCONT/' (use with care!)")
-    group_other.add_option("--install",metavar="DIR",
-                           action="store", type="string", dest="install",default='',
-                           help="Install to DIR after the build")
+    group_other.add_option("--install",metavar="DIR", # DGBUILD-NO-EXPORT
+                           action="store", type="string", dest="install",default='', # DGBUILD-NO-EXPORT
+                           help="Install to DIR after the build") # DGBUILD-NO-EXPORT
     group_other.add_option("--removelock",
                            action='store_true', dest="removelock", default=False,
                            help="Force removal of lockfile")
@@ -772,15 +772,15 @@ if opt.runtests:
     if ec:
         sys.exit(1 if ec > 128 else ec)
 
-if opt.install:
-    ec=utils.system('. %s/setup.sh && dginstall -q "%s"'%(dirs.installdir,opt.install))
-    if ec:
-        sys.exit(1 if ec > 128 else ec)
-    if not opt.quiet:
-        print (prefix+'Copied self-contained installation to:')
-        print (prefix)
-        print (prefix+'  %s'%opt.install)
-        print (prefix)
+if opt.install: # DGBUILD-NO-EXPORT
+    ec=utils.system('. %s/setup.sh && dginstall -q "%s"'%(dirs.installdir,opt.install))   # DGBUILD-NO-EXPORT
+    if ec: # DGBUILD-NO-EXPORT
+        sys.exit(1 if ec > 128 else ec) # DGBUILD-NO-EXPORT
+    if not opt.quiet: # DGBUILD-NO-EXPORT
+        print (prefix+'Copied self-contained installation to:') # DGBUILD-NO-EXPORT
+        print (prefix) # DGBUILD-NO-EXPORT
+        print (prefix+'  %s'%opt.install) # DGBUILD-NO-EXPORT
+        print (prefix) # DGBUILD-NO-EXPORT
 
 if not opt.quiet:
     if cfgvars.get('ONLY','')=='Framework::*' and not 'NOT' in cfgvars:

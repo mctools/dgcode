@@ -1,11 +1,12 @@
 import os
 import glob
+import pathlib
 from . import conf
 
 _islink=os.path.islink
 _osstat=os.stat
 def mtime(f):
-    s=_osstat(f)
+    s = f.stat() if hasattr(f,'stat') else _osstat(f)
     return max(s.st_mtime,s.st_ctime)
     #m=max(s.st_mtime,s.st_ctime)
     #if not _islink(f):
@@ -64,20 +65,24 @@ def mtime_pkg(pkg):
 
 def mtime_cmake():
     from . import dirs
-    c=os.path.join(dirs.sysdir,'cmakedetect')
-    files=glob.glob(c+'/*.cmake')+glob.glob(c+'/optional/*.cmake')+[c+'/CMakeLists.txt',c,c+'/optional']
+    c = dirs.cmakedetectdir
+    files  = list(dirs.cmakedetectdir.glob('**/*.txt'))
+    files += list(dirs.cmakedetectdir.glob('**/*.cmake'))
+    files += list(dirs.cmakedetectdir.glob('**/*.py'))
+    files = [ f for f in files if '#' not in f.name ]
     mt=-1
     for f in files:
         mt=max(mt,mtime(f))
     return mt
 
 def mtime_pymods():
-    from . import dirs
-    files = glob.glob(os.path.join(dirs.sysdir,'mods/*.py'))
-    files += glob.glob(os.path.join(dirs.sysdir,'publicmods/dgbuild/*.py'))
-    files += [os.path.join(dirs.sysdir,'bin/dgbuild'),
-              os.path.join(dirs.sysdir,'dgtests_template'),
-              os.path.join(dirs.sysdir,'dginstall')]
+    files = [ str(e) for e in pathlib.Path(__file__).parent.glob('*.py') ]
+
+    from . import dirs                                      # DGBUILD-NO-EXPORT
+    files += [os.path.join(dirs.sysdir,'bin/dgbuild'),      # DGBUILD-NO-EXPORT
+              os.path.join(dirs.sysdir,'dgtests_template'), # DGBUILD-NO-EXPORT
+              os.path.join(dirs.sysdir,'dginstall') ]       # DGBUILD-NO-EXPORT
+    files = [ f for f in files if '#' not in f ]
     mt=-1
     for f in files:
         mt=max(mt,mtime(f))

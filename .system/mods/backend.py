@@ -348,18 +348,14 @@ def perform_configuration(cmakeargs=[],
     #Save new state:
     db.save_to_file()
 
-    dgtestfile=dirs.blddir / 'dgtests'
-    if not os.path.exists(dgtestfile):
-        fh=open(dgtestfile,'w')
-        for l in open(os.path.join(dirs.sysdir,'dgtests_template')):
-            if l=='%%INCLUDED_FUNCTIONS%%\n':
-                import inspect
-                fh.write(''.join(inspect.getsourcelines(conf.runnable_is_test)[0]))
-                fh.write(''.join(inspect.getsourcelines(utils.mkdir_p)[0]))
-                fh.write(''.join(inspect.getsourcelines(utils.system)[0]))
-            else:
-                fh.write(l)
-        fh.close()
+    dgtestfile=dirs.blddir / 'dgtests' # DGBUILD-NO-EXPORT
+    if not os.path.exists(dgtestfile): # DGBUILD-NO-EXPORT
+        with open(dgtestfile,'w') as fh: # DGBUILD-NO-EXPORT
+            for l in open(os.path.join(dirs.sysdir,'dgtests_template')): # DGBUILD-NO-EXPORT
+                if '<<INJECTPYPATH>>' in l: # DGBUILD-NO-EXPORT
+                    l = l.replace('<<INJECTPYPATH>>', # DGBUILD-NO-EXPORT
+                                  str( ( pathlib.Path(__file__).resolve().absolute().parent.parent / 'pypath' ).absolute().resolve() ) ) # DGBUILD-NO-EXPORT
+                fh.write(l) # DGBUILD-NO-EXPORT
 
 #    dir_env_vars = {
 #      'includedir': 'ESS_INCLUDE_DIR',

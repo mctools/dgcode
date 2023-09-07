@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import pathlib
 import sys
-sys.path.insert(0, str( ( pathlib.Path(__file__).parent.parent / 'pypath' ).absolute().resolve() ) )
+import os
+p = str( ( pathlib.Path(__file__).parent.parent / 'pypath' ).absolute().resolve() )
+sys.path.insert(0, p )
+os.environ['PYTHONPATH']='%s:%s'%(p,os.environ.get('PYTHONPATH',''))
 import ess_dgbuild_internals.frontend

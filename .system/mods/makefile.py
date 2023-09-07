@@ -60,7 +60,7 @@ def write_main(global_targets,enabled_pkgnames):
     fh.write('PKG := %s\n'%dirs.pkgdirbase)
     #fh.write('SRC := %s\n'%dirs.codedir)
     fh.write('BLD := %s\n'%dirs.blddir)
-    fh.write('SYS := %s\n'%dirs.sysdir)
+    fh.write('SYS := %s\n'%dirs.sysdir)# DGBUILD-NO-EXPORT
     fh.write('INC := ${INST}/%s\n'%dirs.incdirname)
     fh.write('TRG := ${BLD}/named_targets\n\n')
     fh.write('EXT := ${BLD}/extdeps\n\n')

@@ -5,7 +5,7 @@ join=path.join
 from . import conf#project specific configuration
 
 #system dir is one up from the modules dir:
-sysdir = pathlib.Path(__file__).absolute().absolute().resolve().parent.parent
+sysdir = str(pathlib.Path(__file__).resolve().absolute().parent.parent)
 fmwkdir = conf.framework_dir(sysdir)
 blddir = conf.build_dir()
 blddir_indicator = conf.build_dir_indicator(blddir)
@@ -18,7 +18,10 @@ installdir = conf.install_dir()
 installdir_indicator = conf.install_dir_indicator(installdir)
 testdir = conf.test_dir()
 projdir = conf.projects_dir()
-cmakedetectdir = join(sysdir,'cmakedetect')
+cmakedetectdir = pathlib.Path(sysdir) / 'cmakedetect' # DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>datadir = pathlib.Path(__file__).resolve().absolute().parent / 'data'
+# DGBUILD-EXPORT-ONLY>>cmakedetectdir = datadir / 'cmake'
+
 incdirname='include'
 #libdirname='lib'#fixme: unused, 'lib' is simply hardcoded in a few places.
 

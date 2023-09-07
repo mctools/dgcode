@@ -75,28 +75,27 @@ class TargetGlobalSysModules(target_base.Target):
         from . import env
         self.name='global__sysmods'
         self.pkgname = None
-        exported_mods = ['junit_xml.py']#TODO: Add more, including utilities reimplemented in Framework/Core. Also, glob for these rather than hardcode list.
-        self.deps=['${SYS}/publicmods/dgbuild/%s'%em for em in exported_mods]
+        self.deps = []
         self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "%sInstalling global system modules%s"; fi'%(col.bldcol('global'),col.bldend),
                      'mkdir -p ${INST}/python/dgbuild',
-                     'touch ${INST}/python/dgbuild/__init__.py',
-                     ] + ['cp -f ${SYS}/publicmods/dgbuild/%s ${INST}/python/dgbuild/%s'%(em,em) for em in exported_mods]
+                     'touch ${INST}/python/dgbuild/__init__.py'
+                     ]
         self.deps += [ '${BLD}/cfg.py' ]
         self.code += ['cp -f ${BLD}/cfg.py ${INST}/python/dgbuild/cfg.py']#TODO: Add more info in cfg.py.
 
-class TargetGlobalScripts(target_base.Target):
-    isglobal=True
-    contains_message=True
-    def __init__(self):
-        from . import env
-        self.name='global__scripts'
-        self.pkgname=None
-        self.deps=['${BLD}/dgtests','${SYS}/dginstall','${SYS}/dgenv']
-        self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "%sInstalling global scripts: dgtests dginstall dgenv%s"; fi'%(col.bldcol('global'),col.bldend),
-                     'mkdir -p ${INST}/sysbin',
-                     'cp -f ${BLD}/dgtests ${INST}/sysbin/dgtests && chmod +x ${INST}/sysbin/dgtests',
-                     'cp -f ${SYS}/dginstall ${INST}/sysbin/dginstall && chmod +x ${INST}/sysbin/dginstall',
-                     'cp -f ${SYS}/dgenv ${INST}/sysbin/dgenv && chmod +x ${INST}/sysbin/dgenv']
+class TargetGlobalScripts(target_base.Target): # DGBUILD-NO-EXPORT
+    isglobal=True # DGBUILD-NO-EXPORT
+    contains_message=True # DGBUILD-NO-EXPORT
+    def __init__(self): # DGBUILD-NO-EXPORT
+        from . import env # DGBUILD-NO-EXPORT
+        self.name='global__scripts' # DGBUILD-NO-EXPORT
+        self.pkgname=None # DGBUILD-NO-EXPORT
+        self.deps=['${BLD}/dgtests','${SYS}/dginstall','${SYS}/dgenv'] # DGBUILD-NO-EXPORT
+        self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "%sInstalling global scripts: dgtests dginstall dgenv%s"; fi'%(col.bldcol('global'),col.bldend), # DGBUILD-NO-EXPORT
+                     'mkdir -p ${INST}/sysbin', # DGBUILD-NO-EXPORT
+                     'cp -f ${BLD}/dgtests ${INST}/sysbin/dgtests && chmod +x ${INST}/sysbin/dgtests', # DGBUILD-NO-EXPORT
+                     'cp -f ${SYS}/dginstall ${INST}/sysbin/dginstall && chmod +x ${INST}/sysbin/dginstall', # DGBUILD-NO-EXPORT
+                     'cp -f ${SYS}/dgenv ${INST}/sysbin/dgenv && chmod +x ${INST}/sysbin/dgenv'] # DGBUILD-NO-EXPORT
 
 class TargetSetupScript(target_base.Target):
     isglobal=True
@@ -111,4 +110,8 @@ class TargetSetupScript(target_base.Target):
 
 
 def create_global_targets():
-    return [TargetGlobalScripts(),TargetGlobalSysModules(),TargetSetupScript()]
+    return [
+        TargetGlobalScripts(), # DGBUILD-NO-EXPORT
+        TargetGlobalSysModules(),
+        TargetSetupScript()
+    ]

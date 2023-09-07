@@ -24,7 +24,7 @@ class TargetSymlinks(target_base.Target):
         self.deps=[mpf]
         self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sUpdating symlinks %s/%s%s"; fi'%(col.bldcol('symlink'),
                                                                                                 pkg.name,linktype,col.bldend),
-                     'python3 ${SYS}/mods/instsl.py %s ${VERBOSE}'%(mpf)]
+                     'python3 -mess_dgbuild_internals.instsl %s ${VERBOSE}'%(mpf)]
 
         pklcont=[]
         for f in self.files:
