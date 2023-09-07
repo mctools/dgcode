@@ -1,12 +1,12 @@
+import os
+import errno
 import sys
 import pathlib
-sys.path.insert(0,str((pathlib.Path(__file__).parent.parent / 'pypath').absolute().resolve()))
+sys.path.insert(0,str((pathlib.Path(__file__).parent.parent / 'pypath').absolute().resolve())) # DGBUILD-NO-EXPORT
+import ess_dgbuild_internals.utils as utils # DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>import .utils
 
 def go():
-    import os
-    import errno
-    import ess_dgbuild_internals.utils as utils
-    #from . import utils
     join=os.path.join
 
     fn=sys.argv[1]
@@ -88,11 +88,9 @@ try:
 except KeyboardInterrupt:
     print ("<<symlink installation interrupted by user!>>>")
     #Fixme: Any way to recover state?? (if so we should also catch other errors)
-    import sys
     sys.stdout.flush()
     sys.stderr.flush()
     import time
     time.sleep(0.2)
     sys.exit(1)
-import sys
 sys.exit(0)

@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
-import os
 import pathlib
 import sys
 sys.path.insert(0, str( ( pathlib.Path(__file__).parent.parent / 'pypath' ).absolute().resolve() ) )
 import ess_dgbuild_internals.frontend
-
-#OLD # Make sure the system mods directory is first in the python path and import the frontend module.
-#OLD from os import path
-#OLD import sys
-#OLD sys.path=[path.realpath(path.join(path.dirname(__file__),'..','mods'))]+sys.path
-#OLD import frontend
-#OLD #Alternatively replace the import statement with the following to profile:
-#OLD #import cProfile,pstats
-#OLD #cProfile.run('import frontend','cprofile')
-#OLD #pstats.Stats('cprofile').sort_stats('tottime').print_stats(20)

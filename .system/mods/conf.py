@@ -2,6 +2,10 @@
 
 import os
 join=os.path.join
+import pathlib
+
+def AbsPath( p ):
+    return pathlib.Path(p).expanduser().resolve().absolute()
 
 lang_extensions = {
     'cxx' : ( ['hh', 'icc'], ['cc'] ),
@@ -62,8 +66,6 @@ def uninstall_package(d,pn):
                                                                                                                                                       d,pn.lower(),
                                                                                                                                                       d,pn.lower()))
 
-from pathlib import Path
-AbsPath = lambda p : Path(p).expanduser().resolve().absolute()
 #Get paths to all packages (including the framework and user packages)
 
 def projects_dir():
@@ -106,25 +108,25 @@ def install_dir():
     return install_dir_real
 
 def test_dir():
-  return Path(build_dir()) / 'testresults/'
+  return AbsPath(build_dir()) / 'testresults/'
 
 def framework_dir(system_dir):
-  return (Path(system_dir) / '../packages/Framework').resolve()
+  return (AbsPath(system_dir) / '../packages/Framework').resolve()
 
 # directory indicators - empty files to indicate the build/install directory, to be checked before using rm -rf on it
 def build_dir_indicator(bld_dir):
-  return Path(bld_dir) / '.dgbuilddir'
+  return AbsPath(bld_dir) / '.dgbuilddir'
 
 def install_dir_indicator(inst_dir):
-  return Path(inst_dir) / '.dginstalldir'
+  return AbsPath(inst_dir) / '.dginstalldir'
 
 def check_build_dir_indicator(bld_dir):
-  if Path(bld_dir).exists() and not Path(build_dir_indicator(bld_dir)).exists():
+  if AbsPath(bld_dir).exists() and not AbsPath(build_dir_indicator(bld_dir)).exists():
      raise SystemExit('Missing build directory indicator in %s suggests possible problem with the DGCODE_BUILD_DIR environment variable. Make sure you really want to delete the folder, and do it by hand!'%bld_dir)
   return True
 
 def check_install_dir_indicator(inst_dir):
-  if Path(inst_dir).exists() and not Path(install_dir_indicator(inst_dir)).exists():
+  if AbsPath(inst_dir).exists() and not AbsPath(install_dir_indicator(inst_dir)).exists():
      raise SystemExit('Missing install directory indicator in %s suggests possible problem with the DGCODE_INSTALL_DIR environment variable. Make sure you really want to delete the folder, and do it by hand!'%inst_dir)
   return True
 

@@ -42,7 +42,10 @@ rel_testdir=os.path.relpath(dirs.testdir)
 
 dgcode_invoke_dirs = [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]
 
-if not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in dgcode_invoke_dirs]):
+check_cwd_compat = True# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>check_cwd_compat = False
+
+if check_cwd_compat and not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in dgcode_invoke_dirs]):
     utils.err(['This instance of %s is associated with'%progname,'',
                '      Framework directory : %s'%dirs.fmwkdir.parent.parent,
                '      Projects directory  : %s'%dirs.projdir,
@@ -285,9 +288,10 @@ parser,opt,new_cfgvars=parse_args()
 #setup lockfile:
 if opt.removelock and dirs.lockfile.exists():
     os.remove(dirs.lockfile)
-if not hasattr(utils,'mkdir_p'):
-    print ("WARNING: utils does not have mkdir_p attribute. Utils module is in file %s and syspath is %s"%(utils.__file__,sys.path))
-##utils.mkdir_p(os.path.dirname(dirs.lockfile))
+
+if not hasattr(utils,'mkdir_p'): #DGBUILD-NO-EXPORT
+    print ("WARNING: utils does not have mkdir_p attribute. Utils module is in file %s and syspath is %s"%(utils.__file__,sys.path)) #DGBUILD-NO-EXPORT
+
 if dirs.lockfile.exists():
     utils.err('Presence of lock file indicates competing invocation of %s. Force removal with %s --removelock if you are sure this is incorrect.'%(progname,progname))
 dirs.create_bld_dir()
@@ -308,7 +312,7 @@ if opt.clean:
     if dirs.blddir.is_dir() or dirs.installdir.is_dir() or dirs.testdir.is_dir():
         if not opt.quiet:
             print (prefix+"Removing temporary build, install and test directories and forgetting stored CMake args. Exiting.")
-       
+
         if check_install_dir_indicator(dirs.installdir):
           utils.rm_rf(dirs.installdir)
         if check_build_dir_indicator(dirs.blddir):

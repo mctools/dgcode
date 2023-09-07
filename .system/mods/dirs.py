@@ -1,11 +1,11 @@
 #global variables
+import pathlib
 from os import path
 join=path.join
 from . import conf#project specific configuration
 
 #system dir is one up from the modules dir:
-sysdir = path.realpath(join(path.dirname(__file__),'..'))
-#sysdir = Path(__file__).resolve().parent
+sysdir = pathlib.Path(__file__).absolute().absolute().resolve().parent.parent
 fmwkdir = conf.framework_dir(sysdir)
 blddir = conf.build_dir()
 blddir_indicator = conf.build_dir_indicator(blddir)

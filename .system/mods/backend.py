@@ -1,4 +1,3 @@
-
 def perform_configuration(cmakeargs=[],
                           select_filter=None,
                           exclude_filter=None,
