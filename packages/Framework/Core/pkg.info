@@ -1,5 +1,5 @@
-package(USEPKG DGBoost G4Units)
-
+package(USEPKG DGBoost G4Units)# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>package(USEPKG G4Units)
 ######################################################################
 
 This package is supposed to provide commonly used functionality which a high

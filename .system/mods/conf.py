@@ -15,8 +15,8 @@ lang_extensions = {
 
 package_cfg_file='pkg.info'
 
-autodeps = set(['Core','G4Units','DGBoost'])
-
+autodeps = set(['Core','G4Units','DGBoost'])# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>autodeps = set(['Core','G4Units'])
 projectname='ESS'
 
 def runnable_name(pkg,base_name):
@@ -84,10 +84,19 @@ def extra_pkg_path():
     dirs.extend([AbsPath(p.strip()) for p in extra_pkg_path_env.split(':') if p.strip()])
   return dirs
 
-def pkg_search_path(system_dir):
-  dirs = [framework_dir(system_dir), projects_dir()]
-  dirs.extend(extra_pkg_path())
-  return dirs
+# DGBUILD-EXPORT-ONLY>>def framework_dir():
+# DGBUILD-EXPORT-ONLY>>  return (AbsPath(__file__).parent / 'data' / 'frameworkpkgs')
+def framework_dir(system_dir): # DGBUILD-NO-EXPORT
+  return (AbsPath(system_dir) / '../packages/Framework').resolve() # DGBUILD-NO-EXPORT
+
+# DGBUILD-EXPORT-ONLY>>def pkg_search_path():
+# DGBUILD-EXPORT-ONLY>>  dirs = [framework_dir(), projects_dir()]
+# DGBUILD-EXPORT-ONLY>>  dirs.extend(extra_pkg_path())
+# DGBUILD-EXPORT-ONLY>>  return dirs
+def pkg_search_path(system_dir): # DGBUILD-NO-EXPORT
+  dirs = [framework_dir(system_dir), projects_dir()] # DGBUILD-NO-EXPORT
+  dirs.extend(extra_pkg_path()) # DGBUILD-NO-EXPORT
+  return dirs # DGBUILD-NO-EXPORT
 
 def build_dir():
     build_dir = os.environ.get('DGCODE_BUILD_DIR_RESOLVED', None)
@@ -109,9 +118,6 @@ def install_dir():
 
 def test_dir():
   return AbsPath(build_dir()) / 'testresults/'
-
-def framework_dir(system_dir):
-  return (AbsPath(system_dir) / '../packages/Framework').resolve()
 
 # directory indicators - empty files to indicate the build/install directory, to be checked before using rm -rf on it
 def build_dir_indicator(bld_dir):

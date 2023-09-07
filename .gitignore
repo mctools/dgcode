@@ -26,6 +26,7 @@
 *.gch
 *.out
 __pycache__/
+*.egg-info/
 
 #latex build leftovers:
 *.aux

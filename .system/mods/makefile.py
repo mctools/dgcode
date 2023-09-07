@@ -95,9 +95,10 @@ def write_main(global_targets,enabled_pkgnames):
         _c += ' -DDGCODE_USESYSBOOSTPYTHON -I%s -isystem%s'%(_,_)
         _l = env.env['system']['general']['sysboostpython_linkflags'].strip()
     else:
-        _c, _l = '',''
-        if dirs.sysinc_shippedboost:
-            _c = ' -I%s -isystem%s'%(dirs.sysinc_shippedboost,dirs.sysinc_shippedboost)
+# DGBUILD-EXPORT-ONLY>>        assert False, "Needs a suitable boost python"
+        _c, _l = '',''  # DGBUILD-NO-EXPORT
+        if dirs.sysinc_shippedboost:  # DGBUILD-NO-EXPORT
+            _c = ' -I%s -isystem%s'%(dirs.sysinc_shippedboost,dirs.sysinc_shippedboost)  # DGBUILD-NO-EXPORT
     fh.write('DGBOOSTCFLAGS := %s\n'%_c)
     def finalise_boost_ldflags( flags, shlib ):
         ra = utils.rpath_appender(lang='cxx',shlib=shlib)

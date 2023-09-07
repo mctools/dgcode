@@ -357,16 +357,7 @@ def perform_configuration(cmakeargs=[],
                                   str( ( pathlib.Path(__file__).resolve().absolute().parent.parent / 'pypath' ).absolute().resolve() ) ) # DGBUILD-NO-EXPORT
                 fh.write(l) # DGBUILD-NO-EXPORT
 
-#    dir_env_vars = {
-#      'includedir': 'ESS_INCLUDE_DIR',
-#      'installprefix': 'ESS_INSTALL_PREFIX',
-#      'testrefdir': 'ESS_TESTREF_DIR',
-#      'datadir': 'ESS_DATA_DIR',
-#      'libdir': 'ESS_LIB_DIR'
-#    }
-#    dirdict = { key: os.environ.get(value) for (key, value) in dir_env_vars.items() if os.environ.get(value, None)}
-
-    dir_names = ('sysdir','fmwkdir','projdir','pkgsearchpath','blddir','installdir','testdir','envcache')
+    dir_names = ('fmwkdir','projdir','pkgsearchpath','blddir','installdir','testdir','envcache')
     dirdict = dict(((d, getattr(dirs, d)) for d in dir_names))
 
     #Update dynamic python module with information, if needed:

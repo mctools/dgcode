@@ -6,13 +6,15 @@ from . import conf#project specific configuration
 
 #system dir is one up from the modules dir:
 sysdir = str(pathlib.Path(__file__).resolve().absolute().parent.parent)
-fmwkdir = conf.framework_dir(sysdir)
+fmwkdir = conf.framework_dir(sysdir)# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>fmwkdir = conf.framework_dir()
 blddir = conf.build_dir()
 blddir_indicator = conf.build_dir_indicator(blddir)
 makefiledir = blddir / 'makefiles'
 
 extrapkgpath = conf.extra_pkg_path()
-pkgsearchpath = conf.pkg_search_path(sysdir)
+pkgsearchpath = conf.pkg_search_path(sysdir)# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>pkgsearchpath = conf.pkg_search_path()
 
 installdir = conf.install_dir()
 installdir_indicator = conf.install_dir_indicator(installdir)
@@ -25,7 +27,7 @@ cmakedetectdir = pathlib.Path(sysdir) / 'cmakedetect' # DGBUILD-NO-EXPORT
 incdirname='include'
 #libdirname='lib'#fixme: unused, 'lib' is simply hardcoded in a few places.
 
-sysinc_shippedboost = join(sysdir,'include')
+sysinc_shippedboost = join(sysdir,'include') # DGBUILD-NO-EXPORT
 envcache = blddir / 'env.cache'
 varcache = blddir / 'vars.cache' #dynamic user settings (for pkg filters and cmake flags)
 systimestamp_cache=blddir / 'systimestamp.cache'
@@ -63,8 +65,8 @@ def pkg_dir(pkg,*subpaths): return join(pkgdirbase,_pkgname(pkg),*subpaths)
 def makefile_pkg_dir(pkg,*subpaths): return join('${PKG}',_pkgname(pkg),*subpaths)
 
 #sanity:
-for d in [str(x) for x in [sysdir, blddir, *pkgsearchpath, installdir]]:
-    assert not ' ' in d, 'Spaces not allowed in directory names. Error with "%s"'%d 
+for d in [str(x) for x in [blddir, *pkgsearchpath, installdir]]:
+    assert not ' ' in d, 'Spaces not allowed in directory names. Illegal path is: "%s"'%d
 
 # Package directory aliases #keep them lowercase
 pkgdir_aliases = {

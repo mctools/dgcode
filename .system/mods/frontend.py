@@ -275,11 +275,11 @@ def parse_args():
     if opt.verbose and opt.quiet:
         parser.error("Do not supply both --quiet and --verbose flags")
 
-    if opt.install:
-        opt.install=os.path.realpath(os.path.expanduser(opt.install))
-        i=opt.install
-        if (isdir(i) and not utils.isemptydir(i)) or isfile(i) or (not exists(i) and not exists(os.path.dirname(i))):
-            parser.error('Please supply non-existing or empty directory to --install')
+    if opt.install:# DGBUILD-NO-EXPORT
+        opt.install=os.path.realpath(os.path.expanduser(opt.install))# DGBUILD-NO-EXPORT
+        i=opt.install# DGBUILD-NO-EXPORT
+        if (isdir(i) and not utils.isemptydir(i)) or isfile(i) or (not exists(i) and not exists(os.path.dirname(i))):# DGBUILD-NO-EXPORT
+            parser.error('Please supply non-existing or empty directory to --install')# DGBUILD-NO-EXPORT
 
     return parser,opt,new_cfgvars
 
@@ -764,13 +764,19 @@ if opt.runtests:
     _testfilter=''
     if opt.testfilter:
         _testfilter = ' --filter=%s'%(pipes.quote(opt.testfilter))
-    ec=utils.system('. %s/setup.sh && dgtests --excerpts=%i -j%i --prefix "%s " --dir "%s"%s'%(dirs.installdir,opt.nexcerpts,opt.njobs,prefix,dirs.testdir,_testfilter))
+    from ._cli_dgtests import perform_tests
+    ec = perform_tests( testdir = dirs.testdir,
+                        installdir = dirs.installdir,
+                        njobs = opt.njobs,
+                        prefix = prefix,
+                        nexcerpts = opt.nexcerpts,
+                        filters = _testfilter,
+                        do_pycoverage = False )
     if ec==0 and (cp['unused_vars'] or cp['other_warnings']):
         print (prefix+'%sWARNING%s There were warnings (see above)'%(col_bad,col_end))
         print (prefix)
-
     if ec:
-        sys.exit(1 if ec > 128 else ec)
+        sys.exit(ec)
 
 if opt.install: # DGBUILD-NO-EXPORT
     ec=utils.system('. %s/setup.sh && dginstall -q "%s"'%(dirs.installdir,opt.install))   # DGBUILD-NO-EXPORT

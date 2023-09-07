@@ -16,6 +16,15 @@ import dgbuild.cfg
 from . import testxml
 
 def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverage):
+
+    col_ok = '\033[92m'
+    col_bad = '\033[91m'
+    col_end = '\033[0m'
+
+    print (prefix+'Running tests in %s:\n'%testdir+prefix)
+    sys.stdout.flush()
+    sys.stderr.flush()
+
     assert not os.path.exists(testdir)
     testdir=os.path.abspath(testdir)
     line_hr = "%s ---------------------------------------+-----------+--------+----------+------------------"%prefix
@@ -63,7 +72,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         print (header)
         print ('%s  n/a'%prefix)
         print (footer)
-        return
+        return 0
 
     mkdir_p(testdir)
     mf=open(join(testdir,'Makefile'),'w')
@@ -86,7 +95,6 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         mkdir_p(td)
         tf=open(join(td,'run.sh'),'w')
         tf.write('#!/usr/bin/env bash\n')
-        #tf.write('mkdir rundir && cd rundir && touch ../time_start && %s &> ../output.log \n'%bn)
         cmdstr = bn
         if do_pycoverage:
             _whichbn = shutil.which(bn)
@@ -194,9 +202,19 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
             print ('\n====>\n====> Last %i lines from %s/%s:\n====>'%(nexcerpts,t,logname))
             system('tail -%i %s'%(nexcerpts,os.path.join(testdir,t,logname)))
             print ('====> (end of %s/%s)\n'%(t,logname))
-    return ec_global
 
-def main():
+    sys.stdout.flush()
+    sys.stderr.flush()
+
+    if ec_global:
+        print (prefix+'  %sERROR: Some tests failed!%s'%(col_bad,col_end))
+        print (prefix)
+    else:
+        print (prefix+'  %sAll tests completed without failures!%s'%(col_ok,col_end))
+        print (prefix)
+    return 0 if ec_global==0 else 1
+
+def parse_cmdline_args():
     parser = OptionParser(usage='%prog [options]')
     parser.add_option("-j", "--jobs",
                       type="int", dest="njobs", default=1,
@@ -227,30 +245,15 @@ def main():
 
     instdir=os.getenv("ESS_INSTALL_PREFIX")
     assert instdir and os.path.isdir(instdir)
+    opt.instdir = instdir
+    return opt
 
-    col_ok = '\033[92m'
-    col_bad = '\033[91m'
-    col_end = '\033[0m'
-
-    print (opt.prefix+'Running tests in %s:\n'%opt.dir+opt.prefix)
-
-    sys.stdout.flush()
-    sys.stderr.flush()
-
-    ec=perform_tests(opt.dir,instdir,njobs=opt.njobs,prefix=opt.prefix,nexcerpts=opt.nexcerpts,
-                     do_pycoverage = opt.pycoverage,
-                     filters=[fltr.strip() for fltr in opt.filters.split(',') if fltr.strip()])
-
-    sys.stdout.flush()
-    sys.stderr.flush()
-
-    if ec:
-        print (opt.prefix+'  %sERROR: Some tests failed!%s'%(col_bad,col_end))
-        print (opt.prefix)
-        sys.exit(1 if ec > 128 else ec)
-    else:
-        print (opt.prefix+'  %sAll tests completed without failures!%s'%(col_ok,col_end))
-        print (opt.prefix)
+def main():
+    opt = parse_cmdline_args
+    ec = perform_tests(opt.dir,instdir,njobs=opt.njobs,prefix=opt.prefix,nexcerpts=opt.nexcerpts,
+                       do_pycoverage = opt.pycoverage,
+                       filters=[fltr.strip() for fltr in opt.filters.split(',') if fltr.strip()])
+    sys.exit(ec)
 
 if __name__=='__main__':
     main()
