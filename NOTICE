@@ -15,5 +15,4 @@ https://www.gnu.org/licenses/lgpl-3.0.txt. This license is a set of additional
 permissions on top of the GNU General Public License, available in the COPYING
 file or at https://www.gnu.org/licenses/gpl-3.0.txt. For the licenses of the
 aforementioned third-party code, look in their respective directories under the
-packages/Framework/External and .system/include/dgboost directories, and the
-header of the .system/publicmods/dgbuild/junit_xml.py file.
+packages/Framework/External and .system/include/dgboost directories.
