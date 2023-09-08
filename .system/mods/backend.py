@@ -136,17 +136,16 @@ def perform_configuration(cmakeargs=[],
                                      dirs.blddir / 'langs' / lang )
 
     #Possible external dependencies (based solely on files in ExtDep directory):
-
     possible_extdeps = set(envdict['extdeps'].keys())
-    special_ncrystal_migration_mode = ( 'NoSystemNCrystal' in possible_extdeps and 'NCrystal' in possible_extdeps )
-    if special_ncrystal_migration_mode:
-        #Special migration feature, making sure that the package 'NCrystalRel'
-        #dynamically gets either EXTDEP NCrystal or USEPKG NCrystalBuiltin
-        #depending on whether or not NCrystal is available on the system.
-        if envdict['extdeps']['NCrystal']['present']:
-            loadpkgs.add_dynamic_dependency( 'NCrystalRel', extdep_list = ['NCrystal'] )
-        else:
-            loadpkgs.add_dynamic_dependency( 'NCrystalRel', usepkg_list = ['NCrystalBuiltin'] )
+    special_ncrystal_migration_mode = ( 'NoSystemNCrystal' in possible_extdeps and 'NCrystal' in possible_extdeps ) # DGBUILD-NO-EXPORT
+    if special_ncrystal_migration_mode:                                                                             # DGBUILD-NO-EXPORT
+        #Special migration feature, making sure that the package 'NCrystalRel'                                      # DGBUILD-NO-EXPORT
+        #dynamically gets either EXTDEP NCrystal or USEPKG NCrystalBuiltin                                          # DGBUILD-NO-EXPORT
+        #depending on whether or not NCrystal is available on the system.                                           # DGBUILD-NO-EXPORT
+        if envdict['extdeps']['NCrystal']['present']:                                                               # DGBUILD-NO-EXPORT
+            loadpkgs.add_dynamic_dependency( 'NCrystalRel', extdep_list = ['NCrystal'] )                            # DGBUILD-NO-EXPORT
+        else:                                                                                                       # DGBUILD-NO-EXPORT
+            loadpkgs.add_dynamic_dependency( 'NCrystalRel', usepkg_list = ['NCrystalBuiltin'] )                     # DGBUILD-NO-EXPORT
 
     #Inspect package tree and load the necessary config files, given the filters:
     pl = loadpkgs.PackageLoader( all_pkgdirs,

@@ -1,6 +1,9 @@
-package()
+package()# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>package(USEEXT NCrystal)
 
 ################################################################################################
+
+Short-term description (long-term there will ONLY be an external NCrystal):
 
 Special meta-package which due to custom code (hacks?) in dgbuild will get
 either "EXTDEP NCrystal" or "USEPKG NCrystalBuiltin" injected as a

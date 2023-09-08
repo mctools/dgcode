@@ -357,6 +357,7 @@ class Package:
 
 _dyndep_map = [ {} ]
 def add_dynamic_dependency( pkgname, extdep_list = None, usepkg_list = None ):
+    #FIXME: Remove again after NCrystal migration?
     d = _dyndep_map[0]
     if not pkgname in d:
         d[pkgname] = dict( extdep_list = [], usepkg_list = [] )
