@@ -17,6 +17,7 @@ for tmp in DGCODE_INSTALL_DIR_RESOLVED ESS_INSTALL_PREFIX; do
         _dgcode_prunepath PATH "${!tmp}"
         _dgcode_prunepath LD_LIBRARY_PATH "${!tmp}"
         _dgcode_prunepath DYLD_LIBRARY_PATH "${!tmp}"
+        _dgcode_prunepath NCRYSTAL_DATA_PATH "${!tmp}"
         unset ${tmp}
     fi
 done

@@ -2,7 +2,7 @@
 #
 # Intended usage:
 #
-# import error
+# from . import error
 # error.error('some error message')
 
 class Error(Exception):

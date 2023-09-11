@@ -84,21 +84,25 @@ from pathlib import Path
 def _check_case_insensitive_duplication(path_str):
   path = Path(path_str)
   if not path.exists():
-    return
+      return
   parentContent = [d.lower() for d in os.listdir(path.parent)]
   occurance = parentContent.count(path.name.lower())
   if not occurance == 1:
-    raise SystemExit('Directory (and file) names differing only in casing are not allowed, due to being a potential source of error for different file systems. \nProblem occured with '%(path_str))
+      from . import error
+      error.error('Directory (and file) names differing only in casing are'
+                  ' not allowed, due to being a potential source of error'
+                  ' for different file systems. \nProblem occured with '%(path_str))
 
 def check_dir_case_insensitive_duplication(dircontent, path):
   ''' Check if dircontent contains elements differing only in casing'''
   if not len(dircontent) == len({d.lower() for d in dircontent}):
-    seen = set()
-    for d in [d.lower() for d in dircontent]:
-      if d in seen:
-        raise SystemExit('Directory (and file) names differing only in casing are not allowed, '
-                         'due to being a potential source of error on some file systems. \n'
-                         'Problem occured with %s in the directory %s'%(d,path))
+      seen = set()
+      for d in [d.lower() for d in dircontent]:
+          if d in seen:
+              from . import error
+              error.error('Directory (and file) names differing only in casing are not allowed, '
+                          'due to being a potential source of error on some file systems. \n'
+                          'Problem occured with %s in the directory %s'%(d,path))
       else:
         seen.add(d)
 

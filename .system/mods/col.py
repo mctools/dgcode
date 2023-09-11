@@ -38,9 +38,9 @@ if __name__=='__main__':
         col=eval(cname)
         print (''.join([cname.ljust(20),' : ',col,cname,end]))
 
-#allow users to modify colours by having stuff like "export COLOR_FIX=bldmsg_symlink=red" in their environment:
-import os
-cf=os.getenv('COLOR_FIX')
+#allow users to modify colours by having stuff like "export DGCODE_COLOR_FIX=bldmsg_symlink=red" in their environment:
+from . import envcfg
+cf = envcfg.var.color_fix_code
 if cf:
     exec(cf)
 

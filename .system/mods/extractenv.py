@@ -1,6 +1,7 @@
 import os
 from . import utils
 from . import dirs
+from . import envcfg
 
 def parse_stdouterr(filename):
     #Errors causes ec!=0 so are noticed by the user. But we want to capture
@@ -153,10 +154,9 @@ def extractenv(tmpdir,cmakedir,cmakeargs,quiet=True,verbose=False,prefix=''):
     capture = ' 2>&1|tee cmake_output21_capture.txt; exit ${PIPESTATUS[0]}'
 
     #pass on conda cmake args:
-    general_cmake_args=os.environ.get('CMAKE_ARGS','')
+    general_cmake_args = envcfg.var.cmake_args
     if general_cmake_args:
         general_cmake_args = ' '+general_cmake_args
-
 
     ec = utils.system("cd %s/cmake/ && cmake%s%s%s %s %s%s"%(tmpdir,
                                                              general_cmake_args,

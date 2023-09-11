@@ -12,7 +12,7 @@ def err(msg):
         print ("ERROR: %s"%msg)
     sys.exit(1)
 
-def system(cmd):
+def system(cmd,*,env=None):
     #flush output, to avoid confusing ordering in log-files:
     sys.stdout.flush()
     sys.stderr.flush()
@@ -21,7 +21,7 @@ def system(cmd):
     import subprocess
     cmd=['bash','-c',cmd]
     try:
-        ec=subprocess.call(cmd)
+        ec=subprocess.call(cmd,env=env)
     except KeyboardInterrupt:
         sys.stdout.flush()
         sys.stderr.flush()
@@ -232,3 +232,7 @@ class rpath_appender:
         for d in found_dirs:
             res += self.apply_to_dir( d )
         return res
+
+def bootstrap_installdir_env():
+    from . import dirs
+    installdir

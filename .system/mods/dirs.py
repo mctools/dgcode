@@ -1,7 +1,6 @@
 #global variables
 import pathlib
-from os import path
-join=path.join
+import os
 from . import conf#project specific configuration
 
 #system dir is one up from the modules dir:
@@ -27,7 +26,7 @@ cmakedetectdir = pathlib.Path(sysdir) / 'cmakedetect' # DGBUILD-NO-EXPORT
 incdirname='include'
 #libdirname='lib'#fixme: unused, 'lib' is simply hardcoded in a few places.
 
-sysinc_shippedboost = join(sysdir,'include') # DGBUILD-NO-EXPORT
+sysinc_shippedboost = os.path.join(sysdir,'include') # DGBUILD-NO-EXPORT
 envcache = blddir / 'env.cache'
 varcache = blddir / 'vars.cache' #dynamic user settings (for pkg filters and cmake flags)
 systimestamp_cache=blddir / 'systimestamp.cache'
@@ -37,18 +36,18 @@ lockfile=blddir / ".lock"
 def makefile_instdir(*subpaths):
     if not subpaths:
         return "${INST}"
-    subpaths=join(*subpaths)
+    subpaths=os.path.join(*subpaths)
     if subpaths[0]=='/':
-        subpaths=path.relpath(subpaths,installdir)
-    return join("${INST}",subpaths)
+        subpaths=os.path.relpath(subpaths,installdir)
+    return os.path.join("${INST}",subpaths)
 
 def makefile_blddir(*subpaths):
     if not subpaths:
         return "${BLD}"
-    subpaths=join(*subpaths)
+    subpaths=os.path.join(*subpaths)
     if subpaths[0]=='/':
-        subpaths=path.relpath(subpaths,blddir)
-    return join("${BLD}",subpaths)
+        subpaths=os.path.relpath(subpaths,blddir)
+    return os.path.join("${BLD}",subpaths)
 
 def _pkgname(pkg):
     return pkg.name if hasattr(pkg,'name') else pkg
@@ -57,12 +56,12 @@ def pkg_cache_dir(pkg,*subpaths):
     return blddir.joinpath('pc',_pkgname(pkg),*subpaths)
 
 def makefile_pkg_cache_dir(pkg,*subpaths):
-    return join('${BLD}','pc',_pkgname(pkg),*subpaths)
+    return os.path.join('${BLD}','pc',_pkgname(pkg),*subpaths)
 
 #where we link (or create dynamic pkgs):
 pkgdirbase = blddir / 'pkgs'
-def pkg_dir(pkg,*subpaths): return join(pkgdirbase,_pkgname(pkg),*subpaths)
-def makefile_pkg_dir(pkg,*subpaths): return join('${PKG}',_pkgname(pkg),*subpaths)
+def pkg_dir(pkg,*subpaths): return os.path.join(pkgdirbase,_pkgname(pkg),*subpaths)
+def makefile_pkg_dir(pkg,*subpaths): return os.path.join('${PKG}',_pkgname(pkg),*subpaths)
 
 #sanity:
 for d in [str(x) for x in [blddir, *pkgsearchpath, installdir]]:
@@ -75,15 +74,14 @@ pkgdir_aliases = {
   "extra": extrapkgpath
   }
 
-from .utils import mkdir_p,touch
-
 def create_bld_dir():
-  mkdir_p(blddir)
-  touch(blddir_indicator)
-  assert blddir.exists()
-  assert blddir_indicator.exists()
+    blddir.mkdir(parents=True,exist_ok=True)
+    blddir_indicator.touch()
+    assert blddir.is_dir()
+    assert blddir_indicator.exists()
 
 def create_install_dir():
-  mkdir_p(installdir)
-  touch(installdir_indicator)
-  assert installdir_indicator.exists()
+    installdir.mkdir(parents=True,exist_ok=True)
+    installdir_indicator.touch()
+    assert installdir.is_dir()
+    assert installdir_indicator.exists()

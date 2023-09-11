@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+export_only = None#['Core','G4Units']
+export_block = ['DGBoost','NCrystalBuiltin']
+#Files not in a package which should be included anyway:
+
 import pathlib
 import shutil
 import stat
@@ -16,12 +20,19 @@ def parse():
 def create_metadata_files( tgtdir ):
     ( tgtdir / 'LICENSE' ).write_text('https://www.apache.org/licenses/LICENSE-2.0')#FIXME: Actual file!
     ( tgtdir / 'README.md' ).write_text('Build system for the ESS-detector group coding framework.')
-#    ( tgtdir / 'setup.py' ).write_text('dummy')
-    ( tgtdir / 'pyproject.toml' ).write_text("""
-#[build-system]
-#requires = ["hatchling"]
-#build-backend = "hatchling.build"
+    #    ( tgtdir / 'setup.py' ).write_text('dummy')
+    ( tgtdir / 'MANIFEST.in' ).write_text("""
+recursive-include src/ess_dgbuild_internals/data/cmake *.cmake *.txt *.py
+recursive-include src/ess_dgbuild_internals/data/pkgs/Framework LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/ess_dgbuild_internals/data/pkgs/Framework/**/data *
+recursive-include src/ess_dgbuild_internals/data/pkgs/Framework/**/scripts *
+global-exclude *~* *\#* .*
+global-exclude *.pyc *.pyo */__pycache__/* */.ruff_cache/*
+global-exclude *.gch *.exe *.so *.dylib *.o *.a
+global-exclude vgcore.* .DS_Store .vscode *.reflogupdate*.orig
+""")
 
+    ( tgtdir / 'pyproject.toml' ).write_text("""
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
@@ -41,19 +52,22 @@ classifiers = [
     "Operating System :: Unix",
 ]
 
-[project.scripts]
-dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main"
-dgtests2 = "ess_dgbuild_internals._cli_dgtests:main"
-
 [project.urls]
 "Homepage" = "https://github.com/mctools/dgcode"
 "Bug Tracker" = "https://github.com/mctools/dgcode/issues"
 
+[project.scripts]
+dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main"
+dgtests2 = "ess_dgbuild_internals._cli_dgtests:main"
 """)
 
 def extract_file_content( f ):
+    try:
+        text_data = f.read_text()
+    except UnicodeDecodeError:
+        return None
     res = ''
-    for l in f.read_text().splitlines():
+    for l in text_data.splitlines():
         if 'DGBUILD-NO-EXPORT' in l:
             continue
         if l.startswith('# DGBUILD-EXPORT-ONLY>>'):
@@ -85,15 +99,16 @@ def create_cmakefiles( srcdir, tgtdir ):
                 continue
         else:
             if f.suffix in ('.cmake','.txt','.py'):
-                ( tgtdir / f.name ).write_text( extract_file_content(f) )
-                continue
+                if f.name !=  'ExtDep_NoSystemNCrystal.cmake':
+                    ( tgtdir / f.name ).write_text( extract_file_content(f) )
+                    continue
         print("WARNING: Ignoring %s"%f)
 
 pkgfile_patterns = ['LICENSE','pkg.info','data/*','scripts/*','python/*.py',
-                    'pycpp_*/*.hh','pycpp_*/*.cc','pycpp_*/*.c','pycpp_*/*.h',
-                    'app_*/*.hh', 'app_*/*.cc', 'app_*/*.h', 'app_*/*.c', 'app_*/*.f',
-                    'libsrc/*.hh', 'libsrc/*.cc', 'libsrc/*.h', 'libsrc/*.c', 'libsrc/*.f',
-                    'libinc/*.hh', 'libinc/*.h',
+                    'pycpp_*/*.hh','pycpp_*/*.cc', 'pycpp_*/*.icc','pycpp_*/*.c','pycpp_*/*.h',
+                    'app_*/*.hh', 'app_*/*.icc', 'app_*/*.cc', 'app_*/*.h', 'app_*/*.c', 'app_*/*.f',
+                    'libsrc/*.hh', 'libsrc/*.icc', 'libsrc/*.cc', 'libsrc/*.h', 'libsrc/*.c', 'libsrc/*.f',
+                    'libinc/*.hh', 'libinc/*.icc', 'libinc/*.h',
                     ]
 
 def get_pkg_files( pkgdir ):
@@ -111,10 +126,6 @@ def chmod_x( path ):
 
 def create_frameworkpkgs( srcdir, tgtdir ):
     tgtdir.mkdir( parents = True )
-    export_only = ['Core','G4Units']
-    export_block = ['DGBoost']
-    #Files not in a package which should be included anyway:
-    extra_files = ['Framework/External/G4Units/LICENSE']
 
     for pkgcfg in srcdir.glob('**/pkg.info'):
         pkgdir = pkgcfg.parent
@@ -131,7 +142,14 @@ def create_frameworkpkgs( srcdir, tgtdir ):
             print ('    -> ',f)
             tgtfile = tgtdir / pkgreldir / f_reltopkg
             tgtfile.parent.mkdir(parents=True,exist_ok=True)
-            tgtfile.write_text( extract_file_content(f) )
+            text_data = extract_file_content(f)
+            if text_data is not None:
+                tgtfile.write_text( text_data )
+            else:
+                assert tgtfile.parent.name == 'data'
+                print('WARNING: Transferring binary data file:',f)
+                tgtfile.write_bytes( f.read_bytes() )
+
             if tgtfile.parent.name=='scripts' and len(f_reltopkg.parts)==2:
                 chmod_x( tgtfile )
 
@@ -147,7 +165,7 @@ def main():
     destdir_mods = opt.targetdir / 'src' / 'ess_dgbuild_internals'
     destdir_data = destdir_mods / 'data'
     destdir_cmake = destdir_data / 'cmake'
-    destdir_pkgs = destdir_data / 'frameworkpkgs'
+    destdir_pkgs = destdir_data / 'pkgs/Framework'
     create_pymodfiles( opt.srcdir / 'mods' , destdir_mods )
     create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs )

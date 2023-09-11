@@ -13,6 +13,7 @@ import sys
 import os
 import glob
 import pipes
+from . import envcfg
 
 progname=os.path.basename(sys.argv[0])
 prefix=progname+': '
@@ -53,7 +54,7 @@ if check_cwd_compat and not any([os.path.realpath(os.getcwd()).startswith(str(d)
              *['                            %s'%str(d) for d in dirs.extrapkgpath[1:]],'',
                'and must only be invoked in those directories or their subdirs.'])
 
-proj_pkg_selection_enabled = os.environ.get('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','').lower() in ['true', '1']
+proj_pkg_selection_enabled = envcfg.var.enable_projects_pkg_selection_flag
 
 def parse_args():
 
@@ -362,7 +363,7 @@ except IOError:
     opt.insist=True
     oldsysts = (None,None)
 
-if os.environ.get('DGCODE_ALLOWSYSDEV',''):
+if envcfg.var.allow_sys_dev:
     #prevent changes in system from triggering rebuilds (for careful system
     #development use):
     systs = oldsysts
@@ -764,15 +765,18 @@ if opt.runtests:
     _testfilter=''
     if opt.testfilter:
         _testfilter = ' --filter=%s'%(pipes.quote(opt.testfilter))
-    from ._cli_dgtests import perform_tests
+    from .testlauncher import perform_tests
     ec = perform_tests( testdir = dirs.testdir,
                         installdir = dirs.installdir,
                         njobs = opt.njobs,
                         prefix = prefix,
                         nexcerpts = opt.nexcerpts,
                         filters = _testfilter,
-                        do_pycoverage = False )
+                        do_pycoverage = False,
+                        pkgloader = pkgloader )
+
     if ec==0 and (cp['unused_vars'] or cp['other_warnings']):
+        #Make sure user sees these warnings:
         print (prefix+'%sWARNING%s There were warnings (see above)'%(col_bad,col_end))
         print (prefix)
     if ec:

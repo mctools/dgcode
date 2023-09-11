@@ -12,6 +12,7 @@ from . import includes
 from . import col
 from . import db
 from . import error
+from . import envcfg
 
 join=os.path.join
 
@@ -130,7 +131,7 @@ class TargetBinary(target_base.Target):
         append_to_rpath( extra_flags, join('${INST}','lib','links') )
         extra_flags.append( '${DGBOOSTLDFLAGS_LIB}' if shlib else '${DGBOOSTLDFLAGS_EXE}' )
 
-        conda_prefix =  os.environ.get('CONDA_PREFIX','')#fixme: query elsewhere?
+        conda_prefix =  envcfg.var.conda_prefix
         if conda_prefix:
             _cp = pathlib.Path(conda_prefix) / 'lib'
             if _cp.is_dir():

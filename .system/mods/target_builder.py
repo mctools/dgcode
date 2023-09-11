@@ -37,6 +37,8 @@ def apply_patterns(pkg):
                     continue#ignore these as a workaround (although we should guard against them being committed)
                 sf=os.path.join(dd,sf)
                 if os.path.isdir(sf):
+                    if os.path.basename(sf).startswith('__pycache__'):
+                        continue
                     error.error('Sub-directories are not allowed in %s/%s/'%(pkg.name,d))
             if l:
                 dirtypes.add(dirtype)
