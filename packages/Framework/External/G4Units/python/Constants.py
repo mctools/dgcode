@@ -1,7 +1,7 @@
 """Python module providing CLHEP/Geant4 constants. See libinc/Constants.hh for more details."""
 from __future__ import division
 
-import Core.Units as Units
+import G4Units.Units as Units
 
 pi  = 3.14159265358979323846
 twopi  = 2*pi

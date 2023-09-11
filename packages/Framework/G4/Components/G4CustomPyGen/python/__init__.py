@@ -83,7 +83,7 @@ class GenBase(_GenBaseCpp):
             except ValueError:
                 unit = None
             if unit == None:
-                import Core.Units
+                import G4Units.Units
                 if hasattr(Core.Units,parts[2]):
                     unit = getattr(Core.Units,parts[2])
                     if not isinstance(unit,float):

@@ -34,7 +34,7 @@ np = numpy
 # sp = scipy
 mpl = matplotlib
 plt = matplotlib.pyplot
-import Core.Units
+import G4Units.Units
 Units = Core.Units
 import Core.FindData
 

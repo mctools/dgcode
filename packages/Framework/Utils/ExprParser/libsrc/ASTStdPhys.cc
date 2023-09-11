@@ -1,6 +1,6 @@
 #include "ExprParser/ASTStdPhys.hh"
 #include "Core/Units.hh"
-#include "Core/Constants.hh"
+#include "G4Units/Constants.hh"
 
 namespace ExprParser {
 

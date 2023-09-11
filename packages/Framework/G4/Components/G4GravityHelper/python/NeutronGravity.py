@@ -2,7 +2,7 @@ __all__ = ['enableNeutronGravity']
 
 import G4GravityHelper.hooks as hooks
 import G4StepLimitHelper.helper as slh
-import Core.Units
+import G4Units.Units
 
 def enableNeutronGravity(launcher, x_dir=0., y_dir=-1., z_dir=0.,g=9.80665,
                          steplim = 10*Core.Units.mm):

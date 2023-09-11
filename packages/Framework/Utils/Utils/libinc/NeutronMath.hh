@@ -2,7 +2,7 @@
 #define Utils_NeutronMath_hh
 
 #include "Core/Units.hh"
-#include "Core/Constants.hh"
+#include "G4Units/Constants.hh"
 #include <limits>//for infinity
 #include <cmath>
 

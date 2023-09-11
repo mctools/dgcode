@@ -6,7 +6,7 @@
 #include "GriffDataRead/Element.hh"
 #include "GriffDataRead/Isotope.hh"
 #include "Core/Units.hh"
-#include "Core/Constants.hh"
+#include "G4Units/Constants.hh"
 #include <iostream>
 
 void GriffDataRead::dump(const Track*t, bool dumpPDGInfo)

@@ -6,7 +6,7 @@
 #include "Core/FindData.hh"
 #include "Core/Units.hh"
 #include "Core/String.hh"
-#include "Core/Constants.hh"//STP temp
+#include "G4Units/Constants.hh"//STP temp
 
 #include "G4NistManager.hh"
 #include "G4Version.hh"

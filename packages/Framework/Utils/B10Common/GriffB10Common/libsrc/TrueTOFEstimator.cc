@@ -2,7 +2,7 @@
 #include "GriffB10Common/Utils.hh"
 #include "Utils/ArrayMath.hh"
 #include "Utils/Kinematics.hh"
-#include "Core/Constants.hh"
+#include "G4Units/Constants.hh"
 #include <cassert>
 #include <limits>
 

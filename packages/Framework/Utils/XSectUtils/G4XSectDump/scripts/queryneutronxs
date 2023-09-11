@@ -35,7 +35,7 @@ def parse(parsed_result):
     assert len(procs)==2
     egrid = procs['scatter'][0]
     assert np.array_equal(egrid,procs['absorption'][0])
-    import Core.Units
+    import G4Units.Units
     egrid /= Core.Units.eV
     xs_scatter = procs['scatter'][1]/Core.Units.barn
     xs_absorption = procs['absorption'][1]/Core.Units.barn

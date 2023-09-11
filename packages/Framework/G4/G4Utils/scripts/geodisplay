@@ -3,7 +3,7 @@ from __future__ import print_function
 import sys# ,os
 import importlib
 from optparse import OptionParser#NOTE: The optparse module is deprecated - we should stop using it at some point
-import Core.Units as Units
+import G4Units.Units as Units
 import G4Launcher
 
 parser = OptionParser(usage='%prog [options] [par1=val1] [par2=val2] [...]')

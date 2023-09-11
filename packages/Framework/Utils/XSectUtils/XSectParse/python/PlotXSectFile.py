@@ -1,5 +1,5 @@
 import XSectParse.ParseXSectFile
-import Core.Units
+import G4Units.Units
 from Utils.NeutronMath import neutron_eV_to_angstrom
 from PyAna import *
 
