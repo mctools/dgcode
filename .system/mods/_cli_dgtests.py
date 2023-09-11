@@ -1,6 +1,8 @@
 def parse_cmdline_args():
     from optparse import OptionParser#FIXME: deprecated, use argparse instead!
     import os
+    import pathlib
+
     parser = OptionParser(usage='%prog [options]')
     parser.add_option("-j", "--jobs",
                       type="int", dest="njobs", default=1,
@@ -17,17 +19,20 @@ def parse_cmdline_args():
                       help=("Only run tests with names matching at least one of provided patterns (use wildcards"+
                             " and comma separation to specify, and prefix patterns with '!' to negate)"),metavar="PATTERN")
     parser.add_option("--pycoverage",action="store_true",dest="pycoverage", default=False, help="Run python scripts under the python coverage module.")
+    parser.add_option("--force",action="store_true",dest="force", default=False, help="Remove existing tests directory if one exists already.")
 
     (opt, args) = parser.parse_args()
     if args:
         parser.error('Unrecognised arguments: %s'%(' '.join(args)))
-    if not opt.dir:
-        fallback=os.path.join(os.getcwd(),'tests')
-        if os.path.exists(fallback):
-            parser.error('You must supply a desired test directory or be in a directory without a tests/ subdirectory')
-        opt.dir=fallback
-    if os.path.exists(opt.dir):
-        parser.error('Test directory must not exist already')
+
+    opt.dir = pathlib.Path(opt.dir).expanduser() if opt.dir else pathlib.Path('.')/'tests'
+
+    if opt.dir.exists():
+        if not opt.force:
+            parser.error('Test directory must not exist already (unless running with --force)')
+        else:
+            import shutil
+            shutil.rmtree(opt.dir)
 
     from . import dirs
     instdir = dirs.installdir
