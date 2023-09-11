@@ -26,6 +26,10 @@ recursive-include src/ess_dgbuild_internals/data/cmake *.cmake *.txt *.py
 recursive-include src/ess_dgbuild_internals/data/pkgs/Framework LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
 recursive-include src/ess_dgbuild_internals/data/pkgs/Framework/**/data *
 recursive-include src/ess_dgbuild_internals/data/pkgs/Framework/**/scripts *
+recursive-include src/ess_dgbuild_g4framework/data/pkgs LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/ess_dgbuild_g4framework/data/pkgs/**/data *
+recursive-include src/ess_dgbuild_g4framework/data/pkgs/**/scripts *
+
 global-exclude *~* *\#* .*
 global-exclude *.pyc *.pyo */__pycache__/* */.ruff_cache/*
 global-exclude *.gch *.exe *.so *.dylib *.o *.a
@@ -86,6 +90,19 @@ def create_pymodfiles( srcdir, tgtdir ):
     for f in sorted(srcdir.glob('*.py')):
         ( tgtdir / f.name ).write_text( extract_file_content(f) )
 
+def create_pymodfiles_g4( tgtdir ):
+    tgtdir.mkdir( parents = True )
+    ( tgtdir / '__init__.py' ).write_text(
+"""
+import pathlib
+def dgbuild_bundle_name():
+    return 'g4framework'
+
+def dgbuild_bundle_pkgroot():
+    return ( pathlib.Path(__file__).parent / 'data' / 'pkgs' ).absolute().resolve()
+"""
+    )
+
 def create_cmakefiles( srcdir, tgtdir ):
     tgtdir.mkdir( parents = True )
     for f in sorted(srcdir.glob('*')):
@@ -124,15 +141,13 @@ def get_pkg_files( pkgdir ):
 def chmod_x( path ):
     path.chmod( path.stat().st_mode | stat.S_IEXEC )
 
-def create_frameworkpkgs( srcdir, tgtdir ):
+def create_frameworkpkgs( srcdir, tgtdir, pkgfilter ):
     tgtdir.mkdir( parents = True )
 
     for pkgcfg in srcdir.glob('**/pkg.info'):
         pkgdir = pkgcfg.parent
         pkgname = pkgdir.name
-        if export_only is not None and not pkgname in export_only:
-            continue
-        if pkgname in export_block:
+        if not pkgfilter(pkgname):
             continue
         pkgreldir = pkgdir.relative_to(srcdir)
         newpkgdir = tgtdir / pkgreldir
@@ -163,12 +178,19 @@ def main():
     opt.targetdir.mkdir( parents=True )
     create_metadata_files( opt.targetdir )
     destdir_mods = opt.targetdir / 'src' / 'ess_dgbuild_internals'
+    destdir_modsg4 = opt.targetdir / 'src' / 'ess_dgbuild_g4framework'
     destdir_data = destdir_mods / 'data'
+    destdir_datag4 = destdir_modsg4 / 'data'
     destdir_cmake = destdir_data / 'cmake'
     destdir_pkgs = destdir_data / 'pkgs/Framework'
+    destdir_pkgsg4 = destdir_datag4 / 'pkgs'
     create_pymodfiles( opt.srcdir / 'mods' , destdir_mods )
+    create_pymodfiles_g4( destdir_modsg4 )
     create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
-    create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs )
+    create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs,
+                          pkgfilter = (lambda pkgname : pkgname=='Core') )
+    create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgsg4,
+                          pkgfilter = (lambda pkgname : pkgname not in ('Core','DGBoost','NCrystalBuiltin') ) )
 
 if __name__ == '__main__':
     main()

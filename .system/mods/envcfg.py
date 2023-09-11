@@ -41,14 +41,53 @@ class EnvCfgClassic:
         'DGCODE_USECONDABOOSTPYTHON'
     ]
 
+
+def _find_plugins():
+    import importlib
+    import pkgutil
+    possible_plugins = {
+        name: importlib.import_module(name)
+        for finder, name, ispkg
+        in pkgutil.iter_modules()
+        if name.startswith('ess_dgbuild_')
+    }
+    plugins = {}
+    for name,mod in sorted(possible_plugins.items()):
+        if hasattr(mod,'dgbuild_bundle_name'):
+            name = getattr(mod,'dgbuild_bundle_name')()
+            if name in plugins:
+                warnings.warn('Multiple plugins named "%s" available. Keeping only the first one.'%name)
+                continue
+            plugins[name] = dict(
+                name = name,
+                pkgroot = getattr(mod,'dgbuild_bundle_pkgroot')() if hasattr(mod,'dgbuild_bundle_pkgroot') else None,
+                extdeps = getattr(mod,'dgbuild_bundle_extdeps')() if hasattr(mod,'dgbuild_bundle_extdeps') else None,
+            )
+    return plugins
+
 def _newcfg():
     from .readcfg import cfg
+    import pathlib
+
+    the_extra_pkg_path = []
+    if cfg.needs_bundles:
+        plugins = _find_plugins()
+        for b in cfg.needs_bundles:
+            p = plugins.get(b)
+            if not p:
+                from . import error
+                error.error(f'Bundle not found in current environment: {b}')
+            if p['pkgroot']:
+                pr = pathlib.Path(p['pkgroot']).absolute().resolve()
+                if not pr in the_extra_pkg_path:
+                    the_extra_pkg_path.append(pr)
+
     class EnvCfg:
         #These are the basic ones:
         build_dir_resolved = cfg.build_cachedir / 'bld'
         install_dir_resolved = cfg.build_cachedir / 'install'
         projects_dir = cfg.project_topdir
-        extra_pkg_path = ''#FIXME cfg.needs_*
+        extra_pkg_path = ':'.join(str(e) for e in the_extra_pkg_path)#fixme: keep at Path objects.
         enable_projects_pkg_selection_flag = False#fixme: we could allow this?
 
         #These are used in the context of conda installs:
