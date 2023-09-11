@@ -18,7 +18,7 @@
 #include "G4NCrystalRel/G4NCInstall.hh"
 #include "G4NCrystalRel/G4NCManager.hh"
 #include "Core/FPE.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 #include "MultiProcessingMgr.hh"
 #include "G4Utils/Flush.hh"
 #include "G4RunManager.hh"

@@ -3,7 +3,7 @@
 #include "G4ParticleTable.hh"
 #include "Utils/NeutronMath.hh"
 #include "Utils/MaxwellDist.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 #include <cassert>
 #include <stdexcept>
 

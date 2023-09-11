@@ -7,7 +7,7 @@
 #include "NCrystalRel/internal_NCCfgTypes.hh"
 #include "NCrystalRel/internal_NCMath.hh"
 #include "IdealGasBuilder/IdealGasBuilder.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 #include "G4Units/Constants.hh"
 #include "Core/FindData.hh"
 #include "Core/String.hh"

@@ -2,7 +2,7 @@
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4IonTable.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 #include "Utils/NeutronMath.hh"
 #include <cassert>
 #include <stdexcept>

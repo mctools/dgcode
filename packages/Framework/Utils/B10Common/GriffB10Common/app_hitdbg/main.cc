@@ -1,5 +1,5 @@
 #include "GriffAnaUtils/All.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 #include "Utils/ArrayMath.hh"
 #include "SimpleHistsUtils/AutoBinHistCollection.hh"
 #include "GriffB10Common/DetHitApproxFlex.hh"

@@ -5,7 +5,7 @@
 #include "GriffDataRead/Material.hh"
 #include "GriffDataRead/Element.hh"
 #include "GriffDataRead/Isotope.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 #include "G4Units/Constants.hh"
 #include <iostream>
 

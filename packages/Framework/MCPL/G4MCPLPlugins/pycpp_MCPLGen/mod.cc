@@ -5,7 +5,7 @@
 #include "MCPLExprParser/MCPLASTBuilder.hh"
 #include "MCPL/mcpl.h"
 #include "Core/FindData.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 #include "Core/String.hh"
 #include "G4ParticleGun.hh"
 #include "CLHEP/Geometry/Vector3D.h"

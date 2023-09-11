@@ -4,7 +4,7 @@
 #include "GriffAnaUtils/SegmentIterator.hh"
 #include "GriffDataRead/GriffDataReader.hh"
 #include "GriffDataRead/Segment.hh"
-#include "Core/Units.hh"
+#include "G4Units/Units.hh"
 
 // Helper class which looks at energy deposits left in the counting gas and
 // determines if a hit was found along with its position and hit-time.
