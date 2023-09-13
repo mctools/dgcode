@@ -40,7 +40,7 @@ from . import error
 
 rel_blddir=os.path.relpath(dirs.blddir)
 rel_instdir=os.path.relpath(dirs.installdir)
-rel_testdir=os.path.relpath(dirs.testdir)
+#rel_testdir=os.path.relpath(dirs.testdir)
 
 dgcode_invoke_dirs = [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]
 
@@ -757,7 +757,8 @@ if not opt.quiet:
         print (prefix)
 
 if opt.runtests:
-    utils.rm_rf(dirs.testdir)
+    assert (conf.test_dir().parent / '.dgbuilddir').exists()
+    shutil.rmtree(conf.test_dir(),ignore_errors=True)
     _testfilter=''
     if opt.testfilter:
         _testfilter = ' --filter=%s'%(pipes.quote(opt.testfilter))

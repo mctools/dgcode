@@ -150,7 +150,7 @@ def install_dir():  # DGBUILD-NO-EXPORT
     return _cache_installdir[0]  # DGBUILD-NO-EXPORT
 
 def test_dir():
-    return AbsPath(build_dir()) / 'testresults/'
+    return build_dir() / 'testresults/'
 
 def safe_remove_install_and_build_dir():
     import shutil
@@ -198,11 +198,6 @@ def target_factories():
     l += [tfact_libavail.tfactory_libavail]
     return l
 
-def _del_pattern(thedir,pattern):
-    import glob
-    for f in glob.glob(os.path.join(thedir,pattern)):
-        os.remove(f)
-
 def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
     from . import utils
     from . import dirs
@@ -212,45 +207,50 @@ def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
     unused=set()
     pydone=False
     pkgcache=dirs.pkg_cache_dir(pkgname)
+    rm_tree = lambda p : shutil.rmtree( p, ignore_errors=True)
+    rm_file = lambda p : p.unlink(missing_ok = True)
+    def rm_pattern(thedir,pattern):
+        for f in thedir.glob(pattern):
+            rm_file(f)
+
     for d in disappeared_parts:
         if d=='libinc':
-            utils.rm_rf(os.path.join(i,'include',pkgname))
+            rm_tree( i / 'include' / pkgname)
         elif d=='libsrc':
-            _del_pattern(os.path.join(i,'lib'),'*PKG__%s.*'%pkgname)
+            rm_pattern(i/'lib','*PKG__%s.*'%pkgname)
         elif d.startswith('app_'):
-            utils.rm_f(os.path.join(i,'bin/ess_%s_%s'%(pkgname.lower(),d[4:].lower())))
+            rm_rf( i / 'bin' / 'ess_%s_%s'%(pkgname.lower(),d[4:].lower()) )
         elif d=='symlink__scripts':
-            _del_pattern(os.path.join(i,'scripts'),'ess_%s_*'%pkgname.lower())#FIXME: clashes (see fixme above)
-            utils.touch(os.path.join(pkgcache,'symlinks/scripts.pkl'))
-            utils.rm_f(os.path.join(pkgcache,'symlinks/scripts.pkl.old'))
+            rm_pattern( i/'scripts','ess_%s_*'%pkgname.lower())#FIXME: clashes (see fixme above)
+            (pkgcache/'symlinks'/'scripts.pkl').touch()
+            rm_file(pkgcache/'symlinks'/'scripts.pkl.old')
         elif d=='symlink__data':
-            utils.rm_rf(os.path.join(i,'data',pkgname))
-            utils.touch(os.path.join(pkgcache,'symlinks/data.pkl'))
-            utils.rm_f(os.path.join(pkgcache,'symlinks/data.pkl.old'))
+            rm_tree( i / 'data' / pkgname )
+            ( pkgcache / 'symlinks' / 'data.pkl' ).touch()
+            rm_file( pkgcache / 'symlinks' / 'data.pkl.old' )
         #don't do this for testref_links, since all packages always have this target:
         #elif d=='testref_links':
+        #    NB: Syntax not updated for pathlib and fcts above!:
         #    utils.rm_f(os.path.join(i,'tests/testref/ess_%s_*.log'%(pkgname.lower())))
         #    utils.touch(os.path.join(pkgcache,'testref/testref.pkl'))
         #    utils.rm_f(os.path.join(pkgcache,'testref/testref.pkl.old'))
         elif d.startswith('autopyinit'):
             if not any(e.startswith('autopyinit') for e in current_parts):
                 #we must remove the auto generated __init__.py as it is in the way
-                autoi=os.path.join(i,'python',pkgname,'__init__.py')
-                if os.path.exists(autoi):
-                    os.remove(autoi)
-                utils.touch(os.path.join(pkgcache,'symlinks/python.pkl'))
-                utils.rm_f(os.path.join(pkgcache,'symlinks/python.pkl.old'))
+                rm_file( i / 'python' / pkgname / '__init__.py' )
+                ( pkgcache / 'symlinks' / 'python.pkl' ).touch()
+                rm_file( pkgcache / 'symlinks' / 'python.pkl.old' )
         elif d.startswith('pycpp_') or d=='symlink__python':
             if d.startswith('pycpp'):
-                utils.rm_f(os.path.join(i,'python/%s/%s.so'%(pkgname,d[6:])))
+                rm_file( i / 'python' / pkgname / '%s.so'%d[6:] )
             if not pydone:
                 pydone=True
                 if not any((e.startswith('pycpp') or e=='symlink__python') for e in current_parts):
-                    utils.rm_rf(os.path.join(i,'python',pkgname))
-                utils.touch(os.path.join(pkgcache,'symlinks/python.pkl'))
-                utils.rm_f(os.path.join(pkgcache,'symlinks/python.pkl.old'))
-                utils.touch(os.path.join(pkgcache,'pyinit/pyinit.pkl'))
-                #utils.rm_f(os.path.join(pkgcache,'pyinit/pyinit.pkl.old'))
+                    rm_tree( i / 'python' / pkgname )
+                ( pkgcache / 'symlinks' / 'python.pkl' ).touch()
+                rm_file( pkgcache / 'symlinks' / 'python.pkl.old' )
+                ( pkgcache / 'pyinit' / 'pyinit.pkl' ).touch()
+                #rm_file( pkgcache / 'pyinit' / 'pyinit.pkl.old' )
         else:
             unused.add(d)
     assert not unused,str(unused)

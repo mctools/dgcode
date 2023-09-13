@@ -23,20 +23,50 @@ def perform_configuration(cmakeargs=[],
     import pickle
     import pathlib
     import pipes
+    import shutil
+
+    #Pre-inspect package directories, simply finding the package dirs for now (do it already to detect some errors early):
+    all_pkgdirs = loadpkgs.find_pkg_dirs ( dirs.pkgsearchpath )
+
+    #next load packages, also detecting some errors early.
+    special_ncrystal_migration_mode = True                                                                           # DGBUILD-NO-EXPORT
+    #special_ncrystal_migration_mode = ( 'NoSystemNCrystal' in possible_extdeps and 'NCrystal' in possible_extdeps ) # DGBUILD-NO-EXPORT
+    if special_ncrystal_migration_mode:                                                                              # DGBUILD-NO-EXPORT
+        #Special migration feature, making sure that the package 'NCrystalRel'                                       # DGBUILD-NO-EXPORT
+        #dynamically gets either EXTDEP NCrystal or USEPKG NCrystalBuiltin                                           # DGBUILD-NO-EXPORT
+        #depending on whether or not NCrystal is available on the system.                                            # DGBUILD-NO-EXPORT
+        #if envdict['extdeps']['NCrystal']['present']:                                                               # DGBUILD-NO-EXPORT
+        if shutil.which('ncrystal-config'): #Not entirely consistent with ExtDep_NCrystal.cmake and not respecting NCrystal=0 # DGBUILD-NO-EXPORT
+            loadpkgs.add_dynamic_dependency( 'NCrystalRel', extdep_list = ['NCrystal'] )                             # DGBUILD-NO-EXPORT
+        else:                                                                                                        # DGBUILD-NO-EXPORT
+            loadpkgs.add_dynamic_dependency( 'NCrystalRel', usepkg_list = ['NCrystalBuiltin'] )                      # DGBUILD-NO-EXPORT
+
+    #Inspect package tree and load the necessary pkg.info files, given the filters:
+    pl = loadpkgs.PackageLoader( all_pkgdirs,
+                                 select_filter,
+                                 exclude_filter,
+                                 autodeps=conf.autodeps,
+                                 load_all = load_all_pkgs )
+
+    #Actual extdeps that might be used:
+    actually_needed_extdeps = set()
+    for p in pl.enabled_pkgs_iter():
+        if p.enabled:
+            actually_needed_extdeps.update(p.direct_deps_extnames)
 
     volatile_misc = envcfg.var.reconf_env_vars[:]
 
     #Inspect environment via cmake (caching the result of previous runs).
 
     def current_reconf_environment(envdict):
-        from distutils.spawn import find_executable#similar to shell "which"
-        return (dict( (b,find_executable(b)) for b in set(envdict['autoreconf']['bin_list'].split(';'))),
-                dict( (e,os.getenv(e)) for e in set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc])))
+        return ( dict( install_dir = str(conf.install_dir()), build_dir = str(conf.build_dir()) ),
+                 dict( (b,shutil.which(b)) for b in set(envdict['autoreconf']['bin_list'].split(';'))),
+                 dict( (e,os.getenv(e)) for e in set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc])))
 
-    assert dirs.blddir.exists()
-    assert dirs.blddir_indicator.exists()
+    assert dirs.blddir.is_dir()
+    assert ( dirs.blddir / '.dgbuilddir' ).exists()
+
     envdict=None
-
     if not force_reconf and os.path.exists(dirs.envcache):
         #load from cache:
         envdict=utils.pkl_load(dirs.envcache)
@@ -49,6 +79,10 @@ def perform_configuration(cmakeargs=[],
             if not quiet:
                 print("%sChange in environment detected => reinspecting via CMake"%prefix)
             envdict=None
+        elif len(actually_needed_extdeps - envdict['_actually_needed_extdeps']) > 0:
+            if not quiet:
+                print("%sChange in relevant extdeps detected => reinspecting via CMake"%prefix)
+            envdict=None
 
     #Make sure any change in reported python version triggers reconf (especially important during python2->python3 transision):
     pyversionstr = str(sys.version_info)
@@ -57,21 +91,23 @@ def perform_configuration(cmakeargs=[],
             print("%sChange in python environment detected => reinspecting via CMake"%prefix)
             envdict=None
 
-    #Pre-inspect package directories, simply finding the package dirs for now (do it already to detect some errors early):
-    all_pkgdirs = loadpkgs.find_pkg_dirs ( dirs.pkgsearchpath )
-
     from . import env
     if envdict:
         #Can reuse config:
         env.env=envdict
     else:
         #must extract the hard way via cmake:
-        envdict = extractenv.extractenv(dirs.blddir,dirs.cmakedetectdir,cmakeargs=cmakeargs,quiet=quiet,verbose=verbose,prefix=prefix)
+        envdict = extractenv.extractenv(dirs.blddir,dirs.cmakedetectdir,
+                                        cmakeargs=cmakeargs,
+                                        actually_needed_extdeps=actually_needed_extdeps,
+                                        quiet=quiet,verbose=verbose,prefix=prefix)
         if not envdict:
             utils.rm_f(dirs.envcache)
             error.error('Failure during cmake configuration')
         assert '_cmakeargs' not in envdict
         envdict['_cmakeargs']=cmakeargs
+        assert not '_actually_needed_extdeps' in envdict
+        envdict['_actually_needed_extdeps'] = actually_needed_extdeps
         assert '_autoreconf_environment' not in envdict
         envdict['_autoreconf_environment']=current_reconf_environment(envdict)
         envdict['_pyversion'] = pyversionstr
@@ -135,26 +171,10 @@ def perform_configuration(cmakeargs=[],
         utils.update_pkl_if_changed( {'langinfo':info,'boostinfo':boostinfo},
                                      dirs.blddir / 'langs' / lang )
 
-    #Possible external dependencies (based solely on files in ExtDep directory):
+    #Possible external dependencies (based solely on available ExtDep_xxx.cmake files):
     possible_extdeps = set(envdict['extdeps'].keys())
-    special_ncrystal_migration_mode = ( 'NoSystemNCrystal' in possible_extdeps and 'NCrystal' in possible_extdeps ) # DGBUILD-NO-EXPORT
-    if special_ncrystal_migration_mode:                                                                             # DGBUILD-NO-EXPORT
-        #Special migration feature, making sure that the package 'NCrystalRel'                                      # DGBUILD-NO-EXPORT
-        #dynamically gets either EXTDEP NCrystal or USEPKG NCrystalBuiltin                                          # DGBUILD-NO-EXPORT
-        #depending on whether or not NCrystal is available on the system.                                           # DGBUILD-NO-EXPORT
-        if envdict['extdeps']['NCrystal']['present']:                                                               # DGBUILD-NO-EXPORT
-            loadpkgs.add_dynamic_dependency( 'NCrystalRel', extdep_list = ['NCrystal'] )                            # DGBUILD-NO-EXPORT
-        else:                                                                                                       # DGBUILD-NO-EXPORT
-            loadpkgs.add_dynamic_dependency( 'NCrystalRel', usepkg_list = ['NCrystalBuiltin'] )                     # DGBUILD-NO-EXPORT
 
-    #Inspect package tree and load the necessary config files, given the filters:
-    pl = loadpkgs.PackageLoader( all_pkgdirs,
-                                 possible_extdeps,
-                                 select_filter,
-                                 exclude_filter,
-                                 autodeps=conf.autodeps,
-                                 load_all=load_all_pkgs )
-
+    pl.check_no_forbidden_extdeps( possible_extdeps )
 
 
     #Gracefully disable packages based on missing external dependencies
@@ -238,7 +258,7 @@ def perform_configuration(cmakeargs=[],
             rd[p.name]=p.reldirname#ok to update immediately?
 
     def nuke_pkg(pkgname):
-        conf.uninstall_package(pipes.quote(str(dirs.installdir)),pipes.quote(pkgname))
+        conf.uninstall_package(pkgname)
         utils.rm_rf(dirs.pkg_cache_dir(pkgname))
         utils.rm_rf(dirs.pkg_dir(pkgname))#remove link to pkg or dynamic package contents.
         nt=pipes.quote(os.path.join(dirs.blddir,'named_targets',pkgname))
