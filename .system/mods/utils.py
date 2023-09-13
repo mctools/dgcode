@@ -176,29 +176,6 @@ def shlex_split(s):
     else:
         return s.split()#hope user didnt use spaces in directories
 
-_import_modatpath_count = [0]
-def import_modatpath(pathtomodule,modulename=None):
-    global _import_modatpath_count
-    try:
-        import importlib
-        from importlib.util import spec_from_file_location,module_from_spec
-    except ImportError:
-        spec_from_file_location,module_from_spec=None,None
-    #If not specified, construct a unique module name:
-    if not modulename:
-        _import_modatpath_count[0] = +1
-        modulename = 'modatpathno%i'%(_import_modatpath_count[0])
-    if spec_from_file_location and module_from_spec:
-        #python3:
-        spec = importlib.util.spec_from_file_location(modulename,pathtomodule)
-        themodule = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(themodule)#don't catch exceptions here, want to propagate errors from embedded code
-        return themodule
-    else:
-        #python2:
-        import imp
-        return imp.load_source(modulename,pathtomodule)
-
 class rpath_appender:
     def __init__( self, lang, shlib ):
         from . import env
@@ -232,7 +209,3 @@ class rpath_appender:
         for d in found_dirs:
             res += self.apply_to_dir( d )
         return res
-
-def bootstrap_installdir_env():
-    from . import dirs
-    installdir

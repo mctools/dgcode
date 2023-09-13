@@ -50,13 +50,16 @@ def descrfct_app(pkg,subdir,name):
     from . import col
     return col.bldcol('app'),'application %s'%name
 
-def uninstall_package(d,pn):
+def uninstall_package(pkgname):
     #completely remove all traces of a pkg from the install area:
     #a few sanity checks since we are about to use rm -rf:
     from . import utils
-    assert d and not ' ' in d
+    #assert d and not ' ' in d
 
-    check_install_dir_indicator(d)
+    instdir = install_dir()
+    if not ( instdir / '.dginstalldir' ).exists():
+        return
+
     #FIXME: ess_foo_bar_blah might be script Blah from package Foo_Bar or script
     #Bar_Blah from package Foo. We should check that the symlinks goes to the
     #correct package! (or better yet, dgbuild should produce pickle file in
@@ -64,33 +67,43 @@ def uninstall_package(d,pn):
     #etc.). But a quick fix for the scripts (not for the apps) would be for the
     #framework to remove all symlinks to the package in question from the
     #install dir, and just let the present function deal with non-symlinks.
-    utils.system('rm -rf %s/data/%s %s/lib/*PKG__%s.*  %s/tests/testref/ess_%s_*.log %s/include/%s %s/python/%s %s/scripts/ess_%s_* %s/bin/ess_%s_*'%(d,pn,
-                                                                                                                                                      d,pn,
-                                                                                                                                                      d,pn.lower(),
-                                                                                                                                                      d,pn,
-                                                                                                                                                      d,pn,
-                                                                                                                                                      d,pn.lower(),
-                                                                                                                                                      d,pn.lower()))
+
+    parts = [ f'data/{pkgname}',
+              f'lib/*PKG__{pkgname}.*',
+              f'tests/testref/ess_{pkgname.lower()}_*.log',
+              f'include/%s',
+              f'python/{pkgname}',
+              f'scripts/ess_{pkgname.lower()}_*',
+              f'bin/ess_{pkgname.lower()}_*' ]
+    import shutil
+    for p in parts:
+        for f in instdir.glob(p):
+            if f.is_dir():
+                shutil.rmtree(f,ignore_errors = True)
+            else:
+                f.unlink(missing_ok = True)
 
 #Get paths to all packages (including the framework and user packages)
 
 def projects_dir():
-  proj_dir_env = envcfg.var.projects_dir
-  if not proj_dir_env:
-      from . import error
-      error.error('The DGCODE_PROJECTS_DIR environment variable must be set.')
-  proj_dir = AbsPath(proj_dir_env)
-  if not proj_dir.is_absolute():
-      from . import error
-      error.error('The DGCODE_PROJECTS_DIR environment variable must hold an absolute path.')
-  return proj_dir
+# DGBUILD-EXPORT-ONLY>>    return envcfg.var.projects_dir
+    proj_dir_env = envcfg.var.projects_dir # DGBUILD-NO-EXPORT
+    if not proj_dir_env: # DGBUILD-NO-EXPORT
+        from . import error # DGBUILD-NO-EXPORT
+        error.error('The DGCODE_PROJECTS_DIR environment variable must be set.') # DGBUILD-NO-EXPORT
+    proj_dir = AbsPath(proj_dir_env) # DGBUILD-NO-EXPORT
+    if not proj_dir.is_absolute(): # DGBUILD-NO-EXPORT
+        from . import error # DGBUILD-NO-EXPORT
+        error.error('The DGCODE_PROJECTS_DIR environment variable must hold an absolute path.') # DGBUILD-NO-EXPORT
+    return proj_dir # DGBUILD-NO-EXPORT
 
 def extra_pkg_path():
-  dirs = []
-  extra_pkg_path_env = envcfg.var.extra_pkg_path
-  if extra_pkg_path_env:
-    dirs.extend([AbsPath(p.strip()) for p in extra_pkg_path_env.split(':') if p.strip()])
-  return dirs
+# DGBUILD-EXPORT-ONLY>>    return envcfg.var.extra_pkg_path_list
+    dirs = [] # DGBUILD-NO-EXPORT
+    extra_pkg_path_env = envcfg.var.extra_pkg_path # DGBUILD-NO-EXPORT
+    if extra_pkg_path_env: # DGBUILD-NO-EXPORT
+        dirs.extend([AbsPath(p.strip()) for p in extra_pkg_path_env.split(':') if p.strip()]) # DGBUILD-NO-EXPORT
+    return dirs # DGBUILD-NO-EXPORT
 
 # DGBUILD-EXPORT-ONLY>>def framework_dir():
 # DGBUILD-EXPORT-ONLY>>    return (AbsPath(__file__).parent / 'data' / 'pkgs' / 'Framework')
@@ -106,56 +119,44 @@ def pkg_search_path(system_dir): # DGBUILD-NO-EXPORT
     dirs.extend(extra_pkg_path()) # DGBUILD-NO-EXPORT
     return dirs # DGBUILD-NO-EXPORT
 
-def _determine_resolved_dir( env_var_name, attribute_name ):
-    assert hasattr(envcfg.var,attribute_name)
-    the_dir = getattr(envcfg.var,attribute_name)
-    if not the_dir:
-      from . import error
-      error.error(f'The {env_var_name} environment variable is not set.'
-                  ' Please source the bootstrap.sh file in the Projects directory once again!')
-    the_dir_real = AbsPath(the_dir)
-    if not the_dir_real.is_absolute():
-      from . import error
-      error.error(f'The {env_var_name} environment variable must hold an absolute path.')
-    return the_dir_real
+# DGBUILD-EXPORT-ONLY>>def build_dir():
+# DGBUILD-EXPORT-ONLY>>    return envcfg.var.build_dir_resolved
+# DGBUILD-EXPORT-ONLY>>def install_dir():
+# DGBUILD-EXPORT-ONLY>>    return envcfg.var.install_dir_resolved
 
-_cache_builddir = [None]
-def build_dir():
-    if _cache_builddir[0] is None:
-        _cache_builddir[0] = _determine_resolved_dir('DGCODE_BUILD_DIR_RESOLVED','build_dir_resolved')
-    return _cache_builddir[0]
+def _determine_resolved_dir( env_var_name, attribute_name ):  # DGBUILD-NO-EXPORT
+    assert hasattr(envcfg.var,attribute_name)  # DGBUILD-NO-EXPORT
+    the_dir = getattr(envcfg.var,attribute_name)  # DGBUILD-NO-EXPORT
+    if not the_dir:  # DGBUILD-NO-EXPORT
+      from . import error  # DGBUILD-NO-EXPORT
+      error.error(f'The {env_var_name} environment variable is not set.'  # DGBUILD-NO-EXPORT
+                  ' Please source the bootstrap.sh file in the Projects directory once again!')  # DGBUILD-NO-EXPORT
+    the_dir_real = AbsPath(the_dir)  # DGBUILD-NO-EXPORT
+    if not the_dir_real.is_absolute():  # DGBUILD-NO-EXPORT
+      from . import error  # DGBUILD-NO-EXPORT
+      error.error(f'The {env_var_name} environment variable must hold an absolute path.')  # DGBUILD-NO-EXPORT
+    return the_dir_real  # DGBUILD-NO-EXPORT
 
-_cache_installdir = [None]
-def install_dir():
-    if _cache_installdir[0] is None:
-        _cache_installdir[0] = _determine_resolved_dir('DGCODE_INSTALL_DIR_RESOLVED','install_dir_resolved')
-    return _cache_installdir[0]
+_cache_builddir = [None]  # DGBUILD-NO-EXPORT
+def build_dir():  # DGBUILD-NO-EXPORT
+    if _cache_builddir[0] is None:  # DGBUILD-NO-EXPORT
+        _cache_builddir[0] = _determine_resolved_dir('DGCODE_BUILD_DIR_RESOLVED','build_dir_resolved')  # DGBUILD-NO-EXPORT
+    return _cache_builddir[0]  # DGBUILD-NO-EXPORT
+
+_cache_installdir = [None]  # DGBUILD-NO-EXPORT
+def install_dir():  # DGBUILD-NO-EXPORT
+    if _cache_installdir[0] is None:  # DGBUILD-NO-EXPORT
+        _cache_installdir[0] = _determine_resolved_dir('DGCODE_INSTALL_DIR_RESOLVED','install_dir_resolved')  # DGBUILD-NO-EXPORT
+    return _cache_installdir[0]  # DGBUILD-NO-EXPORT
 
 def test_dir():
     return AbsPath(build_dir()) / 'testresults/'
 
-# directory indicators - empty files to indicate the build/install directory, to be checked before using rm -rf on it
-def build_dir_indicator(bld_dir):
-    return AbsPath(bld_dir) / '.dgbuilddir'
-
-def install_dir_indicator(inst_dir):
-    return AbsPath(inst_dir) / '.dginstalldir'
-
-def check_build_dir_indicator(bld_dir):
-  if AbsPath(bld_dir).exists() and not AbsPath(build_dir_indicator(bld_dir)).exists():
-      from .import error
-      error.error(f'Missing build directory indicator in {bld_dir} suggests a possible'
-                  ' problem with the DGCODE_BUILD_DIR environment variable. Make sure'
-                  ' you really want to delete the folder, and do it by hand!'%bld_dir)
-  return True
-
-def check_install_dir_indicator(inst_dir):
-  if AbsPath(inst_dir).exists() and not AbsPath(install_dir_indicator(inst_dir)).exists():
-      from .import error
-      error.error(f'Missing install directory indicator in {inst_dir} suggests a possible'
-                  ' problem with the DGCODE_INSTALL_DIR environment variable. Make sure'
-                  ' you really want to delete the folder, and do it by hand!'%inst_dir)
-  return True
+def safe_remove_install_and_build_dir():
+    import shutil
+    for fingerprintfile in [ build_dir() / '.dgbuilddir', install_dir() / '.dginstalldir' ]:
+        if fingerprintfile.exists():
+            shutil.rmtree( fingerprintfile.parent, ignore_errors=True )
 
 def target_factories_for_patterns():
     from . import tfact_symlink as tfs
@@ -205,8 +206,9 @@ def _del_pattern(thedir,pattern):
 def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
     from . import utils
     from . import dirs
-    d=disappeared_parts
     i=instdir
+    if not ( i / '.dginstalldir' ).exists():
+        return
     unused=set()
     pydone=False
     pkgcache=dirs.pkg_cache_dir(pkgname)

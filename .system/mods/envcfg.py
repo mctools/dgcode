@@ -56,6 +56,7 @@ def _find_plugins():
         if hasattr(mod,'dgbuild_bundle_name'):
             name = getattr(mod,'dgbuild_bundle_name')()
             if name in plugins:
+                import warnings
                 warnings.warn('Multiple plugins named "%s" available. Keeping only the first one.'%name)
                 continue
             plugins[name] = dict(
@@ -88,6 +89,7 @@ def _newcfg():
         install_dir_resolved = cfg.build_cachedir / 'install'
         projects_dir = cfg.project_topdir
         extra_pkg_path = ':'.join(str(e) for e in the_extra_pkg_path)#fixme: keep at Path objects.
+        extra_pkg_path_list = the_extra_pkg_path#New style!
         enable_projects_pkg_selection_flag = False#fixme: we could allow this?
 
         #These are used in the context of conda installs:
@@ -102,14 +104,11 @@ def _newcfg():
         # changed needing an automatic cmake reconf. We provide a good base list
         # here:
 
-        #FIXME: Too large list for this mode!:
         reconf_env_vars = [
-        #First all of the above except DGCODE_ALLOWSYSDEV:
-            'DGCODE_PROJECTS_DIR', 'DGCODE_INSTALL_DIR_RESOLVED','DGCODE_BUILD_DIR_RESOLVED',
-            'DGCODE_EXTRA_PKG_PATH', 'DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','DGCODE_COLOR_FIX',
-            'CONDA_PREFIX','CMAKE_ARGS','PYTHONPATH',
-            #Then some more used in our cmake modules (but not most of those marked for
-            #reconf inside the ExtDep_xxx.cmake files):
+            #All of the above except DGCODE_ALLOWSYSDEV:
+            'PATH','DGCODE_COLOR_FIX','CONDA_PREFIX','CMAKE_ARGS','PYTHONPATH',
+            #Then some more used in our cmake modules (but not those marked for
+            #reconf inside the optional/ExtDep_xxx.cmake files):
             'DGCODE_USECONDABOOSTPYTHON'
         ]
     return EnvCfg()

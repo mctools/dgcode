@@ -8,7 +8,6 @@ sysdir = str(pathlib.Path(__file__).resolve().absolute().parent.parent)
 fmwkdir = conf.framework_dir(sysdir)# DGBUILD-NO-EXPORT
 # DGBUILD-EXPORT-ONLY>>fmwkdir = conf.framework_dir()
 blddir = conf.build_dir()
-blddir_indicator = conf.build_dir_indicator(blddir)
 makefiledir = blddir / 'makefiles'
 
 extrapkgpath = conf.extra_pkg_path()
@@ -16,7 +15,6 @@ pkgsearchpath = conf.pkg_search_path(sysdir)# DGBUILD-NO-EXPORT
 # DGBUILD-EXPORT-ONLY>>pkgsearchpath = conf.pkg_search_path()
 
 installdir = conf.install_dir()
-installdir_indicator = conf.install_dir_indicator(installdir)
 testdir = conf.test_dir()
 projdir = conf.projects_dir()
 cmakedetectdir = pathlib.Path(sysdir) / 'cmakedetect' # DGBUILD-NO-EXPORT
@@ -66,6 +64,7 @@ def makefile_pkg_dir(pkg,*subpaths): return os.path.join('${PKG}',_pkgname(pkg),
 #sanity:
 for d in [str(x) for x in [blddir, *pkgsearchpath, installdir]]:
     assert not ' ' in d, 'Spaces not allowed in directory names. Illegal path is: "%s"'%d
+    assert len(d)>3,f"suspiciously short path name: {d}"
 
 # Package directory aliases #keep them lowercase
 pkgdir_aliases = {
@@ -76,12 +75,12 @@ pkgdir_aliases = {
 
 def create_bld_dir():
     blddir.mkdir(parents=True,exist_ok=True)
-    blddir_indicator.touch()
+    ( blddir / '.dgbuilddir' ).touch()
     assert blddir.is_dir()
-    assert blddir_indicator.exists()
+    assert ( blddir  / '.dgbuilddir' ).exists()
 
 def create_install_dir():
     installdir.mkdir(parents=True,exist_ok=True)
-    installdir_indicator.touch()
+    ( installdir / '.dginstalldir' ).touch()
     assert installdir.is_dir()
-    assert installdir_indicator.exists()
+    assert ( installdir  / '.dginstalldir' ).exists()

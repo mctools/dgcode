@@ -91,7 +91,7 @@ def _check_case_insensitive_duplication(path_str):
       from . import error
       error.error('Directory (and file) names differing only in casing are'
                   ' not allowed, due to being a potential source of error'
-                  ' for different file systems. \nProblem occured with '%(path_str))
+                  ' for different file systems. \nProblem occured with %s'%(path_str))
 
 def check_dir_case_insensitive_duplication(dircontent, path):
   ''' Check if dircontent contains elements differing only in casing'''
@@ -107,6 +107,11 @@ def check_dir_case_insensitive_duplication(dircontent, path):
         seen.add(d)
 
 def _find_pkg_dirs_under_basedir(dirname):
+    #Ignore dgbuild's own cache dirs:
+    if os.path.exists(os.path.join(dirname,'.dginstalldir')):
+        return []
+    if os.path.exists(os.path.join(dirname,'.dgbuilddir')):
+        return []
     if os.path.exists(os.path.join(dirname,conf.package_cfg_file)):
         #dir is itself a pkg dir
         return [os.path.realpath(dirname)]
@@ -171,7 +176,7 @@ class Package:
             from . import db
             db.db['pkg2inc'][self.name]= langs.headers_in_dir(d) if os.path.isdir(d) else set()
 
-    def setup(self,name2object,extdeps,autodeps,enable_and_recurse_to_deps=False):
+    def setup(self,name2object,autodeps,enable_and_recurse_to_deps=False):
         #Ensures cfg file is parsed and direct dep links are established.
         #Recursively setups (and enables) deps if requested.
         if self.is_setup:
@@ -181,10 +186,6 @@ class Package:
         ed,pd,cf,lf,extra_incdeps,dynpkgcode,dynoffset=parse_depfile(self.dirname)
         if not self.name in autodeps:
             pd.update(autodeps)
-        for e in ed:
-            if not e in extdeps:
-                error.error('Unknown external dependency "%s" specified in %s'%(e,pcf)+
-                          '\nPossible values are: "%s"'%'", "'.join(extdeps))
         self.direct_deps_extnames = ed
         self.direct_deps_pkgnames = pd
         self.direct_clients=set()
@@ -214,7 +215,7 @@ class Package:
         if enable_and_recurse_to_deps:
             self.enabled=True
             for p in l:
-                p.setup(name2object,extdeps,autodeps,True)
+                p.setup(name2object,autodeps,True)
         self.__deps=None
         self.__extdeps=None
         self.__deplock=False
@@ -378,7 +379,6 @@ class PackageLoader:
 
     def __init__(self,
                  basedirs,
-                 extdeps,
                  select_pkg_filter=None,
                  exclude_pkg_filter=None,
                  autodeps=None,
@@ -433,14 +433,14 @@ class PackageLoader:
         if select_pkg_filter:
             for p in pkgs:
                 if select_pkg_filter(p.name,p.dirname):
-                    p.setup(pkg_name2obj,extdeps,autodeps,True)
+                    p.setup(pkg_name2obj,autodeps,True)
             #always enable the autodeps no matter what:
             if autodeps:
                 for p in (pkg_name2obj(ad) for ad in autodeps):
-                    p.setup(pkg_name2obj,extdeps,autodeps,True)
+                    p.setup(pkg_name2obj,autodeps,True)
         if not select_pkg_filter or load_all:
             for p in pkgs:
-                p.setup(pkg_name2obj,extdeps,autodeps)
+                p.setup(pkg_name2obj,autodeps)
 
         #5) setup client links (only to clients which are setup):
         for p in pkgs:
@@ -456,6 +456,16 @@ class PackageLoader:
 
         for p in self.enabled_pkgs_iter():
             p.deps()#must setup deps of all enabled packages, otherwise we can't be sure to detect circular deps
+
+    def check_no_forbidden_extdeps( self, possible_extdeps ):
+        for p in self.pkgs:
+            if not hasattr(p,'direct_deps_extnames'):
+                continue#pkg.info was never parsed (possibly the package was disabled by filter => do not load just to validate)
+            forbidden = p.direct_deps_extnames - possible_extdeps
+            forbidden = forbidden.pop() if forbidden else None
+            if forbidden:
+                error.error('Unknown external dependency "%s" specified in %s/%s'%(forbidden,p.dirname,conf.package_cfg_file)+
+                          '\Available values in this configuration are: "%s"'%'", "'.join(possible_extdeps))
 
     def enabled_pkgs_iter(self):
         for p in self.pkgs:

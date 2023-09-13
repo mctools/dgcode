@@ -34,6 +34,7 @@ osx=not isfile('/proc/cpuinfo')
 #########################
 
 from . import dirs
+from . import conf
 from . import utils
 from . import error
 
@@ -307,18 +308,11 @@ def unlock():
 import atexit
 atexit.register(unlock)
 
-from .conf import check_install_dir_indicator, check_build_dir_indicator
-
 if opt.clean:
-    if dirs.blddir.is_dir() or dirs.installdir.is_dir() or dirs.testdir.is_dir():
+    if dirs.blddir.is_dir() or dirs.installdir.is_dir():
         if not opt.quiet:
-            print (prefix+"Removing temporary build, install and test directories and forgetting stored CMake args. Exiting.")
-
-        if check_install_dir_indicator(dirs.installdir):
-          utils.rm_rf(dirs.installdir)
-        if check_build_dir_indicator(dirs.blddir):
-          utils.rm_rf(dirs.blddir)
-        utils.rm_rf(dirs.testdir)
+            print (prefix+"Removing temporary cache directories and forgetting stored CMake args. Exiting.")
+        conf.safe_remove_install_and_build_dir()
     else:
         if not opt.quiet:
             print (prefix+"Nothing to clean. Exiting.")
@@ -373,17 +367,15 @@ if not opt.insist and oldsysts!=systs:
     if oldsysts[1]!=systs[1]: opt.insist = True
 
 if dirs.envcache.exists():
-  envdict=utils.pkl_load(dirs.envcache)
-  #insist rebuilding from scratch if install dir was changed since the build dir was last used
-  if not envdict['system']['volatile']['misc']['DGCODE_INSTALL_DIR_RESOLVED'] == str(dirs.installdir):
-    opt.insist = True
+    envdict=utils.pkl_load(dirs.envcache)
+    #insist rebuilding from scratch if install dir was changed since the build dir was last used
+    if ( envdict['_autoreconf_environment'][0]['install_dir'] != str(conf.install_dir())
+         or envdict['_autoreconf_environment'][0]['build_dir'] != str(conf.build_dir()) ):
+        opt.insist = True
 
 if opt.insist:
-  if check_install_dir_indicator(dirs.installdir):
-    utils.rm_rf(dirs.installdir)
-  if check_build_dir_indicator(dirs.blddir):
-    utils.rm_rf(dirs.blddir)
-  dirs.create_bld_dir()
+    conf.safe_remove_install_and_build_dir()
+    dirs.create_bld_dir()
 
 utils.pkl_dump(cfgvars,dirs.varcache)
 utils.pkl_dump(systs,dirs.systimestamp_cache)
@@ -516,6 +508,8 @@ if err_txt:
         error.print_traceback(unclean_exception,prefix)
     sys.exit(1)
 
+assert dirs.makefiledir.is_dir()
+
 def query_pkgs():
     l=[]
     for p in sorted(pkgloader.pkgs):
@@ -644,6 +638,8 @@ elif opt.quiet: extramakeopts=' VERBOSE=-1'
 else: extramakeopts=''
 if not opt.quiet:
     print (prefix+"Configuration completed => Launching build with %i parallel processes"%opt.njobs)
+
+assert dirs.makefiledir.is_dir()
 ec=utils.system("cd %s && make --warn-undefined-variables -f Makefile -j%i%s"%(dirs.makefiledir,opt.njobs,extramakeopts))
 if ec!=0:
     if not opt.quiet:

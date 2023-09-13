@@ -40,6 +40,20 @@ def link_file(src_abspath,target_filename):
 
 #Code from %s:\n###################################################################\n"""
 
+_import_modatpath_count = [0]
+def import_modatpath(pathtomodule,modulename=None):
+    global _import_modatpath_count
+    import importlib
+    from importlib.util import spec_from_file_location,module_from_spec
+    #If not specified, construct a unique module name:
+    if not modulename:
+        _import_modatpath_count[0] = +1
+        modulename = 'modatpathno%i'%(_import_modatpath_count[0])
+    spec = importlib.util.spec_from_file_location(modulename,pathtomodule)
+    themodule = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(themodule)#don't catch exceptions here, want to propagate errors from embedded code
+    return themodule
+
 class DynPkgBuilder:
 
     def __init__(self,pkg):
@@ -79,7 +93,7 @@ class DynPkgBuilder:
         #sanity check that there are not cmdline arguments which might be inspected by dynamic code:
         assert len(sys.argv)==1
         try:
-            thedynmod = utils.import_modatpath(self._dynmodname)
+            thedynmod = import_modatpath(self._dynmodname)
         except Exception as e:
             error.print_traceback(e)
             if isinstance(e,SyntaxError):

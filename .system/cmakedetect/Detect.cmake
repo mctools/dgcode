@@ -65,6 +65,19 @@ foreach(extdep ${extdep_all})
     set(HAS_${extdep} "pending")
 endforeach()
 
+string(REPLACE ":" ";" DG_ACTUALLY_USED_EXTDEPS "${DG_ACTUALLY_USED_EXTDEPS}")
+
+#Make sure the DG_ACTUALLY_USED_EXTDEPS are first in the list, since they might
+#activate other not directly used extdeps via the EXTDEPS_WAITS_FOR variable
+#(e.g. Garfield might activate ROOT):
+foreach( tmp ${DG_ACTUALLY_USED_EXTDEPS} )
+  if ( NOT "${tmp}" IN_LIST extdep_pending )
+    message( FATAL_ERROR "Unknown external dependency specified in pkg.info file: \"${tmp}\"" )
+  endif()
+  list(REMOVE_ITEM extdep_pending ${tmp})
+endforeach()
+list( PREPEND extdep_pending ${DG_ACTUALLY_USED_EXTDEPS} )
+
 while(extdep_pending)
   list(GET extdep_pending 0 extdep)
 
@@ -72,9 +85,17 @@ while(extdep_pending)
   #We can explicitly ignore a dependency named SomeExtdep by putting "SomeExtdep=0" or "SomeExtdep=OFF", etc.
   if ( NOT "x${${extdep}}" STREQUAL "x"  AND NOT "${${extdep}}" )
     set(HAS_${extdep} 0)
+    message( STATUS "Skipping since this dependency was explicitly disabled")
+  elseif( NOT "${extdep}" IN_LIST DG_ACTUALLY_USED_EXTDEPS )
+    set(HAS_${extdep} 0)
+    message( STATUS "Skipping since no active packages require this dependency")
   else()
     cmake_policy(PUSH)
+    set( EXTDEPS_WAITS_FOR "")
     include(optional/ExtDep_${extdep}.cmake)
+    if ( EXTDEPS_WAITS_FOR )
+      list( APPEND DG_ACTUALLY_USED_EXTDEPS ${EXTDEPS_WAITS_FOR} )
+    endif()
     cmake_policy(POP)
   endif()
 

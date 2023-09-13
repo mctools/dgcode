@@ -144,7 +144,7 @@ def parse(filename):
 
     return cfgvars
 
-def extractenv(tmpdir,cmakedir,cmakeargs,quiet=True,verbose=False,prefix=''):
+def extractenv(tmpdir,cmakedir,*,cmakeargs,actually_needed_extdeps,quiet=True,verbose=False,prefix=''):
     assert not (quiet and verbose)
     ec = utils.system("rm -rf %s/cmake/"%tmpdir)
     if ec!=0: return
@@ -158,14 +158,18 @@ def extractenv(tmpdir,cmakedir,cmakeargs,quiet=True,verbose=False,prefix=''):
     if general_cmake_args:
         general_cmake_args = ' '+general_cmake_args
 
-    ec = utils.system("cd %s/cmake/ && cmake%s%s%s %s %s%s"%(tmpdir,
+    import time
+    t0 = time.time()
+    ec = utils.system("cd %s/cmake/ && cmake%s%s%s%s %s %s%s"%(tmpdir,
                                                              general_cmake_args,
                                                              ' -DDG_QUIET=1' if quiet else '',
                                                              ' -DDG_VERBOSE=1' if verbose else '',
+                                                             ' -DDG_ACTUALLY_USED_EXTDEPS=%s'%(':'.join(actually_needed_extdeps)),
                                                              ' '.join('-D'+a for a in cmakeargs),
                                                              cmakedir,
                                                              capture))
-    print("%sEnvironment inspection done"%prefix)#don't silence this even if quiet==true
+    t1 = time.time()
+    print("%sEnvironment inspection done (%.2g seconds)"%(prefix,t1-t0))#don't silence this even if quiet==true
     if ec!=0: return
     printedinfo = parse_stdouterr(os.path.join(tmpdir,'cmake','cmake_output21_capture.txt'))
     writteninfo = parse('%s/cmake/cmakecfg.txt'%tmpdir)

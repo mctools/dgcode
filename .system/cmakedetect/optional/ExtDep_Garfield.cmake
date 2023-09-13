@@ -50,4 +50,6 @@ if (NOT "x${HAS_ROOT}" STREQUAL "xpending" AND NOT "x${HAS_Fortran}" STREQUAL "x
       endif()
     endif()
   endif()
+else()
+    set( EXTDEPS_WAITS_FOR "ROOT" "Fortran" )
 endif()

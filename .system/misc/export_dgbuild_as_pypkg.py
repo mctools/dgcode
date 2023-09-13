@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-export_only = None#['Core','G4Units']
-export_block = ['DGBoost','NCrystalBuiltin']
 #Files not in a package which should be included anyway:
 
 import pathlib

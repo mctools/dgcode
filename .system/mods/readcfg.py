@@ -1,7 +1,12 @@
 import pathlib
 import os
 import warnings
-from . import error
+
+def _cfg_error(msg ):
+    #This happens very early, before we catch error.Error exceptions, so we emit a SystemExit instead:
+    #from . import error
+    #error.error(msg)
+    raise SystemExit('dgbuild configuration error: %s'%(msg or '<unknown error>'))
 
 try:
     import tomllib
@@ -9,59 +14,60 @@ except ModuleNotFoundError:
     try:
         import tomli as tomllib
     except ModuleNotFoundError:
-        error.error('Required toml functionality is not found. Either use '
-                    'python 3.11+ or install tomli'
-                    ' ("conda install -c conda-forge tomli" or "pip install tomli") ')
+        raise SystemExit('Required toml functionality is not found. Either use '
+                         'python 3.11+ or install tomli'
+                         ' ("conda install -c conda-forge tomli" or "pip install tomli") ')
+
 
 def _generate_schema():
     def decode_nonempty_str( infile, itemname, item ):
         if not isinstance(item,str) or not str:
-            error.error(f'Invalid value "{item}" for item {itemname} (expected non-empty string) in {infile}')
+            _cfg_error(f'Invalid value "{item}" for item {itemname} (expected non-empty string) in {infile}')
         return item
 
     def decode_nonempty_isalnum_str( infile, itemname, item ):
         if not isinstance(item,str) or not item or not item.isalnum():
-            error.error(f'Invalid value "{item}" for item {itemname} (expected alphanumeric string) in {infile}')
+            _cfg_error(f'Invalid value "{item}" for item {itemname} (expected alphanumeric string) in {infile}')
         return item
 
     def decode_is_list_of_nonempty_isalnum_str( infile, itemname, item ):
         if not isinstance( item, list ):
-            error.error('Invalid value "{item}" for item {itemname} (expected list) in {infile}')
+            _cfg_error('Invalid value "{item}" for item {itemname} (expected list) in {infile}')
         for i,k in enumerate(item):
             if not isinstance(k,str) or not k or not k.isalnum():
-                error.error('Invalid value of list entry #{i+1} in item {itemname} (expected alphanumeric string) in {infile}')
+                _cfg_error('Invalid value of list entry #{i+1} in item {itemname} (expected alphanumeric string) in {infile}')
         return tuple(item)
 
     def decode_is_list_of_nonempty_str( infile, itemname, item ):
         if not isinstance( item, list ):
-            error.error(f'Invalid value "{item}" for item {itemname} (expected list) in {infile}')
+            _cfg_error(f'Invalid value "{item}" for item {itemname} (expected list) in {infile}')
         for i,k in enumerate(item):
             if not isinstance(k,str) or not k:
-                error.error(f'Invalid value of list entry #{i+1} in item {itemname} (expected non-empty string) in {infile}')
+                _cfg_error(f'Invalid value of list entry #{i+1} in item {itemname} (expected non-empty string) in {infile}')
         return tuple(item)
 
     def decode_is_list_of_paths( infile, itemname, item ):
         if not isinstance( item, list ):
-            error.error(f'Invalid value "{item}" for item {itemname} (expected list) in {infile}')
+            _cfg_error(f'Invalid value "{item}" for item {itemname} (expected list) in {infile}')
         res=[]
         for i,k in enumerate(item):
             if not isinstance(k,str) or not k:
-                error.error(f'Invalid value of list entry #{i+1} in item {itemname} (expected non-empty string) in {infile}')
+                _cfg_error(f'Invalid value of list entry #{i+1} in item {itemname} (expected non-empty string) in {infile}')
             p = pathlib.Path(k)
             if not p.exists():
-                error.error(f'Non-existing path "{p}" in list entry #{i+1} in item {itemname} in {infile}')
+                _cfg_error(f'Non-existing path "{p}" in list entry #{i+1} in item {itemname} in {infile}')
             res.append(p.absolute().resolve())
         return tuple(res)
 
     def decode_str_enum( infile, itemname, item, optionlist ):
         item = decode_nonempty_str( infile, itemname, item )
         if item not in optionlist:
-            error.error(f'Invalid option "{item}" for item {itemname} (must be one of {",".join(optionlist)}) in {infile}')
+            _cfg_error(f'Invalid option "{item}" for item {itemname} (must be one of {",".join(optionlist)}) in {infile}')
         return item
 
     def decode_nonneg_int( infile, itemname, item ):
         if not isinstance(item,int):
-            error.error(f'Invalid option "{item}" for item {itemname} (must be a non-negative integer) in {infile}')
+            _cfg_error(f'Invalid option "{item}" for item {itemname} (must be a non-negative integer) in {infile}')
         return item
 
     def decode_dir( infile, itemname, item ):
@@ -95,17 +101,19 @@ _schema = _generate_schema()
 def _locate_cfg_file():
     p = os.environ.get('DGBUILD_CFG')
     if p:
-        p = pathlib.Path(p)
+        p = pathlib.Path(p).expanduser()
         if not p.exists():
-            error.error('DGBUILD_CFG was set to a non-existing directory or file')
+            _cfg_error('DGBUILD_CFG was set to a non-existing directory or file')
         if p.is_dir():
             p = p / 'dgbuild.cfg'
             if not p.exists():
-                error.error('DGBUILD_CFG was set to a directory'
+                _cfg_error('DGBUILD_CFG was set to a directory'
                             ' with no dgbuild.cfg file in it')
         else:
             if not p.exists():
-                error.error('DGBUILD_CFG was set to non-existing file')
+                _cfg_error('DGBUILD_CFG was set to non-existing file')
+        if not p.is_absolute():
+            _cfg_error('DGBUILD_CFG must be set to an absolute path')
         return p
     p = pathlib.Path('.').absolute()#NB: NOT .resolve() on purpose!
     f = p / 'dgbuild.cfg'
@@ -119,17 +127,19 @@ def _locate_cfg_file():
 def _extract_cfg():
     f = _locate_cfg_file()
     if not f:
-        error.error('No dgbuild.cfg found in current or any parent directory')
+        _cfg_error('No dgbuild.cfg found in current or any parent directory'
+                   ' (step into a directory tree with a dgbuild.cfg at the '
+                   'root or set DGBUILD_CFG to a directory with a dgbuild.cfg file in it)')
     try:
         content = f.read_text()
     except UnicodeDecodeError:
-        error.error(f'Not a text-file: {f}')
+        _cfg_error(f'Not a text-file: {f}')
     try:
         cfg = tomllib.loads(content)
     except tomllib.TOMLDecodeError as e:
-        error.error(f'Syntax error in {f}: {e}')
+        _cfg_error(f'Syntax error in {f}: {e}')
     if not cfg:
-        error.error(f'No data defined in {f}')
+        _cfg_error(f'No data defined in {f}')
     return f,cfg
 
 def _process_cfg(infile,cfg,target):
