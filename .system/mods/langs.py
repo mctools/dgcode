@@ -1,6 +1,5 @@
 from . import conf
 from . import utils
-from . import env
 import os
 splitext = os.path.splitext
 

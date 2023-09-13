@@ -48,10 +48,10 @@ def run(cmd):
     try:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = p.communicate()[0]
-    except:
-        return (1,'')
-        pass
-    return (p.returncode,output)
+        ec = p.returncode
+    except (OSError,subprocess.SubprocessError):
+        ec = 1
+    return (ec,output if ec==0 else '')
 
 def mkdir_p(path):
     try:

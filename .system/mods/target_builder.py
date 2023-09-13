@@ -74,7 +74,6 @@ class TargetGlobalSysModules(target_base.Target):
     isglobal=True
     contains_message=True
     def __init__(self):
-        from . import env
         self.name='global__sysmods'
         self.pkgname = None
         self.deps = []
@@ -89,7 +88,6 @@ class TargetGlobalScripts(target_base.Target): # DGBUILD-NO-EXPORT
     isglobal=True # DGBUILD-NO-EXPORT
     contains_message=True # DGBUILD-NO-EXPORT
     def __init__(self): # DGBUILD-NO-EXPORT
-        from . import env # DGBUILD-NO-EXPORT
         self.name='global__scripts' # DGBUILD-NO-EXPORT
         self.pkgname=None # DGBUILD-NO-EXPORT
         self.deps=['${BLD}/dgtests','${SYS}/dginstall','${SYS}/dgenv'] # DGBUILD-NO-EXPORT

@@ -1,12 +1,9 @@
 import os
-import sys
 from . import utils
 from . import langs
 from . import col
 from . import includes
 from . import conf
-from . import error
-from . import dirs
 path=os.path
 from .grep import pkgdir_for_search
 

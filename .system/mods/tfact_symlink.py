@@ -37,10 +37,10 @@ class TargetSymlinks(target_base.Target):
             dirs.makefile_instdir(self.destdir)
             if self.renamefct:
                 r=self.renamefct(pkg,f)
-                dest=dirs.makefile_instdir(self.destdir,r)
+                #dest=dirs.makefile_instdir(self.destdir,r)
             else:
                 r=f
-                dest=dirs.makefile_instdir(self.destdir)
+                #dest=dirs.makefile_instdir(self.destdir)
             if runnables:
                 pkg.register_runnable(r)
                 db.db['pkg2runnables'].setdefault(pkg.name,set()).add(r)

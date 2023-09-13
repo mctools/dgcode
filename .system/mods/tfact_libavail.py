@@ -1,7 +1,6 @@
 from . import target_base
 from . import dirs
 from . import utils
-import os
 
 class TargetLibAvail(target_base.Target):
     def __init__(self,pkg):

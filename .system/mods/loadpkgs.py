@@ -1,7 +1,5 @@
 import os
-import sys
 from . import dirs
-from . import utils
 from . import langs
 from . import conf
 from . import error

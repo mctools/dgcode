@@ -1,5 +1,4 @@
 import os
-import glob
 import pathlib
 from . import conf
 
@@ -65,7 +64,6 @@ def mtime_pkg(pkg):
 
 def mtime_cmake():
     from . import dirs
-    c = dirs.cmakedetectdir
     files  = list(dirs.cmakedetectdir.glob('**/*.txt'))
     files += list(dirs.cmakedetectdir.glob('**/*.cmake'))
     files += list(dirs.cmakedetectdir.glob('**/*.py'))

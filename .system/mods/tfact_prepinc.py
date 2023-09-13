@@ -4,7 +4,6 @@ import os.path
 from . import utils
 from . import col
 from . import db
-from . import env
 join=os.path.join
 
 class TargetPrepInc(target_base.Target):
@@ -23,7 +22,7 @@ class TargetPrepInc(target_base.Target):
         utils.mkdir_p(self._cachedir)
         self._neededlinks=set()
         if self._has_libinc:
-            contains_message=True
+            #contains_message=True
             self.code.insert(0,'@if [ ${VERBOSE} -ge 0 ]; then echo "  %sInstalling %s headers%s"; fi'%(col.bldcol('headers'),pkg.name,col.bldend))
             db.db['pkg2parts'][pkg.name].add('libinc')
             li=dirs.pkg_dir(pkg,'libinc')

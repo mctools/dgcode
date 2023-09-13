@@ -13,13 +13,13 @@ import sys
 import os
 import glob
 import pipes
+import pathlib
 from . import envcfg
 
 progname=os.path.basename(sys.argv[0])
 prefix=progname+': '
-v=sys.version_info[0:2]
-if v<(3,6) or v>=(4,0):
-    print (prefix+"Error: Python not found in required version. The python version must be at least 3.6 but less than 4.0 (check with python -V).")
+if not ( (3,8) <= sys.version_info[0:2] < (4,0) ):
+    print (prefix+"Error: Python not found in required version. The python version must be at least 3.8 but less than 4.0 (check with python -V).")
     sys.exit(1)
 
 from optparse import OptionParser,OptionGroup#FIXME: deprecated, use argparse instead!
@@ -441,7 +441,8 @@ def create_filter(pattern):
     # Separate patterns, and expand directory aliases
     pattern_parts = [item for p in pattern.replace(';',',').split(',') if p for item in expand_alias(p)]
 
-    import fnmatch,re
+    import fnmatch
+    import re
     namepatterns = []
     dirpatterns = []
     for p in pattern_parts:
@@ -651,10 +652,17 @@ if not opt.quiet:
     print ('%sSuccessfully built and installed all enabled packages!'%prefix)
     print (prefix)
     print ('%sSummary:'%prefix)
-    print (prefix+'  Framework directory              : %s'%dirs.fmwkdir)
-    print (prefix+'  Projects directory               : %s'%dirs.projdir)
-    print (prefix+'  Installation directory           : %s'%dirs.installdir)
-    print (prefix+'  Build directory                  : %s'%dirs.blddir)
+    def fixpath( p ):
+        if envcfg.var.conda_prefix:
+            pabs = p.absolute().resolve()
+            cp = pathlib.Path(envcfg.var.conda_prefix).absolute().resolve()
+            if cp.is_dir() and pabs.is_relative_to(cp):
+                return os.path.join('${CONDA_PREFIX}',str(pabs.relative_to(cp)))
+        return str(p)
+    print (prefix+'  Framework directory              : %s'%fixpath(dirs.fmwkdir))
+    print (prefix+'  Projects directory               : %s'%fixpath(dirs.projdir))
+    print (prefix+'  Installation directory           : %s'%fixpath(dirs.installdir))
+    print (prefix+'  Build directory                  : %s'%fixpath(dirs.blddir))
 
     from . import col
     col_ok = col.ok
@@ -683,12 +691,19 @@ if not opt.quiet:
 
     pkd_src_info = []
     for basedir in dirs.pkgsearchpath:
-      pkg_nr = len([p.name for p in pkgloader.pkgs if p.dirname.startswith(str(basedir))])
-      pkg_enabled = len([p.name for p in pkgloader.pkgs if p.enabled and p.dirname.startswith(str(basedir))])
-      pkd_src_info.append([basedir, pkg_enabled, (pkg_nr-pkg_enabled) ])
+        pkg_nr = len([p.name for p in pkgloader.pkgs if p.dirname.startswith(str(basedir))])
+        pkg_enabled = len([p.name for p in pkgloader.pkgs if p.enabled and p.dirname.startswith(str(basedir))])
+        pkd_src_info.append([basedir, pkg_enabled, (pkg_nr-pkg_enabled) ])
 
     def pkg_info_str(info):
-      return "%s (%s%d%s built, %s%d%s skipped)"%(info[0], col_ok,info[1],col_end, col_bad,info[2],col_end,)
+        p=fixpath(info[0])
+        if info[1]+info[2]==0:
+            descr='no pkgs'
+        else:
+            nbuilt = '%s%d%s'%(col_ok,info[1],col_end) if info[1]!=0 else '0'
+            nskipped = '%s%d%s'%(col_bad,info[2],col_end) if info[2]!=0 else '0'
+            descr='%s built, %s skipped'%(nbuilt, nskipped)
+        return "%s (%s)"%(p, descr)
 
     print (prefix+'  Package search path              : %s'%formatlist([pkg_info_str(info) for info in pkd_src_info],None))
 
@@ -758,6 +773,7 @@ if not opt.quiet:
 
 if opt.runtests:
     assert (conf.test_dir().parent / '.dgbuilddir').exists()
+    import shutil
     shutil.rmtree(conf.test_dir(),ignore_errors=True)
     _testfilter=''
     if opt.testfilter:

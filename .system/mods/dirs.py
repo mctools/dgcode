@@ -58,8 +58,11 @@ def makefile_pkg_cache_dir(pkg,*subpaths):
 
 #where we link (or create dynamic pkgs):
 pkgdirbase = blddir / 'pkgs'
-def pkg_dir(pkg,*subpaths): return os.path.join(pkgdirbase,_pkgname(pkg),*subpaths)
-def makefile_pkg_dir(pkg,*subpaths): return os.path.join('${PKG}',_pkgname(pkg),*subpaths)
+def pkg_dir(pkg,*subpaths):
+    return pkgdirbase.joinpath( _pkgname(pkg),*subpaths )
+
+def makefile_pkg_dir(pkg,*subpaths):
+    return os.path.join('${PKG}',_pkgname(pkg),*subpaths)
 
 #sanity:
 for d in [str(x) for x in [blddir, *pkgsearchpath, installdir]]:

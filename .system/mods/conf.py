@@ -53,7 +53,6 @@ def descrfct_app(pkg,subdir,name):
 def uninstall_package(pkgname):
     #completely remove all traces of a pkg from the install area:
     #a few sanity checks since we are about to use rm -rf:
-    from . import utils
     #assert d and not ' ' in d
 
     instdir = install_dir()
@@ -71,7 +70,7 @@ def uninstall_package(pkgname):
     parts = [ f'data/{pkgname}',
               f'lib/*PKG__{pkgname}.*',
               f'tests/testref/ess_{pkgname.lower()}_*.log',
-              f'include/%s',
+              f'include/{pkgname}',
               f'python/{pkgname}',
               f'scripts/ess_{pkgname.lower()}_*',
               f'bin/ess_{pkgname.lower()}_*' ]
@@ -183,6 +182,7 @@ def target_factories_for_patterns():
     return l
 
 def ignore_file(f):
+    f = f.name if hasattr(f,'name') else f
     return f[0]=='.' or '~' in f or '#' in f or f.endswith('.orig') or f.endswith('.bak') or f=='__pycache__'
 
 def target_factories():
@@ -199,7 +199,6 @@ def target_factories():
     return l
 
 def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
-    from . import utils
     from . import dirs
     i=instdir
     if not ( i / '.dginstalldir' ).exists():
@@ -207,6 +206,7 @@ def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
     unused=set()
     pydone=False
     pkgcache=dirs.pkg_cache_dir(pkgname)
+    import shutil
     rm_tree = lambda p : shutil.rmtree( p, ignore_errors=True)
     rm_file = lambda p : p.unlink(missing_ok = True)
     def rm_pattern(thedir,pattern):
@@ -219,7 +219,7 @@ def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
         elif d=='libsrc':
             rm_pattern(i/'lib','*PKG__%s.*'%pkgname)
         elif d.startswith('app_'):
-            rm_rf( i / 'bin' / 'ess_%s_%s'%(pkgname.lower(),d[4:].lower()) )
+            rm_tree( i / 'bin' / 'ess_%s_%s'%(pkgname.lower(),d[4:].lower()) )
         elif d=='symlink__scripts':
             rm_pattern( i/'scripts','ess_%s_*'%pkgname.lower())#FIXME: clashes (see fixme above)
             (pkgcache/'symlinks'/'scripts.pkl').touch()

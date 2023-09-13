@@ -115,5 +115,3 @@ def _newcfg():
 
 var = EnvCfgClassic()# DGBUILD-NO-EXPORT
 # DGBUILD-EXPORT-ONLY>>var = _newcfg()
-
-del _query

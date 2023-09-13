@@ -1,7 +1,6 @@
 import os
 from . import dirs
 from . import conf
-from . import utils
 from . import env
 
 def create_install_env_clone():

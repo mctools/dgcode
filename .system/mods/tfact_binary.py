@@ -1,6 +1,4 @@
 import os
-import re
-import shlex
 import pathlib
 from . import conf
 from . import target_base
@@ -46,7 +44,7 @@ class TargetBinaryObject(target_base.Target):
         if pkg.extraflags_comp:
             extra_flags+=pkg.extraflags_comp
 
-        contains_message=True
+        #contains_message=True
         self.code=['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sBuilding %s/%s/%s%s"; fi'%(col.bldcol('objectfile'),
                                                                                         pkg.name,
                                                                                         subdir,
@@ -139,7 +137,7 @@ class TargetBinary(target_base.Target):
         if not os.path.exists(objlistfile) or open(objlistfile).read()!=sobjs:
             open(objlistfile,'w').write(sobjs)
         d=join('${INST}',instsubdir)
-        contains_message=True
+        #contains_message=True
         pattern = 'create_lib' if shlib else 'create_exe'
         self.code=['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sCreating %s%s"; fi'%(dcol,descr,dcolend),
                    'mkdir -p %s'%d,

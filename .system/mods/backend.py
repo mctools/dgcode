@@ -122,8 +122,8 @@ def perform_configuration(cmakeargs=[],
         #(re)create any libs_to_symlink whenever extracting env via cmake:
         dirs.create_install_dir()
         linkdir=dirs.installdir / 'lib' / 'links'
-        utils.rm_rf(linkdir)
-        utils.mkdir_p(linkdir)
+        linkdir.unlink(missing_ok=True)
+        linkdir.mkdir(parents=True)
         for lib_to_symlink in env.env['system']['runtime']['libs_to_symlink']:
             #Symlink not only the given file, but also all other files in target
             #dir with same basename and pointing to same file (e.g. if libA.so
@@ -248,13 +248,14 @@ def perform_configuration(cmakeargs=[],
                 #dynamic but are now static, might have leftover a real
                 #directory with obsolete contents:
                 lt=dirs.pkg_dir(p)
-                if os.path.isdir(lt) and not os.path.islink(lt):
-                    utils.rm_rf(lt)
+                if lt.is_dir() and not lt.is_symlink():
+                    assert lt.is_relative_to( conf.build_dir() ) and ( conf.build_dir()/'.dgbuilddir' ).exists()
+                    shutil.rmtree( lt, ignore_errors=True)
                 else:
-                    utils.mkdir_p(os.path.dirname(lt))
-                    if os.path.lexists(lt):
-                        os.remove(lt)
-                    os.symlink(p.dirname,lt)
+                    lt.parent.mkdir( parents = True, exist_ok = True )
+                    if lt.is_symlink():
+                        lt.unlink()
+                    lt.symlink_to(p.dirname,target_is_directory=True)
             rd[p.name]=p.reldirname#ok to update immediately?
 
     def nuke_pkg(pkgname):

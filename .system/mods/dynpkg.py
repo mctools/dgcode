@@ -8,7 +8,6 @@ from . import col
 from . import utils
 from . import dirs
 from . import error
-from . import dirs
 from . import mtime
 
 _dynpreamble="""import os,sys,shutil
@@ -44,7 +43,6 @@ _import_modatpath_count = [0]
 def import_modatpath(pathtomodule,modulename=None):
     global _import_modatpath_count
     import importlib
-    from importlib.util import spec_from_file_location,module_from_spec
     #If not specified, construct a unique module name:
     if not modulename:
         _import_modatpath_count[0] = +1

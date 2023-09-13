@@ -1,6 +1,4 @@
 import os
-import sys
-import glob
 from . import target_base
 from . import utils
 from . import dirs
@@ -44,7 +42,7 @@ def tfactory_reflogs(pkg,dirtypes):
 
     applogs,scriptlogs=[],[]
     if 'app_' in dirtypes:
-        applogs = [f for f in glob.glob(dirs.pkg_dir(pkg,'app_*/*.log')) if not conf.ignore_file(f)]
+        applogs = [f for f in dirs.pkg_dir(pkg).glob('app_*/*.log') if not conf.ignore_file(f)]
         for f in applogs:
             if basename(f)!='test.log' or utils.is_executable(f):
                 if basename(f)!='test.log':
@@ -53,7 +51,7 @@ def tfactory_reflogs(pkg,dirtypes):
                     e='Log files should not be executable (correct by running chmod -x <filename>).'
                 error.error('%s\n\nProblematic file: %s'%(e,f))
     if 'scri' in dirtypes:
-        scriptlogs = [f for f in glob.glob(dirs.pkg_dir(pkg,'scripts/*.log')) if not conf.ignore_file(f)]
+        scriptlogs = [f for f in dirs.pkg_dir(pkg,'scripts').glob('*.log') if not conf.ignore_file(f)]
         for f in scriptlogs:
             sf,ext = os.path.splitext(f)
             assert ext=='.log'

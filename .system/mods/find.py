@@ -1,6 +1,5 @@
 import os
 import fnmatch
-from . import col
 from . import conf
 from .grep import pkgfiles, pkgdir_for_search
 pjoin=os.path.join

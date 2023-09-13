@@ -1,6 +1,5 @@
 import os
 from . import utils
-from . import dirs
 from . import envcfg
 
 def parse_stdouterr(filename):
