@@ -27,8 +27,8 @@ def parse(fh):
             if key.startswith('Process '):
                 assert metadata['EnergyUnit']=='eV'
                 assert metadata['XSectUnit']=='barn'
-                unit_energy = Core.Units.eV
-                unit_xsect = Core.Units.barn
+                unit_energy = G4Units.Units.eV
+                unit_xsect = G4Units.Units.barn
                 if currentproc:
                     procs[currentproc] = storagetrf(currentprocdata)
                 currentproc=val
@@ -40,7 +40,7 @@ def parse(fh):
             assert currentproc!=None
             vals=[float(e) for e in l.split()]
             assert len(vals)==2
-            currentprocdata+=[(vals[0]*unit_energy,vals[1]*unit_xsect,xsect2mfp*Core.Units.mm/(vals[1]*unit_xsect/Core.Units.barn))]
+            currentprocdata+=[(vals[0]*unit_energy,vals[1]*unit_xsect,xsect2mfp*G4Units.Units.mm/(vals[1]*unit_xsect/G4Units.Units.barn))]
     if currentproc:
         procs[currentproc] = storagetrf(currentprocdata)
 
@@ -111,10 +111,10 @@ def create_tgraphs(datafile,unitx=None,unity=None,show_mfp=False,emin=None,emax=
         tgr.SetLineColor(col)
         tgr.SetFillColor(ROOT.kWhite)
 
-    if unitx==None: unitx=Core.Units.eV
+    if unitx==None: unitx=G4Units.Units.eV
     if unity==None:
-        if show_mfp: unity=Core.Units.cm
-        else: unity=Core.Units.barn
+        if show_mfp: unity=G4Units.Units.cm
+        else: unity=G4Units.Units.barn
 
     xsectdata = parse(datafile)
     md=xsectdata['metadata']

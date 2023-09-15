@@ -8,8 +8,8 @@ def _find_nearest(array,value):
     return idx
 
 def _extract_vals(npa,wl,mfp):
-    energy_ev=npa[:,0]/Core.Units.eV
-    yvals = npa[:,2]/Core.Units.cm if mfp else npa[:,1]/Core.Units.barn
+    energy_ev=npa[:,0]/G4Units.Units.eV
+    yvals = npa[:,2]/G4Units.Units.cm if mfp else npa[:,1]/G4Units.Units.barn
     if wl:
         #convert energy to wl, reverse array direction and limit to 0.1..25Aa
         y=yvals[::-1]
@@ -132,7 +132,7 @@ def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,xsectname='Total',
             continue
         xvals,yvals = _extract_vals(npa,versus_wavelength,showMFP)
         if mfpunit!='cm':
-            yvals *= (Core.Units.cm/getattr(Core.Units,mfpunit))
+            yvals *= (G4Units.Units.cm/getattr(G4Units.Units,mfpunit))
         label,linestyle,linewidth,col = labelstyle_gen(ifile,p['metadata'])
         if col==None: col=colors[ifile%len(colors)]
         if linestyle==None: linestyle='-'

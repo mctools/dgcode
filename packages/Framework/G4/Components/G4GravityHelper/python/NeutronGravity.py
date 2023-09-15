@@ -5,7 +5,7 @@ import G4StepLimitHelper.helper as slh
 import G4Units.Units
 
 def enableNeutronGravity(launcher, x_dir=0., y_dir=-1., z_dir=0.,g=9.80665,
-                         steplim = 10*Core.Units.mm):
+                         steplim = 10*G4Units.Units.mm):
     ng = hooks.NeutronGravity()
     ng.setDir(x_dir,y_dir,z_dir)
     launcher.preinit_hook(ng.set)
