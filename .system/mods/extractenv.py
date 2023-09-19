@@ -153,20 +153,20 @@ def extractenv(tmpdir,cmakedir,*,cmakeargs,actually_needed_extdeps,quiet=True,ve
     capture = ' 2>&1|tee cmake_output21_capture.txt; exit ${PIPESTATUS[0]}'
 
     #pass on conda cmake args:
-    general_cmake_args = envcfg.var.cmake_args
+    general_cmake_args = envcfg.var.cmake_args or ''
     if general_cmake_args:
         general_cmake_args = ' '+general_cmake_args
 
     import time
     t0 = time.time()
     ec = utils.system("cd %s/cmake/ && cmake%s%s%s%s %s %s%s"%(tmpdir,
-                                                             general_cmake_args,
-                                                             ' -DDG_QUIET=1' if quiet else '',
-                                                             ' -DDG_VERBOSE=1' if verbose else '',
-                                                             ' -DDG_ACTUALLY_USED_EXTDEPS=%s'%(':'.join(actually_needed_extdeps)),
-                                                             ' '.join('-D'+a for a in cmakeargs),
-                                                             cmakedir,
-                                                             capture))
+                                                               general_cmake_args,
+                                                               ' -DDG_QUIET=1' if quiet else '',
+                                                               ' -DDG_VERBOSE=1' if verbose else '',
+                                                               ' -DDG_ACTUALLY_USED_EXTDEPS=%s'%(':'.join(actually_needed_extdeps)),
+                                                               ' '.join('-D'+a for a in cmakeargs),
+                                                               cmakedir,
+                                                               capture))
     t1 = time.time()
     print("%sEnvironment inspection done (%.2g seconds)"%(prefix,t1-t0))#don't silence this even if quiet==true
     if ec!=0: return
