@@ -207,8 +207,10 @@ def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
     pydone=False
     pkgcache=dirs.pkg_cache_dir(pkgname)
     import shutil
-    rm_tree = lambda p : shutil.rmtree( p, ignore_errors=True)
-    rm_file = lambda p : p.unlink(missing_ok = True)
+    def rm_tree(p):
+        shutil.rmtree( p, ignore_errors=True)
+    def rm_file( p ):
+        p.unlink(missing_ok = True)
     def rm_pattern(thedir,pattern):
         for f in thedir.glob(pattern):
             rm_file(f)

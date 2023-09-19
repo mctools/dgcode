@@ -30,7 +30,7 @@ class TargetSymlinks(target_base.Target):
         for f in self.files:
             absf=join(self.srcdir,f)
             assert not os.path.isdir(absf)#should not happen since listfiles ignores subdirs
-            if self.chmodx!=None and self.chmodx != utils.is_executable(absf):
+            if self.chmodx is not None and self.chmodx != utils.is_executable(absf):
                 error.error('File must %sbe executable: %s'%('' if self.chmodx else 'not ',os.path.realpath(absf)),
                             '\nYou can correct it by running the command:\n',
                             '    chmod %sx %s'%('+' if self.chmodx else '-',os.path.realpath(absf)))

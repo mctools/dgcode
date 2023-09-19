@@ -180,7 +180,7 @@ def create_tfactory_binary(instsubdir=None,pkglib=False,shlib=False,allowed_lang
         skip_fct = None
 
         if pkg.name=='DGBoost' and env.env['system']['general']['sysboostpython_use']:
-            skip_fct = lambda basename : basename.startswith('dgboostpython_')
+            skip_fct = lambda basename : basename.startswith('dgboostpython_') # noqa E731
 
         for f in utils.listfiles(dirs.pkg_dir(pkg,subdir),ignore_logs=subdir.startswith('app_')):
             n,e=os.path.splitext(f)

@@ -43,7 +43,7 @@ def parse_depfile(pkgdir):
                     elif e=='EXTRA_INCDEPS': current=extra_incdeps
                     elif e=='DYNAMICPKG': isdynamicpkg,current=True,None
                     else:
-                        if current==None:
+                        if current is None:
                             _err()
                         current += [e]
                 if isdynamicpkg:
@@ -80,29 +80,29 @@ def parse_depfile(pkgdir):
 
 from pathlib import Path
 def _check_case_insensitive_duplication(path_str):
-  path = Path(path_str)
-  if not path.exists():
-      return
-  parentContent = [d.lower() for d in os.listdir(path.parent)]
-  occurance = parentContent.count(path.name.lower())
-  if not occurance == 1:
-      from . import error
-      error.error('Directory (and file) names differing only in casing are'
-                  ' not allowed, due to being a potential source of error'
-                  ' for different file systems. \nProblem occured with %s'%(path_str))
+    path = Path(path_str)
+    if not path.exists():
+        return
+    parentContent = [d.lower() for d in os.listdir(path.parent)]
+    occurance = parentContent.count(path.name.lower())
+    if not occurance == 1:
+        from . import error
+        error.error('Directory (and file) names differing only in casing are'
+                    ' not allowed, due to being a potential source of error'
+                    ' for different file systems. \nProblem occured with %s'%(path_str))
 
 def check_dir_case_insensitive_duplication(dircontent, path):
-  ''' Check if dircontent contains elements differing only in casing'''
-  if not len(dircontent) == len({d.lower() for d in dircontent}):
-      seen = set()
-      for d in [d.lower() for d in dircontent]:
-          if d in seen:
-              from . import error
-              error.error('Directory (and file) names differing only in casing are not allowed, '
-                          'due to being a potential source of error on some file systems. \n'
-                          'Problem occured with %s in the directory %s'%(d,path))
-      else:
-        seen.add(d)
+    ''' Check if dircontent contains elements differing only in casing'''
+    if not len(dircontent) == len({d.lower() for d in dircontent}):
+        seen = set()
+        for d in [d.lower() for d in dircontent]:
+            if d in seen:
+                from . import error
+                error.error('Directory (and file) names differing only in casing are not allowed, '
+                            'due to being a potential source of error on some file systems. \n'
+                            'Problem occured with %s in the directory %s'%(d,path))
+        else:
+          seen.add(d)
 
 def _find_pkg_dirs_under_basedir(dirname):
     #Ignore dgbuild's own cache dirs:
@@ -145,15 +145,15 @@ class Package:
         assert self.name != o.name
         return self.name < o.name
 
-    def __init__(self,dirname,basedir,enabled):
-        self.dirname = dirname
+    def __init__(self,basedir,reldirname,enabled):
+        self.dirname = os.path.join(basedir,reldirname)
         self.__haslib=None
-        self.reldirname = os.path.relpath(dirname,basedir)
+        self.reldirname = reldirname
         #self.reldirnamewithparent = os.path.relpath(dirname,basedir+'/..')
-        self.name = os.path.basename(dirname)
+        self.name = os.path.basename(reldirname)
         assert isinstance(self.name,str)
-        assert isinstance(self.dirname,str)
-        assert isinstance(self.reldirname,str)
+        assert isinstance(self.dirname,str)#fixme
+        assert isinstance(self.reldirname,str)#fixme
         self.enabled=enabled
         self.is_setup=False
         self._any_parent_changed=False
@@ -174,7 +174,7 @@ class Package:
             from . import db
             db.db['pkg2inc'][self.name]= langs.headers_in_dir(d) if os.path.isdir(d) else set()
 
-    def setup(self,name2object,autodeps,enable_and_recurse_to_deps=False):
+    def setup(self,name2object,autodeps,*,enable_and_recurse_to_deps=False):
         #Ensures cfg file is parsed and direct dep links are established.
         #Recursively setups (and enables) deps if requested.
         if self.is_setup:
@@ -199,7 +199,6 @@ class Package:
                 error.error('Malformed EXTRA_INCDEPS statement in %s'%pcf)
             self.extra_include_deps += [eid]
 
-        #self.enabled_direct_clients = set()#To be set later
         l=[]
         for n in pd:
             o=name2object(n)
@@ -213,14 +212,14 @@ class Package:
         if enable_and_recurse_to_deps:
             self.enabled=True
             for p in l:
-                p.setup(name2object,autodeps,True)
+                p.setup(name2object,autodeps,enable_and_recurse_to_deps=True)
         self.__deps=None
         self.__extdeps=None
         self.__deplock=False
 
     def deps(self):
         #all pkgs we depend on, directly or indirectly.
-        if self.__deps!=None:
+        if self.__deps is not None:
             return self.__deps
         if self.__deplock:
             if self in self.direct_deps:
@@ -237,14 +236,14 @@ class Package:
 
     def deps_names(self):
         #names all pkgs we depend on, directly or indirectly, including ourselves.
-        if self.__deps_names!=None:
+        if self.__deps_names is not None:
             return self.__deps_names
         self.__deps_names = set(p.name for p in self.deps())
         return self.__deps_names
 
     def extdeps(self):
         #all extdeps we depend on, directly or indirectly.
-        if self.__extdeps!=None:
+        if self.__extdeps is not None:
             return self.__extdeps
         self.__extdeps=set(self.direct_deps_extnames)
         for p in self.direct_deps:
@@ -376,7 +375,7 @@ def get_dynamic_dependency( pkgname ):
 class PackageLoader:
 
     def __init__(self,
-                 basedirs,
+                 pkgdirs,
                  select_pkg_filter=None,
                  exclude_pkg_filter=None,
                  autodeps=None,
@@ -389,6 +388,17 @@ class PackageLoader:
         """
         #use load_all to (inefficiently) load all cfg info even when select filter is set (to produce pkg graphs)
 
+        if exclude_pkg_filter == 'NOTLEGACYMODE':
+            pkg_filter_obj =  select_pkg_filter
+            del select_pkg_filter
+            del exclude_pkg_filter
+            legacy_mode = False
+            #pkg_filter_obj.dump()
+            if pkg_filter_obj.fully_open():
+                pkg_filter_obj = None
+        else:
+            legacy_mode = True
+
         #Note, when select_pkg_filter is set, we do not need to load ALL cfg
         #files, hence the difference in treatment below.
         self.autodeps=set(autodeps if autodeps else [])
@@ -400,16 +410,20 @@ class PackageLoader:
         #if select_pkg_filter and exclude_pkg_filter:
         #    error.error("Can't exclude packages when simultaneously requesting to enable only certain packages")
 
-        #2) Read directory structure in order to find all package directories:
-        pkgdirs = find_pkg_dirs ( basedirs )
+        #2) Construct Package objects and name->object maps:
+        if legacy_mode:
+            default_enabled = False if select_pkg_filter else True
+        else:
+            default_enabled = pkg_filter_obj is None
 
-        #3) Construct Package objects and name->object maps:
-        default_enabled = False if select_pkg_filter else True
         n2p={}
         lowercased_pkgs=set()
         pkgs=[]
         for pd,basedir in pkgdirs.items():
-            p=Package(pd,basedir,default_enabled)
+            pkg_reldir = os.path.relpath(pd,basedir)
+            pkg_name = os.path.basename(pd)
+            assert len(pkg_name)>=3
+            p=Package(basedir,pkg_reldir,default_enabled)
             pkgs+=[p]
             ln=p.name.lower()
             if p.name in n2p:
@@ -424,30 +438,40 @@ class PackageLoader:
         self.pkgs=pkgs
         self.name2pkg=n2p
 
-        #4) Load contents of all or some of the package config files.
+        #3) Load contents of all or some of the package config files.
         g=self.name2pkg.get
         def pkg_name2obj(pn):
             return g(pn,None)
-        if select_pkg_filter:
-            for p in pkgs:
-                if select_pkg_filter(p.name,p.dirname):
-                    p.setup(pkg_name2obj,autodeps,True)
-            #always enable the autodeps no matter what:
-            if autodeps:
-                for p in (pkg_name2obj(ad) for ad in autodeps):
-                    p.setup(pkg_name2obj,autodeps,True)
-        if not select_pkg_filter or load_all:
-            for p in pkgs:
-                p.setup(pkg_name2obj,autodeps)
+        if legacy_mode:
+            if select_pkg_filter:
+                for p in pkgs:
+                    if select_pkg_filter(p.name,p.dirname):
+                        p.setup(pkg_name2obj,autodeps,enable_and_recurse_to_deps=True)
+                #always enable the autodeps no matter what:
+                if autodeps:
+                    for p in (pkg_name2obj(ad) for ad in autodeps):
+                        p.setup(pkg_name2obj,autodeps,enable_and_recurse_to_deps=True)
+            if not select_pkg_filter or load_all:
+                for p in pkgs:
+                    p.setup(pkg_name2obj,autodeps)
+        else:
+            if pkg_filter_obj:
+                for p in pkgs:
+                    if pkg_filter_obj.passes( p.name, p.reldirname ):
+                        p.setup(pkg_name2obj,autodeps,enable_and_recurse_to_deps=True)
+            if load_all or not pkg_filter_obj:
+                for p in pkgs:
+                    p.setup(pkg_name2obj,autodeps)
 
-        #5) setup client links (only to clients which are setup):
+        #4) setup client links (only to clients which are setup):
         for p in pkgs:
             if p.is_setup:
                 for pd in p.direct_deps:
-                    pd.direct_clients.add(p)
+                    if pd.is_setup:
+                        pd.direct_clients.add(p)
 
-        #6) Apply exclusion filter:
-        if exclude_pkg_filter:
+        #5) Apply exclusion filter:
+        if legacy_mode and exclude_pkg_filter:
             for p in pkgs:
                 if exclude_pkg_filter(p.name,p.dirname):
                     p.disable()

@@ -27,7 +27,7 @@ def grepfile(filename,pattern,color=None):
         for i,l in enumerate(fh):
             ll=l.lower()
             if lp.lower() in ll:
-                if color==None:
+                if color is None:
                     yield (i+1,l)
                 else:
                     used=0

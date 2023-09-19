@@ -13,6 +13,8 @@ class EnvCfgClassic:
     #mentioning the name of the environment variables. Thus, any changes here
     #should be reflected in the code using them as well.
 
+    legacy_mode = True
+
     #These are the basic ones:
     build_dir_resolved = _query('DGCODE_BUILD_DIR_RESOLVED')
     install_dir_resolved = _query('DGCODE_INSTALL_DIR_RESOLVED')
@@ -41,56 +43,30 @@ class EnvCfgClassic:
         'DGCODE_USECONDABOOSTPYTHON'
     ]
 
-
-def _find_plugins():
-    import importlib
-    import pkgutil
-    possible_plugins = {
-        name: importlib.import_module(name)
-        for finder, name, ispkg
-        in pkgutil.iter_modules()
-        if name.startswith('ess_dgbuild_')
-    }
-    plugins = {}
-    for name,mod in sorted(possible_plugins.items()):
-        if hasattr(mod,'dgbuild_bundle_name'):
-            name = getattr(mod,'dgbuild_bundle_name')()
-            if name in plugins:
-                import warnings
-                warnings.warn('Multiple plugins named "%s" available. Keeping only the first one.'%name)
-                continue
-            plugins[name] = dict(
-                name = name,
-                pkgroot = getattr(mod,'dgbuild_bundle_pkgroot')() if hasattr(mod,'dgbuild_bundle_pkgroot') else None,
-                extdeps = getattr(mod,'dgbuild_bundle_extdeps')() if hasattr(mod,'dgbuild_bundle_extdeps') else None,
-            )
-    return plugins
-
 def _newcfg():
-    from .readcfg import cfg
-    import pathlib
+    from .cfgbuilder import locate_master_cfg_file, CfgBuilder
+    from .singlecfg import SingleCfg
+    from .pkgfilter import PkgFilter
+    master_cfg_file = locate_master_cfg_file()
 
-    the_extra_pkg_path = []
-    if cfg.needs_bundles:
-        plugins = _find_plugins()
-        for b in cfg.needs_bundles:
-            p = plugins.get(b)
-            if not p:
-                from . import error
-                error.error(f'Bundle not found in current environment: {b}')
-            if p['pkgroot']:
-                pr = pathlib.Path(p['pkgroot']).absolute().resolve()
-                if not pr in the_extra_pkg_path:
-                    the_extra_pkg_path.append(pr)
+    assert master_cfg_file.is_file()
+    master_cfg = SingleCfg.create_from_toml_file( master_cfg_file )
+    cfg = CfgBuilder( master_cfg )
+    pkgfilterobj = PkgFilter( cfg.build_pkg_filter )
 
     class EnvCfg:
+
+        legacy_mode = False
+
+
         #These are the basic ones:
         build_dir_resolved = cfg.build_cachedir / 'bld'
         install_dir_resolved = cfg.build_cachedir / 'install'
-        projects_dir = cfg.project_topdir
-        extra_pkg_path = ':'.join(str(e) for e in the_extra_pkg_path)#fixme: keep at Path objects.
-        extra_pkg_path_list = the_extra_pkg_path#New style!
+        projects_dir = master_cfg.project_pkg_root #FIXME: Is this ok?
+        extra_pkg_path = ':'.join(str(e) for e in cfg.pkg_path)#fixme: keep at Path objects.
+        extra_pkg_path_list = cfg.pkg_path#New style!
         enable_projects_pkg_selection_flag = False#fixme: we could allow this?
+        pkg_filter = pkgfilterobj#New style!
 
         #These are used in the context of conda installs:
         conda_prefix =  _query('CONDA_PREFIX')
@@ -109,7 +85,9 @@ def _newcfg():
             'PATH','DGCODE_COLOR_FIX','CONDA_PREFIX','CMAKE_ARGS','PYTHONPATH',
             #Then some more used in our cmake modules (but not those marked for
             #reconf inside the optional/ExtDep_xxx.cmake files):
-            'DGCODE_USECONDABOOSTPYTHON'
+            'DGCODE_USECONDABOOSTPYTHON',
+            #Also this one of course:
+            'DGBUILD_CFG',
         ]
     return EnvCfg()
 

@@ -35,17 +35,15 @@ def find_includes(cfile,pkg):
         return None,None
     possible_privincs=set()
     possible_pkgincs=set()
-    if bytes==str:
-        py23bytes2str = lambda b : b
-    else:
-        py23bytes2str = lambda b : b.decode('ascii')
+    def bytes2str( b ):
+        return b.decode('ascii')
     for l in output.splitlines():
         pkgname,fn = include_decoder(l)
         if fn:
             if pkgname:
-                possible_pkgincs.add((py23bytes2str(pkgname),py23bytes2str(fn)))
+                possible_pkgincs.add((bytes2str(pkgname),bytes2str(fn)))
             else:
-                possible_privincs.add(py23bytes2str(fn))
+                possible_privincs.add(bytes2str(fn))
     if pkg.extra_include_deps:
         if pkg.isdynamicpkg:
             from . import error
@@ -57,7 +55,7 @@ def find_includes(cfile,pkg):
                 pkgname,fn = include_decoder(b'#include "%s"'%(incdep.encode('ascii') if hasattr(incdep,'encode') else incdep))
                 if fn:
                     if pkgname:
-                        possible_pkgincs.add((py23bytes2str(pkgname),py23bytes2str(fn)))
+                        possible_pkgincs.add((bytes2str(pkgname),bytes2str(fn)))
                     else:
-                        possible_privincs.add(py23bytes2str(fn))
+                        possible_privincs.add(bytes2str(fn))
     return possible_privincs,possible_pkgincs

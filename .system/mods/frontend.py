@@ -14,13 +14,17 @@ import os
 import glob
 import pipes
 import pathlib
-from . import envcfg
 
 progname=os.path.basename(sys.argv[0])
 prefix=progname+': '
 if not ( (3,8) <= sys.version_info[0:2] < (4,0) ):
     print (prefix+"Error: Python not found in required version. The python version must be at least 3.8 but less than 4.0 (check with python -V).")
     sys.exit(1)
+
+#Always inspect cfg and set up appropriate warnings/error printouts:
+from . import error
+error.fmt_dgbuild_warnings()
+from . import envcfg
 
 from optparse import OptionParser,OptionGroup#FIXME: deprecated, use argparse instead!
 
@@ -36,7 +40,6 @@ osx=not isfile('/proc/cpuinfo')
 from . import dirs
 from . import conf
 from . import utils
-from . import error
 
 rel_blddir=os.path.relpath(dirs.blddir)
 rel_instdir=os.path.relpath(dirs.installdir)
@@ -102,24 +105,21 @@ def parse_args():
                              help="Shortcut for CMAKE_BUILD_TYPE=DEBUG")
     parser.add_option_group(group_cfgvars)
 
-    group_pkgselect = OptionGroup(parser, "Selecting what packages to enable",
-                                  "The flags below provide a convenient alternative to"
-                                  " direct modification of the configuration variable named \"ONLY\". Default is to enable all packages.")
-    group_pkgselect.add_option("-a","--all",action='store_true', default=False,dest='enableall',
-                             help="Enable *all* packages.")
+    if envcfg.var.legacy_mode:
 
-    if proj_pkg_selection_enabled:
-      group_pkgselect.add_option("-p","--project",
-                             action='store', dest="project", default='',metavar='PROJ',
-                             help=('Enable packages in selected projects under $DGCODE_PROJECTS_DIR'
-                                   +' (defined by the name of their top-level directory under $DGCODE_PROJECTS_DIR).'))
-#    group_pkgselect.add_option("-k","--pkg",
-#                             action='store', dest="pkgs", default='',metavar='PKG',
-#                             help='Enable these packages in addition to those selected by'
-#                             ' --project (can use wildcards and comma separation).')
-#    #TODO: Make *exclusion* easy as well (Need both NOT and ONLY vars to work at the same time).
+        group_pkgselect = OptionGroup(parser, "Selecting what packages to enable",
+                                      "The flags below provide a convenient alternative to"
+                                      " direct modification of the configuration variable named \"ONLY\". Default is to enable all packages.")
+        group_pkgselect.add_option("-a","--all",action='store_true', default=False,dest='enableall',
+                                 help="Enable *all* packages.")
 
-    parser.add_option_group(group_pkgselect)
+        if proj_pkg_selection_enabled:
+          group_pkgselect.add_option("-p","--project",
+                                 action='store', dest="project", default='',metavar='PROJ',
+                                 help=('Enable packages in selected projects under $DGCODE_PROJECTS_DIR'
+                                       +' (defined by the name of their top-level directory under $DGCODE_PROJECTS_DIR).'))
+
+        parser.add_option_group(group_pkgselect)
 
     group_query = OptionGroup(parser, "Query options")
 
@@ -210,7 +210,7 @@ def parse_args():
     if opt.release: new_cfgvars['CMAKE_BUILD_TYPE']='RELEASE'
     if opt.debug: new_cfgvars['CMAKE_BUILD_TYPE']='DEBUG'
 
-    if proj_pkg_selection_enabled:
+    if envcfg.var.legacy_mode and proj_pkg_selection_enabled:
       if opt.project and opt.enableall:
         parser.error('Do not specify both --all and --project')
 
@@ -245,7 +245,7 @@ def parse_args():
 ##        new_cfgvars['NOT']=''
 ##     .... todo...
 
-    if opt.enableall:
+    if envcfg.var.legacy_mode and opt.enableall:
         if 'ONLY' in new_cfgvars:
             parser.error('Do not set ONLY=... variable when supplying --all flag')
         #if 'NOT' in new_cfgvars:
@@ -340,9 +340,10 @@ for k,v in old_cfgvars.items():
 
 #Make sure that if nothing is specified, we compile ALL packages,
 #or just Framework packages if project package selection is enabled (+ all extrapkgpath packages, if the path is set):
-pkg_selection_default = "*" if not proj_pkg_selection_enabled else ("Framework::*,Extra::*" if dirs.extrapkgpath else "Framework::*")
-if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
-    cfgvars['ONLY'] = pkg_selection_default
+if envcfg.var.legacy_mode:
+    pkg_selection_default = "*" if not proj_pkg_selection_enabled else ("Framework::*,Extra::*" if dirs.extrapkgpath else "Framework::*")
+    if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
+        cfgvars['ONLY'] = pkg_selection_default
 
 #Old check, we try to allow both variables now:
 #if 'ONLY' in cfgvars and 'NOT' in cfgvars:
@@ -415,6 +416,7 @@ if opt.show:
     sys.exit(0)
 
 def create_filter(pattern):
+    #fixme soon obsolete
     #Patterns separated with ; or ,.
     #
     #A '/' char indicates a pattern to be tested versus the path to the package,
@@ -463,16 +465,29 @@ def create_filter(pattern):
 
     return the_filter
 
-select_filter=create_filter(cfgvars['ONLY']) if 'ONLY' in cfgvars else None
-exclude_filter=create_filter(cfgvars['NOT']) if 'NOT' in cfgvars else None
+if envcfg.var.legacy_mode:
+    select_filter=create_filter(cfgvars['ONLY']) if 'ONLY' in cfgvars else None
+    exclude_filter=create_filter(cfgvars['NOT']) if 'NOT' in cfgvars else None
+    cmakeargs=[pipes.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if not k in set(['ONLY','NOT'])]
+    cmakeargs.sort()
+else:
+    #fixme: cleanup variable usage after migration!
+    select_filter = envcfg.var.pkg_filter
+    assert select_filter is not None
+    exclude_filter = 'NOTLEGACYMODE'
+    if 'ONLY' in cfgvars or 'NOT' in cfgvars:
+        error.error('Do not use old-school -p/-a/ONLY=/NOT= mode for filtering packages.'
+                    ' Instead add a [build] pkg_filter = ["filter",...] entry in your main dgbuild.cfg.')
+    cmakeargs = []#fixme
 
-cmakeargs=[pipes.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if not k in set(['ONLY','NOT'])]
-cmakeargs.sort()
+
+
 autodisable = True
 
 from . import backend
 
 err_txt,unclean_exception = None,None
+error.default_error_type = error.Error
 try:
     pkgloader = backend.perform_configuration(cmakeargs=cmakeargs,
                                               select_filter=select_filter,
@@ -496,6 +511,8 @@ except SystemExit as e:
     if str(e)!="knownhandledexception":
         err_txt = "Halted by unexpected call to system exit!"
         unclean_exception = e
+
+error.default_error_type = SystemExit
 
 if err_txt:
     pr="\n\nERROR during configuration:\n\n  %s\n\nAborting."%(err_txt.replace('\n','\n  '))

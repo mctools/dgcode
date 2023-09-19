@@ -121,8 +121,9 @@ def perform_configuration(cmakeargs=[],
         create_setup_file.recreate_unsetup()
         #(re)create any libs_to_symlink whenever extracting env via cmake:
         dirs.create_install_dir()
-        linkdir=dirs.installdir / 'lib' / 'links'
-        linkdir.unlink(missing_ok=True)
+        linkdir = dirs.installdir / 'lib' / 'links'
+        assert ( dirs.installdir / '.dginstalldir' ).exists()
+        shutil.rmtree( linkdir, ignore_errors=True)
         linkdir.mkdir(parents=True)
         for lib_to_symlink in env.env['system']['runtime']['libs_to_symlink']:
             #Symlink not only the given file, but also all other files in target

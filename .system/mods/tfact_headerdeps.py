@@ -10,7 +10,7 @@ class TargetIncDep(target_base.Target):
     #for header files not part of an inderdependent circular group or for such a circular group.
     def __init__(self,pkg,subdir,fn,pub,priv,possible_privincs,igroup=None):
         self.pkglevel = False#does not need a pkglevel dep, just needs to be present as possible dependency
-        isgroup = (igroup!=None)
+        isgroup = (igroup is not None)
         assert bool(isgroup)==bool(isinstance(fn,set))
         self.name='%s__%s__%s'%(pkg.name,subdir,('group%i'%igroup if isgroup else fn))
         self.pkgname=pkg.name
@@ -111,7 +111,7 @@ def tfactory_headerdeps(pkg,subdir):
     tgts=[]
     for hh,deps in hh2deps.items():
         igroup = hh2group.get(hh,None)
-        if igroup==None:
+        if igroup is None:
             possible_privincs = hhs.difference(set([hh]))
             priv,pub=deps
             if subdir=='libinc':

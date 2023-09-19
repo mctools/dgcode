@@ -90,7 +90,8 @@ def create_pymodfiles( srcdir, tgtdir ):
 
 def create_pymodfiles_g4( tgtdir ):
     tgtdir.mkdir( parents = True )
-    ( tgtdir / '__init__.py' ).write_text(
+    ( tgtdir / '__init__.py' ).write_text('')
+    ( tgtdir / 'dgbuild_bundle_info.py' ).write_text(
 """
 import pathlib
 def dgbuild_bundle_name():

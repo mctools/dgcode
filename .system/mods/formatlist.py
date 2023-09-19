@@ -11,7 +11,7 @@ def formatlist(l,width,colour=None,indent_first='',indent_others='',nonetext='<n
         except ValueError:
             e=entry
             c=colour
-        if colour!=None:
+        if colour is not None:
             c=colour
         if i>width:
             out+=['']

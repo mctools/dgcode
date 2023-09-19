@@ -1,9 +1,6 @@
 import os
 import errno
 import sys
-import re
-from . import conf
-import shutil
 
 def err(msg):
     if isinstance(msg,list):
@@ -74,6 +71,7 @@ def rm_rf(path):
     #First attempt with os.remove, and only in case it was a directory go for
     #shutil.rmtree (since shutil.rmtree prints error messages if fed symlinks to
     #directories):
+    import shutil
     try:
         os.remove(path)
     except OSError as e:
@@ -89,7 +87,12 @@ def rm_rf(path):
             return#Sudden disappearance is still ok.
         raise
 
+def is_empty_dir( path ):
+    #any(..) returns False for empty iterables.
+    return path.is_dir() and not any( path.iterdir() )
+
 def isemptydir(path):
+    #obsolete str-based version
     if not os.path.isdir(path):
         return False
     for f in os.listdir(path):
@@ -100,8 +103,8 @@ def rmdir(path):
     if isemptydir(path):
         os.rmdir(path)
 
-_normalre=re.compile('').match
 def listfiles(d,filterfnc=0,error_on_no_match=True,ignore_logs=False):
+    from . import conf
     for f in os.listdir(d):
         if ignore_logs and f.endswith('.log'):
             continue

@@ -7,8 +7,16 @@
 
 class Error(Exception):
     pass
+
+class DGBuildUserWarning( UserWarning ):
+    """UserWarning's emitted from dgbuild"""
+    def __init__(self,*args,**kwargs):
+        super(DGBuildUserWarning, self).__init__(*args,**kwargs)
+
+default_error_type = SystemExit
+
 def error(*args):
-    raise Error('\n'.join(args))
+    raise default_error_type('\n'.join(args))
 
 #Used to exit the programme after catching and dealing with an Error at a lower level.
 class CleanExit(Exception):
@@ -29,3 +37,18 @@ def print_traceback(exc,prefix=''):
         traceback.print_exc(exc)
     print ("%s----end traceback---"%prefix)
     print (prefix)
+
+
+import warnings
+_orig_showwarning = warnings.showwarning
+def _custom_warning_fmt(msg,cat,*args,**kwargs):
+    if issubclass(cat,DGBuildUserWarning):
+        print('dgbuild WARNING: %s'%msg)
+    else:
+        _orig_showwarning(msg,cat,*args,**kwargs)
+
+def fmt_dgbuild_warnings():
+    warnings.showwarning = _custom_warning_fmt
+
+def warn(msg):
+    warnings.warn( DGBuildUserWarning( str(msg) ), stacklevel = 2 )

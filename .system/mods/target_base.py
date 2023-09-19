@@ -47,7 +47,7 @@ class Target:
         assert self.name#unique name (file or just a label)
         assert isinstance(self.name,str)
         if self.isglobal:
-            assert self.pkgname==None
+            assert self.pkgname is None
         else:
             assert self.pkgname
             assert isinstance(self.pkgname,str)

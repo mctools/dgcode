@@ -99,7 +99,7 @@ def collect_info(pkgloader,f):
     _,ext = path.splitext(f)
     isheader=True
     lang = langs.hdrext2lang.get(ext,None)
-    if lang==None:
+    if lang is None:
         isheader=False
         langs.srcext2lang.get(ext,None)
 

@@ -2,19 +2,16 @@ from ess_dgbuild_internals.pkgfilter import PkgFilter
 
 
 def main( verbose = True ):
-    default_pkgs = ( 'Core', 'subdir/Utils', 'subdir/subdir/CoreTests' )
-    all_pkgs = '__all__pkgs__'
+    default_pkgs = ( 'Core', 'subdir/Utils', 'subdir/subdir/CoreTests', 'otherdir/FooUtils', 'SomePkg' )
 
     def test( filters, expected_selected_pkgs, pkgs = None ):
         pkgname = lambda reldir : reldir.split('/')[-1]
         pkgs = set(pkgs or default_pkgs)
-        if expected_selected_pkgs==all_pkgs:
-            expected_selected_pkgs = set( pkgname(e) for e in pkgs )
-        else:
-            expected_selected_pkgs = set(expected_selected_pkgs)
+        expected_selected_pkgs = set(expected_selected_pkgs)
         if verbose:
             print(f"===> test( {filters=},\n           {expected_selected_pkgs=},\n           {pkgs=}\n     )")
         pkgfilter = PkgFilter( filters )
+        pkgfilter.dump()
         pkglist = ( ( pkgname(e), e ) for e in pkgs )
         selected_actual = set( e for e in pkgfilter.apply( pkglist ) )
         if verbose:
@@ -30,23 +27,32 @@ def main( verbose = True ):
 
     test( [], default_pkgs )
     test( ['Core'], ['Core'] )
+    test( ['CoreTests'], ['CoreTests'] )
+    test( ['Utils'], ['Utils'] )
+    test( ['Utils','CoreTests'], ['Utils','CoreTests'] )
     test( ['Core*'], ['Core','CoreTests'] )
     test( ['subdir'], [] )
     test( ['subdir/'], [] )
     test( ['subdir/*'], ['Utils','CoreTests'] )
     test( ['./'], [] )
-    test( ['*/*'], all_pkgs )
-    test( ['./*'], all_pkgs )
-    test( ['./*/*'], ['Utils','CoreTests'] )
+    test( ['*/*'], ['Utils','CoreTests','FooUtils'] )
+    test( ['./*'], default_pkgs )
+    test( ['./*/*'], ['Utils','CoreTests','FooUtils'] )
     test( ['./*/*/*'], ['CoreTests'] )
-    test( ['./*','!Core'],['Utils','CoreTests'] )
-    test( ['./*','!Core'],['Utils','CoreTests'] )
+    test( ['./*','!Core'],['Utils','CoreTests','FooUtils','SomePkg'] )
     test( ['subdir/*','!Core*'],['Utils'] )
     test( ['subdir/*','!*/U*'],['CoreTests'] )
+    test( ['RE::^Core.*$'],['Core'] )
+    test( ['RE::Core$'],['Core'] )
+    test( ['RE::Core'],['Core'] )
+    test( ['RE::CoreTests'],[] )
+    test( ['RE::.*Core.*'],['Core','CoreTests'] )
+    test( ['!./subdir/*','*Utils','RE::.*Core.*'],['Core','FooUtils'] )
+    test( ['!RE::^subdir/.*','*Utils','RE::.*Core.*'],['Core','FooUtils'] )
+    test( ["Foo*","CoreTests",'!FooUtils'], ['CoreTests'])
+
 
     #negations, all, regex::
-
-
 
 if __name__ == '__main__':
     main()
