@@ -24,7 +24,6 @@ if not ( (3,8) <= sys.version_info[0:2] < (4,0) ):
 #Always inspect cfg and set up appropriate warnings/error printouts:
 from . import error
 error.fmt_dgbuild_warnings()
-from . import envcfg
 
 from optparse import OptionParser,OptionGroup#FIXME: deprecated, use argparse instead!
 
@@ -37,20 +36,22 @@ osx=not isfile('/proc/cpuinfo')
 ### Parse arguments  ####
 #########################
 
-from . import dirs
-from . import conf
-from . import utils
+legacy_mode = True# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>legacy_mode = False
 
-rel_blddir=os.path.relpath(dirs.blddir)
-rel_instdir=os.path.relpath(dirs.installdir)
-#rel_testdir=os.path.relpath(dirs.testdir)
+if legacy_mode:
+    from . import dirs # noqa: F811
+    rel_blddir=os.path.relpath(dirs.blddir)
+    rel_instdir=os.path.relpath(dirs.installdir)
 
-dgcode_invoke_dirs = [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]
+def get_dgcode_invoke_dirs():
+    #FIXME: This is nonsensical now, we can only be in the projdir (and envcfg will complain if there are issues)!
+    from . import dirs
+    return [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]
 
-check_cwd_compat = True# DGBUILD-NO-EXPORT
-# DGBUILD-EXPORT-ONLY>>check_cwd_compat = False
-
-if check_cwd_compat and not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in dgcode_invoke_dirs]):
+if legacy_mode and not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in get_dgcode_invoke_dirs()]):
+    from . import dirs
+    from . import utils
     utils.err(['This instance of %s is associated with'%progname,'',
                '      Framework directory : %s'%dirs.fmwkdir.parent.parent,
                '      Projects directory  : %s'%dirs.projdir,
@@ -58,18 +59,28 @@ if check_cwd_compat and not any([os.path.realpath(os.getcwd()).startswith(str(d)
              *['                            %s'%str(d) for d in dirs.extrapkgpath[1:]],'',
                'and must only be invoked in those directories or their subdirs.'])
 
-proj_pkg_selection_enabled = envcfg.var.enable_projects_pkg_selection_flag
-
+if legacy_mode:
+    from . import envcfg
+    proj_pkg_selection_enabled = envcfg.var.enable_projects_pkg_selection_flag
+else:
+    proj_pkg_selection_enabled = False
 def parse_args():
 
     #Prepare parser:
     parser = OptionParser(usage='%prog [options]')
 
-    group_build = OptionGroup(parser, "Controlling the build","The build will be carried out"
-                              " in the %s/ directory and after a successful build it"
-                              " will install the results in %s/. In addition to"
-                              " configuration variables, the follow options can be used to fine-tune"
-                              " the build process."%(rel_blddir,rel_instdir))
+    if legacy_mode:
+        group_build = OptionGroup(parser, "Controlling the build","The build will be carried out"
+                                  " in the %s/ directory and after a successful build it"
+                                  " will install the results in %s/. In addition to"
+                                  " configuration variables, the follow options can be used to fine-tune"
+                                  " the build process."%(rel_blddir,rel_instdir))
+    else:
+        group_build = OptionGroup(parser, "Controlling the build","The build will be carried out"
+                                  " and installed in a cache directory (use --info to see which). In addition to"
+                                  " configuration variables, the follow options can be used to fine-tune"
+                                  " the build process.")
+
     group_build.add_option("-j", "--jobs",
                            type="int", dest="njobs", default=0,
                            help="Use up to N parallel processes",metavar="N")
@@ -105,7 +116,7 @@ def parse_args():
                              help="Shortcut for CMAKE_BUILD_TYPE=DEBUG")
     parser.add_option_group(group_cfgvars)
 
-    if envcfg.var.legacy_mode:
+    if legacy_mode:
 
         group_pkgselect = OptionGroup(parser, "Selecting what packages to enable",
                                       "The flags below provide a convenient alternative to"
@@ -122,6 +133,13 @@ def parse_args():
         parser.add_option_group(group_pkgselect)
 
     group_query = OptionGroup(parser, "Query options")
+
+    #FIXME: Should be something simple like -s (after we retire the current way of setting cmake args
+    if not legacy_mode:
+        group_query.add_option('--cfginfo',
+                               action='store_true', dest='cfginfo', default=False,
+                               help='Print overall configuration information (based on the dgbuild.cfg file) and exit.')
+
 
     group_query.add_option("--pkginfo",
                            action="store", dest="pkginfo", default='',metavar='PKG',
@@ -156,9 +174,14 @@ def parse_args():
     group_other.add_option("--testfilter",
                            type="str", dest="testfilter", default='',
                            help="Only run tests with names matching provided patterns (passed on to 'dgtests --filter', c.f. 'dgtests --help' for details)",metavar="PATTERN")
-    group_other.add_option("-c", "--clean",
-                           action='store_true', dest="clean", default=False,
-                           help="Remove %s and %s directories and exit"%(rel_blddir,rel_instdir))
+    if legacy_mode:
+        group_other.add_option("-c", "--clean",
+                               action='store_true', dest="clean", default=False,
+                               help="Remove %s and %s directories and exit"%(rel_blddir,rel_instdir))
+    else:
+        group_other.add_option("-c", "--clean",
+                               action='store_true', dest="clean", default=False,
+                               help="Completely remove cache directories and exit.")
     group_other.add_option("--replace",
                            action="store", dest="replace", default=None, metavar='PATTERN',
                            help="Global search and replace in packages via pattern like '/OLDCONT/NEWCONT/' (use with care!)")
@@ -168,6 +191,13 @@ def parse_args():
     group_other.add_option("--removelock",
                            action='store_true', dest="removelock", default=False,
                            help="Force removal of lockfile")
+
+# DGBUILD-EXPORT-ONLY>>    group_other.add_option("--env-setup",
+# DGBUILD-EXPORT-ONLY>>                           action="store_true", dest="env_setup", default=False,
+# DGBUILD-EXPORT-ONLY>>                           help="Emit shell code needed to modify environment variables to use build packages, then exit.")
+# DGBUILD-EXPORT-ONLY>>    group_other.add_option("--env-unsetup",
+# DGBUILD-EXPORT-ONLY>>                           action="store_true", dest="env_unsetup", default=False,
+# DGBUILD-EXPORT-ONLY>>                           help="Emit shell code undoing the effect of any previous --env-setup usage, then exit.")
 
     parser.add_option_group(group_other)
 
@@ -196,8 +226,11 @@ def parse_args():
         opt.grep=opt.grepc
         opt.grepc=bool(opt.grepc)
 
-    if new_cfgvars and (opt.forget or opt.clean or opt.pkginfo or opt.grep or opt.incinfo):
-        parser.error("Don't supply <var>=<val> arguments together with --clean, --forget, --grep, --incinfo or --pkginfo flags")
+    if legacy_mode:
+        opt.cfginfo = False
+
+    if new_cfgvars and (opt.forget or opt.clean or opt.pkginfo or opt.grep or opt.incinfo or opt.cfginfo):
+        parser.error("Don't supply <var>=<val> arguments together with --cfginfo, --clean, --forget, --grep, --incinfo, --pkginfo flags")
 
     if opt.pkggraph_activeonly:
         opt.pkggraph=True
@@ -210,7 +243,7 @@ def parse_args():
     if opt.release: new_cfgvars['CMAKE_BUILD_TYPE']='RELEASE'
     if opt.debug: new_cfgvars['CMAKE_BUILD_TYPE']='DEBUG'
 
-    if envcfg.var.legacy_mode and proj_pkg_selection_enabled:
+    if legacy_mode and proj_pkg_selection_enabled:
       if opt.project and opt.enableall:
         parser.error('Do not specify both --all and --project')
 
@@ -222,6 +255,7 @@ def parse_args():
           #    parser.error('Do not set NOT=... variable when supplying --project flag')
           projs = set(e.lower() for e in opt.project.split(','))
           extra='Framework::*,'
+          from . import dirs
           if dirs.extrapkgpath:
               extra+='Extra::*,'
           if not projs:
@@ -245,7 +279,7 @@ def parse_args():
 ##        new_cfgvars['NOT']=''
 ##     .... todo...
 
-    if envcfg.var.legacy_mode and opt.enableall:
+    if legacy_mode and opt.enableall:
         if 'ONLY' in new_cfgvars:
             parser.error('Do not set ONLY=... variable when supplying --all flag')
         #if 'NOT' in new_cfgvars:
@@ -255,13 +289,14 @@ def parse_args():
         new_cfgvars['ONLY']='*'#this is how we make sure --all is remembered
 
     query_mode_withpathzoom_n = sum(int(bool(a)) for a in [opt.grep,opt.replace,opt.find])
-    query_mode_n = query_mode_withpathzoom_n + sum(int(bool(a)) for a in [opt.pkggraph,opt.pkginfo,opt.incinfo])
+    query_mode_n = query_mode_withpathzoom_n + sum(int(bool(a)) for a in [opt.pkggraph,opt.pkginfo,opt.incinfo,opt.cfginfo])
     if int(opt.forget)+int(opt.show)+int(opt.clean)+ query_mode_n > 1:
-        parser.error("More than one of --clean, --forget, --show, --pkggraph, --pkginfo, --grep, --grepc, --replace, --find, --incinfo specified at the same time")
+        parser.error("More than one of --clean, --forget, --show, --pkggraph, --pkginfo, --grep, --grepc, --replace, --find, --cfginfo, --incinfo specified at the same time")
     opt.query_mode = query_mode_n > 0
     if query_mode_withpathzoom_n > 0:
         for a in args_unused:
             qp=os.path.abspath(os.path.realpath(a))
+            dgcode_invoke_dirs = get_dgcode_invoke_dirs()
             if not any([qp.startswith(str(d)) for d in dgcode_invoke_dirs]):
                 parser.error("grep/find/replace/... can only work on directories below %s"%dgcode_invoke_dirs) #TODO ' '.join(dgcode_invoke_dirs) might look nicer
             gps=[d for d in glob.glob(qp) if os.path.isdir(d)]
@@ -280,6 +315,7 @@ def parse_args():
     if opt.install:# DGBUILD-NO-EXPORT
         opt.install=os.path.realpath(os.path.expanduser(opt.install))# DGBUILD-NO-EXPORT
         i=opt.install# DGBUILD-NO-EXPORT
+        from . import utils# DGBUILD-NO-EXPORT
         if (isdir(i) and not utils.isemptydir(i)) or isfile(i) or (not exists(i) and not exists(os.path.dirname(i))):# DGBUILD-NO-EXPORT
             parser.error('Please supply non-existing or empty directory to --install')# DGBUILD-NO-EXPORT
 
@@ -287,16 +323,36 @@ def parse_args():
 
 parser,opt,new_cfgvars=parse_args()
 
+# DGBUILD-EXPORT-ONLY>>if opt.env_setup:
+if False: #DGBUILD-NO-EXPORT
+    from .envsetup import emit_envsetup
+    emit_envsetup()
+    raise SystemExit
+
+# DGBUILD-EXPORT-ONLY>>if opt.env_unsetup:
+if False: #DGBUILD-NO-EXPORT
+    from .envsetup import emit_envunsetup
+    emit_envunsetup()
+    raise SystemExit
+
+if opt.cfginfo:
+    assert not legacy_mode
+    print("FIXME: This is not yet implemented!")
+    raise SystemExit
+
 #setup lockfile:
+from . import dirs
+from . import conf
+from . import envcfg
+from . import utils
 if opt.removelock and dirs.lockfile.exists():
     os.remove(dirs.lockfile)
 
-if not hasattr(utils,'mkdir_p'): #DGBUILD-NO-EXPORT
-    print ("WARNING: utils does not have mkdir_p attribute. Utils module is in file %s and syspath is %s"%(utils.__file__,sys.path)) #DGBUILD-NO-EXPORT
-
 if dirs.lockfile.exists():
-    utils.err('Presence of lock file indicates competing invocation of %s. Force removal with %s --removelock if you are sure this is incorrect.'%(progname,progname))
+    error.error('ERROR: Presence of lock file indicates competing invocation of '
+                '%s. Force removal with %s --removelock if you are sure this is incorrect.'%(progname,progname))
 dirs.create_bld_dir()
+
 utils.touch(dirs.lockfile)
 
 assert dirs.lockfile.exists()
@@ -340,7 +396,7 @@ for k,v in old_cfgvars.items():
 
 #Make sure that if nothing is specified, we compile ALL packages,
 #or just Framework packages if project package selection is enabled (+ all extrapkgpath packages, if the path is set):
-if envcfg.var.legacy_mode:
+if legacy_mode:
     pkg_selection_default = "*" if not proj_pkg_selection_enabled else ("Framework::*,Extra::*" if dirs.extrapkgpath else "Framework::*")
     if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
         cfgvars['ONLY'] = pkg_selection_default
@@ -465,7 +521,7 @@ def create_filter(pattern):
 
     return the_filter
 
-if envcfg.var.legacy_mode:
+if legacy_mode:
     select_filter=create_filter(cfgvars['ONLY']) if 'ONLY' in cfgvars else None
     exclude_filter=create_filter(cfgvars['NOT']) if 'NOT' in cfgvars else None
     cmakeargs=[pipes.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if not k in set(['ONLY','NOT'])]
@@ -595,9 +651,11 @@ if opt.incinfo:
         if isdir(fn):
             parser.error("Not a file: %s"%fn)
         fn=os.path.abspath(os.path.realpath(fn))
-        if not any([fn.startswith(str(d)) for d in dgcode_invoke_dirs]):
-        #if not fn.startswith(os.path.abspath(dirs.codedir)):#TODO: This currently fails for dynamic packages!
-            parser.error("File must be located under %s"%dgcode_invoke_dirs)
+        p = pathlib.Path(fn).absolute().resolve()
+        dgcode_invoke_dirs = get_dgcode_invoke_dirs()
+        if not any( p.is_relative_to( d ) for d in dgcode_invoke_dirs):
+            #TODO: This currently fails for dynamic packages!
+            parser.error(f"File {p} must be located under one of the following directories:\n%s"%('\n '.join(str(e) for e in dgcode_invoke_dirs)))
         return [fn]#expands to a single file
     from . import incinfo
     fnsraw = opt.incinfo.split(',') if ',' in opt.incinfo else [opt.incinfo]

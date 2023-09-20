@@ -53,7 +53,7 @@ class CfgBuilder:
 
         #Build up everything else recursively, starting from the master_cfg:
         self.__pkg_path = []#result 1
-        self.__env_paths = []#result 2
+        self.__env_paths = {}#result 2
         self.__cfg_search_path_already_considered = set()
         self.__available_unused_cfgs = []#only needed during build up
         self.__cfg_names_used = set()
@@ -127,9 +127,10 @@ class CfgBuilder:
         #Add actual pkg-dirs and env-path requests from cfg:
         if not cfg.project_pkg_root in self.__pkg_path:
             self.__pkg_path.append( cfg.project_pkg_root )
-        for ep in cfg.project_env_paths:
-            if not ep in self.__env_paths:
-                self.__env_paths.append( ep )
+        for pathvar,contents in cfg.project_env_paths.items():
+            if not pathvar in self.__env_paths:
+                self.__env_paths[pathvar] = set()
+            self.__env_paths[pathvar].update( contents )
 
         #Use cfgs we found as appropriate:
         self.__search_available_cfgs()

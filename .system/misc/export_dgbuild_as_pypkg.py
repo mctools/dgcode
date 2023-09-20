@@ -60,6 +60,7 @@ classifiers = [
 
 [project.scripts]
 dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main"
+unwrapped_dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main_fix_argv0"
 dgtests2 = "ess_dgbuild_internals._cli_dgtests:main"
 """)
 

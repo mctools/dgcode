@@ -5,6 +5,12 @@
 # from . import error
 # error.error('some error message')
 
+
+# IMPORTANT: This module should NOT import other dgbuild modules (in particular
+# not anything triggering envcfg etc.)
+
+import warnings
+
 class Error(Exception):
     pass
 
@@ -39,7 +45,6 @@ def print_traceback(exc,prefix=''):
     print (prefix)
 
 
-import warnings
 _orig_showwarning = warnings.showwarning
 def _custom_warning_fmt(msg,cat,*args,**kwargs):
     if issubclass(cat,DGBuildUserWarning):

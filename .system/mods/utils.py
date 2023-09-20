@@ -3,6 +3,7 @@ import errno
 import sys
 
 def err(msg):
+    #FIXME: obsolete?
     if isinstance(msg,list):
         print ("ERROR: %s"%('\nERROR: '.join(msg)))
     else:

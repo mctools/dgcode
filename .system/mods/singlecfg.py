@@ -107,12 +107,6 @@ class SingleCfg:
 
 #######################################################################################################
 
-def cfg_error(msg ):
-    #This ususally happens early, before we catch error.Error exceptions, so we emit a SystemExit instead:
-    #from . import error
-    #error.error(msg)
-    raise SystemExit('dgbuild configuration error: %s'%(msg or '<unknown error>'))
-
 _cache_tomllib = [None]
 def import_tomllib():
     if _cache_tomllib[0] is None:
@@ -163,6 +157,20 @@ def _generate_toml_schema():
             if not _is_valid_identifier(k):
                 error.error(f'Invalid value of list entry #{i+1} in item {ctx.item_name} (expected string matching {_reexp_valid_identifier}) in {ctx.src_descr}')
         return tuple(item)
+
+    def decode_is_env_paths( ctx : TOMLSchemaDecodeContext, item ):
+        if not isinstance( item, list ):
+            error.error(f'Invalid value "{item}" for item {ctx.item_name} (expected list) in {ctx.src_descr}')
+        res = {}
+        for idx,e in enumerate(item):
+            parts = list(x.strip() for x in e.split(':<install>/') if x.strip())
+            if not len(parts)>=2:
+                error.error(f'Invalid value "{e}" for list entry #{idx+1} in item {ctx.item_name} (expected format like "VARNAME:<install>/SUBDIRNAME" but got "{e}") in {ctx.src_descr}')
+            varname, install_subdirnames = parts[0],parts[1:]
+            if not varname in res:
+                res[varname] = set()
+            res[varname].update(install_subdirnames)
+        return res
 
     def decode_is_list_of_nonempty_str( ctx : TOMLSchemaDecodeContext, item ):
         if not isinstance( item, list ):
@@ -218,7 +226,7 @@ def _generate_toml_schema():
 
     return dict( project   = dict( name        = (decode_valid_identifier_string,None),
                                    pkg_root      = (decode_dir, '.'),
-                                   env_paths   = (decode_is_list_of_nonempty_str,[]),
+                                   env_paths   = (decode_is_env_paths,[]),
                                   ),
                  depend     = dict( projects     = (decode_is_list_of_nonempty_str,[]),
                                     search_path = (decode_is_list_of_paths,[])

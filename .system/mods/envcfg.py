@@ -43,13 +43,19 @@ class EnvCfgClassic:
         'DGCODE_USECONDABOOSTPYTHON'
     ]
 
+
 def _newcfg():
     from .cfgbuilder import locate_master_cfg_file, CfgBuilder
     from .singlecfg import SingleCfg
     from .pkgfilter import PkgFilter
     master_cfg_file = locate_master_cfg_file()
 
+    if not master_cfg_file or not master_cfg_file.is_file():
+        from . import error
+        error.error('In order to continue, please step into a directory tree with a dgbuild.cfg file at its root.')
+
     assert master_cfg_file.is_file()
+
     master_cfg = SingleCfg.create_from_toml_file( master_cfg_file )
     cfg = CfgBuilder( master_cfg )
     pkgfilterobj = PkgFilter( cfg.build_pkg_filter )
@@ -57,7 +63,6 @@ def _newcfg():
     class EnvCfg:
 
         legacy_mode = False
-
 
         #These are the basic ones:
         build_dir_resolved = cfg.build_cachedir / 'bld'
@@ -89,6 +94,9 @@ def _newcfg():
             #Also this one of course:
             'DGBUILD_CFG',
         ]
+
+        env_paths = cfg.env_paths
+
     return EnvCfg()
 
 var = EnvCfgClassic()# DGBUILD-NO-EXPORT
