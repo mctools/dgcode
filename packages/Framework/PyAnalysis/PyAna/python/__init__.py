@@ -35,7 +35,7 @@ np = numpy
 mpl = matplotlib
 plt = matplotlib.pyplot
 import G4Units.Units
-Units = Core.Units
+Units = G4Units.Units
 import Core.FindData
 
 #2b) Add plt.show2 as plt.show with extra improvements (not replacing plt.show
