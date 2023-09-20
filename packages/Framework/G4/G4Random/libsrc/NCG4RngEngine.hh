@@ -29,8 +29,16 @@ public:
   void saveStatus( const char filename[] ) const override;
   void restoreStatus( const char filename[] ) override;
   void showStatus() const override;
+
   std::ostream& put( std::ostream& ) const override;
   std::istream& get( std::istream& ) override;
+
+  std::vector<unsigned long> put () const override;
+  bool get (const std::vector<unsigned long> &) override;
+
+  bool getState (const std::vector<unsigned long> & v) override;
+  std::istream & getState ( std::istream & is ) override;
+
 private:
   double doGenerate() {
     //NCrystal rng shoots in (0,1] but we need to exclude 1 as well. We simply do:

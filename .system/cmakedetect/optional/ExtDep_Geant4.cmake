@@ -88,8 +88,6 @@ if (geant4_config_file)
   execute_process(COMMAND "${geant4_config_file}" "--version" OUTPUT_VARIABLE tmp OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(STRIP "${tmp}" tmp)
   set(ExtDep_Geant4_VERSION "${tmp}")
-  #For gcc 8.2.0+G4 10.4.3 we got into trouble with -Woverloaded-virtual. Explicitly disable it for now:
-  set(ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX} -Wno-overloaded-virtual")
 
   #Leave C flags empty, Geant4 is for C++ only:
   set(ExtDep_Geant4_COMPILE_FLAGS_C "")

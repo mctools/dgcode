@@ -61,6 +61,77 @@ std::ostream & NCG4RngEngine::put( std::ostream& os ) const
   return os;
 }
 
+std::vector<unsigned long> NCG4RngEngine::put () const
+{
+  static_assert( sizeof(uint64_t) == sizeof(unsigned long)
+                 || sizeof(uint32_t) == sizeof(unsigned long), "" );
+  static_assert( sizeof(m_rng.state()[0]) == sizeof(uint64_t) );
+
+  std::vector<unsigned long> v;
+  assert(m_rng.state().size()==2);
+  if ( sizeof(unsigned long) == sizeof(uint64_t) ) {
+    v.push_back( static_cast<unsigned long>(m_rng.state()[0]) );
+    v.push_back( static_cast<unsigned long>(m_rng.state()[1]) );
+  } else {
+    //pack 64 bit ints into double the number of 32 bit ints:
+    uint64_t x = m_rng.state()[0];
+    uint64_t y = m_rng.state()[1];
+    uint32_t a = (uint32_t)((x & 0xFFFFFFFF00000000LL) >> 32);
+    uint32_t b = (uint32_t)(x & 0xFFFFFFFFLL);
+    uint32_t c = (uint32_t)((y & 0xFFFFFFFF00000000LL) >> 32);
+    uint32_t d = (uint32_t)(y & 0xFFFFFFFFLL);
+    v.push_back(static_cast<unsigned long>(a));
+    v.push_back(static_cast<unsigned long>(b));
+    v.push_back(static_cast<unsigned long>(c));
+    v.push_back(static_cast<unsigned long>(d));
+  }
+  return v;
+}
+
+bool NCG4RngEngine::get( const std::vector<unsigned long> & v )
+{
+  static_assert( sizeof(uint64_t) == sizeof(unsigned long)
+                 || sizeof(uint32_t) == sizeof(unsigned long), "" );
+  static_assert( sizeof(m_rng.state()[0]) == sizeof(uint64_t) );
+
+  constexpr std::size_t vsize = ( sizeof(unsigned long) == sizeof(uint64_t) ? 2 : 4 );
+
+  if ( v.size() != vsize ) {
+    std::cerr << "  -- Invalid state for NCG4RngEngine received. Engine state remains unchanged.\n";
+    return false;
+  }
+
+  NC::RandXRSRImpl::state_t state;
+
+  if ( sizeof(unsigned long) == sizeof(m_rng.state()[0]) ) {
+    assert ( v.size() == 2 );
+    state[0] = static_cast<uint64_t>(v[0]);
+    state[1] = static_cast<uint64_t>(v[1]);
+  } else {
+    assert ( v.size() == 4 );
+    uint32_t a = static_cast<uint32_t>( v[0] );
+    uint32_t b = static_cast<uint32_t>( v[1] );
+    uint32_t c = static_cast<uint32_t>( v[2] );
+    uint32_t d = static_cast<uint32_t>( v[3] );
+    uint64_t x = ((uint64_t)a) << 32 | b;
+    uint64_t y = ((uint64_t)c) << 32 | d;
+    state[0] = x;
+    state[1] = y;
+  }
+  m_rng = NC::RandXRSRImpl( state );
+  return true;
+}
+
+bool NCG4RngEngine::getState (const std::vector<unsigned long> & v)
+{
+  return this->get(v);
+}
+
+std::istream & NCG4RngEngine::getState ( std::istream & is )
+{
+  return this->get(is);
+}
+
 std::istream& NCG4RngEngine::get ( std::istream& is )
 {
   auto endBad = [&is]() -> std::istream&
@@ -101,6 +172,7 @@ std::istream& NCG4RngEngine::get ( std::istream& is )
     return endBad();
   m_rng = NC::RandXRSRImpl( state );
 
-  return getState(is);
+  return is;
+  //  return getState(is);
 }
 
