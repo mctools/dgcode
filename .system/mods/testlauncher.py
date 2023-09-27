@@ -19,7 +19,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
     col_bad = '\033[91m'
     col_end = '\033[0m'
 
-    print (prefix+'Running tests in %s:\n'%testdir+prefix)
+    print(prefix+'Running tests in %s:\n'%testdir+prefix)
     sys.stdout.flush()
     sys.stderr.flush()
 
@@ -54,33 +54,45 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         import dgbuild.cfg as dgbuild_cfg#FIXME: Could/should we brute-force load via importlib, so avoid poluting the module space here?
         sys.path.pop(0)
         pkginfo = dgbuild_cfg.pkgs
+
+    if filters:
+        _ = []
+        for fltr in filters:
+            fltr=fltr.strip()
+            invert=False
+            if fltr.startswith('!'):
+                fltr=fltr[1:].strip()
+                invert=True
+            if not fltr:
+                continue
+            _.append( (invert, fltr ) )
+        filters = _
+    filters = filters or []
+
+    nfiltered = 0
     for p in (p for _,p in pkginfo.items() if p['enabled']):
         reflogs, runnables = p['reflogs'],p['runnables']
         for runnable in runnables:
             hasreflog = '%s.log'%runnable in reflogs
             if hasreflog or runnable_is_test(runnable):
-                if filters:
-                    selected=False
-                    for fltr in filters:
-                        fltr=fltr.strip()
-                        invert=False
-                        if fltr.startswith('!'):
-                            fltr=fltr[1:].strip()
-                            invert=True
-                        if not fltr:
-                            continue
-                        if not fnmatch.fnmatch(runnable,fltr) == invert:
-                            selected=True
-                    if not selected:
-                        continue
-                assert runnable not in tests
-                tests.add(runnable)
-                testinfo[runnable] = {'pkgname':p['name']}
+                selected = not filters
+                for invert, fltr in filters:
+                    if not fnmatch.fnmatch(runnable,fltr) == invert:
+                        selected=True
+                        break
+                if not selected:
+                    nfiltered += 1
+                else:
+                    assert runnable not in tests
+                    tests.add(runnable)
+                    testinfo[runnable] = {'pkgname':p['name']}
 
     if not tests:
-        print (header)
-        print ('%s  n/a'%prefix)
-        print (footer)
+        if nfiltered:
+            print('%sWARNING: All %i tests were blocked by specified filters.'%(prefix,nfiltered))
+        print(header)
+        print('%s  n/a'%prefix)
+        print(footer)
         return 0
 
     mkdir_p(testdir)
@@ -116,7 +128,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         tf.write('EC=$?\n')
         tf.write('touch ../time_end\n')
         tf.write('echo $EC > ../ec.txt\n')
-        tf.write('python3 -c \'import os.path;print (1000.0*(os.path.getmtime("../time_end")-os.path.getmtime("../time_start")))\' > ../timing_ms\n')
+        tf.write('python3 -c \'import os.path;print(1000.0*(os.path.getmtime("../time_end")-os.path.getmtime("../time_start")))\' > ../timing_ms\n')
         if bn+'.log' in logfiles:
             ref=join(installdir,'tests/testref/%s.log'%bn)
             tf.write("""if [ $EC == 0 ]; then
@@ -145,7 +157,9 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         rep+=[(t,int(open(join(td,'ec.txt')).read()),ecdiff)]
     rep.sort()
     excerpts_to_print=[]
-    print (header)
+    if nfiltered:
+        print('%sNote: %i tests were blocked by specified filters.'%(prefix,nfiltered))
+    print(header)
     for t,ec,ecdiff in rep:
         time_ms=float(open(join(testdir,t,'timing_ms')).read())
         ecstr='FAIL' if ec else ' OK '
@@ -158,7 +172,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
             ec_global=1
             if nexcerpts>0:
                 excerpts_to_print += [(t,testdir,'output.log' if ec!=0 else 'refdiff.log')]
-        print ("%s  %-37s |  %6.0f   |  %s  |   %s   | %s"%(prefix,t,time_ms,
+        print("%s  %-37s |  %6.0f   |  %s  |   %s   | %s"%(prefix,t,time_ms,
                                                            ecstr,
                                                            logdiffstr,info))
         logdiffok = (ecdiff is None or not ecdiff)
@@ -186,7 +200,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
 
     assert len(alltests)==len(set(alltests))
 
-    print (footer)
+    print(footer)
 
     do_junitxml = True
     if do_junitxml:
@@ -208,20 +222,20 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
 
     if excerpts_to_print:
         for t,testdir,logname in excerpts_to_print:
-            print ('\n====>\n====> First %i lines from %s/%s:\n====>'%(nexcerpts,t,logname))
+            print('\n====>\n====> First %i lines from %s/%s:\n====>'%(nexcerpts,t,logname))
             system('head -%i %s'%(nexcerpts,os.path.join(testdir,t,logname)))
-            print ('====> (end of %s/%s)\n'%(t,logname))
-            print ('\n====>\n====> Last %i lines from %s/%s:\n====>'%(nexcerpts,t,logname))
+            print('====> (end of %s/%s)\n'%(t,logname))
+            print('\n====>\n====> Last %i lines from %s/%s:\n====>'%(nexcerpts,t,logname))
             system('tail -%i %s'%(nexcerpts,os.path.join(testdir,t,logname)))
-            print ('====> (end of %s/%s)\n'%(t,logname))
+            print('====> (end of %s/%s)\n'%(t,logname))
 
     sys.stdout.flush()
     sys.stderr.flush()
 
     if ec_global:
-        print (prefix+'  %sERROR: Some tests failed!%s'%(col_bad,col_end))
-        print (prefix)
+        print(prefix+'  %sERROR: Some tests failed!%s'%(col_bad,col_end))
+        print(prefix)
     else:
-        print (prefix+'  %sAll tests completed without failures!%s'%(col_ok,col_end))
-        print (prefix)
+        print(prefix+'  %sAll tests completed without failures!%s'%(col_ok,col_end))
+        print(prefix)
     return 0 if ec_global==0 else 1

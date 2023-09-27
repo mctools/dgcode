@@ -12,7 +12,7 @@
 import sys
 import os
 import glob
-import pipes
+import shlex
 import pathlib
 
 progname=os.path.basename(sys.argv[0])
@@ -450,7 +450,7 @@ if opt.show:
             print (prefix)
         #print the values even when quiet:
         for k,v in sorted(cfgvars.items()):
-            print ('%s    %s=%s'%(prefix,k,pipes.quote(v)))
+            print ('%s    %s=%s'%(prefix,k,shlex.quote(v)))
     else:
         if not opt.quiet:
             print ('%sCurrently no configuration variables are set.'%prefix)
@@ -529,7 +529,7 @@ def create_filter(pattern):
 if legacy_mode:
     select_filter=create_filter(cfgvars['ONLY']) if 'ONLY' in cfgvars else None
     exclude_filter=create_filter(cfgvars['NOT']) if 'NOT' in cfgvars else None
-    cmakeargs=[pipes.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if not k in set(['ONLY','NOT'])]
+    cmakeargs=[shlex.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if not k in set(['ONLY','NOT'])]
     cmakeargs.sort()
 else:
     #fixme: cleanup variable usage after migration!
@@ -823,10 +823,10 @@ if not opt.quiet:
     ucvlist = []
     for k,v in cfgvars.items():
         if k in unused_vars:
-            ucvlist+=['%s%s=%s%s'%(col_bad,k,pipes.quote(v),col_end)]
+            ucvlist+=['%s%s=%s%s'%(col_bad,k,shlex.quote(v),col_end)]
             unused_vars_withvals+=[ucvlist[-1]]
         else:
-            ucvlist+=['%s=%s'%(k,pipes.quote(v))]
+            ucvlist+=['%s=%s'%(k,shlex.quote(v))]
 
     print (prefix+'  User configuration variables[*]  : %s'%formatlist(ucvlist,None))
     print (prefix+'  Required dependencies            : %s'%formatlist(['%s[%s]'%(k,v) for k,v in sorted(set(reqdep))],None))
@@ -857,7 +857,7 @@ if opt.runtests:
     shutil.rmtree(conf.test_dir(),ignore_errors=True)
     _testfilter=''
     if opt.testfilter:
-        _testfilter = ' --filter=%s'%(pipes.quote(opt.testfilter))
+        _testfilter=[fltr.strip() for fltr in opt.testfilter.split(',') if fltr.strip()]
     from .testlauncher import perform_tests
     ec = perform_tests( testdir = dirs.testdir,
                         installdir = dirs.installdir,
@@ -897,3 +897,12 @@ if not opt.quiet:
     print (prefix)
     print (prefix+'To see available applications, type "ess_" and hit the TAB key twice.')
     print (prefix)
+
+
+from .envsetup import calculate_env_setup
+if not legacy_mode and calculate_env_setup():
+    #Fixme: not exactly correct! Perhaps only do so if not called as "unwrapped_dgbuild2" ?
+    print (prefix+'To enable the build environment you must first enable it.\n'
+           'Type the following command (exactly) to do so (undo later by --env-unsetup instead):\n'
+           f'  eval "$({progname} --env-unsetup)"'
+           )

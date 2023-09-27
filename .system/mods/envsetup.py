@@ -4,17 +4,25 @@ def emit_envsetup( oldenv = None ):
 def emit_env_unsetup( oldenv = None ):
     emit_env_dict( calculate_env_unsetup( oldenv ) )
 
-def create_install_env_clone():
+def create_install_env_clone( env_dict = None ):
     from .envsetup import calculate_env_setup
-    res_env = os.environ.copy()
-    res_env_changes = calculate_env_setup()
-    for k,v in res_env_changes.items():
-        if v is None:
-            if k in res_env:
-                del res_env[k]
+    if env_dict is None:
+        import os
+        env_dict = os.environ.copy()
+    else:
+        if hasattr( env_dict, 'copy' ):
+            env_dict = env_dict.copy()
         else:
-            res_env[k] = v
-    return res_env
+            import copy
+            env_dict = copy.deepcopy(env_dict)
+    env_dict_changes = calculate_env_setup()
+    for k,v in env_dict_changes.items():
+        if v is None:
+            if k in env_dict:
+                del env_dict[k]
+        else:
+            env_dict[k] = v
+    return env_dict
 
 def apply_envsetup_to_dict( current_env ):
     for k,v in calculate_env_setup( current_env ).items():
@@ -102,7 +110,7 @@ def modify_path_var(varname,*,env_dict, blockpath = None, prepend_entries = None
     import pathlib
     assert env_dict is not None
     assert isinstance(blockpath,pathlib.Path)
-    assert blockpath.is_dir()
+    assert not blockpath.exists() or blockpath.is_dir()#if exists, must be dir
     if prepend_entries:
         res = prepend_entries[:]
     else:
