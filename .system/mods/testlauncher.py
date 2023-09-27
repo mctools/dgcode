@@ -89,7 +89,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
 
     if not tests:
         if nfiltered:
-            print('%sWARNING: All %i tests were blocked by specified filters.'%(prefix,nfiltered))
+            print('%sWARNING: All %i tests were blocked by specified filters.\n%s'%(prefix,nfiltered,prefix))
         print(header)
         print('%s  n/a'%prefix)
         print(footer)
@@ -158,7 +158,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
     rep.sort()
     excerpts_to_print=[]
     if nfiltered:
-        print('%sNote: %i tests were blocked by specified filters.'%(prefix,nfiltered))
+        print('%sNote: %i tests were blocked by specified filters.\n%s'%(prefix,nfiltered,prefix))
     print(header)
     for t,ec,ecdiff in rep:
         time_ms=float(open(join(testdir,t,'timing_ms')).read())

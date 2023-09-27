@@ -110,8 +110,12 @@ def framework_dir(system_dir): # DGBUILD-NO-EXPORT
     return (AbsPath(system_dir) / '../packages/Framework').resolve() # DGBUILD-NO-EXPORT
 
 # DGBUILD-EXPORT-ONLY>>def pkg_search_path():
-# DGBUILD-EXPORT-ONLY>>    dirs = [framework_dir(), projects_dir()]
-# DGBUILD-EXPORT-ONLY>>    dirs.extend(extra_pkg_path())
+# DGBUILD-EXPORT-ONLY>>    candidates = [framework_dir(), projects_dir()]
+# DGBUILD-EXPORT-ONLY>>    candidates.extend(extra_pkg_path())
+# DGBUILD-EXPORT-ONLY>>    dirs = []
+# DGBUILD-EXPORT-ONLY>>    for d in candidates:
+# DGBUILD-EXPORT-ONLY>>        if not d in dirs:
+# DGBUILD-EXPORT-ONLY>>            dirs.append( d )
 # DGBUILD-EXPORT-ONLY>>    return dirs
 def pkg_search_path(system_dir): # DGBUILD-NO-EXPORT
     dirs = [framework_dir(system_dir), projects_dir()] # DGBUILD-NO-EXPORT

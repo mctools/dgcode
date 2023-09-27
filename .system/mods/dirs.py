@@ -28,7 +28,6 @@ sysinc_shippedboost = os.path.join(sysdir,'include') # DGBUILD-NO-EXPORT
 envcache = blddir / 'env.cache'
 varcache = blddir / 'vars.cache' #dynamic user settings (for pkg filters and cmake flags)
 systimestamp_cache=blddir / 'systimestamp.cache'
-setupfile_cache=blddir / 'setup.sh'
 lockfile=blddir / ".lock"
 
 def makefile_instdir(*subpaths):

@@ -1,7 +1,7 @@
 import os
 import errno
 import sys
-import pathlib
+import pathlib # DGBUILD-NO-EXPORT
 sys.path.insert(0,str((pathlib.Path(__file__).parent.parent / 'pypath').absolute().resolve())) # DGBUILD-NO-EXPORT
 import ess_dgbuild_internals.utils as utils # DGBUILD-NO-EXPORT
 # DGBUILD-EXPORT-ONLY>>from . import utils

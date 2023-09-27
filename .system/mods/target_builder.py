@@ -96,22 +96,21 @@ class TargetGlobalScripts(target_base.Target): # DGBUILD-NO-EXPORT
                      'cp -f ${BLD}/dgtests ${INST}/sysbin/dgtests && chmod +x ${INST}/sysbin/dgtests', # DGBUILD-NO-EXPORT
                      'cp -f ${SYS}/dginstall ${INST}/sysbin/dginstall && chmod +x ${INST}/sysbin/dginstall', # DGBUILD-NO-EXPORT
                      'cp -f ${SYS}/dgenv ${INST}/sysbin/dgenv && chmod +x ${INST}/sysbin/dgenv'] # DGBUILD-NO-EXPORT
-
-class TargetSetupScript(target_base.Target):
-    isglobal=True
-    contains_message=True
-    def __init__(self):
-        self.name='global__setupscript'
-        self.pkgname=None
-        self.deps=['${BLD}/setup.sh']
-        self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "%sInstalling global script: setup.sh%s"; fi'%(col.bldcol('global'),col.bldend),
-                     'mkdir -p ${INST}',
-                     'cp -f ${BLD}/setup.sh ${INST}/setup.sh']
-
+# DGBUILD-NO-EXPORT
+class TargetSetupScript(target_base.Target): # DGBUILD-NO-EXPORT
+    isglobal=True # DGBUILD-NO-EXPORT
+    contains_message=True # DGBUILD-NO-EXPORT
+    def __init__(self): # DGBUILD-NO-EXPORT
+        self.name='global__setupscript' # DGBUILD-NO-EXPORT
+        self.pkgname=None # DGBUILD-NO-EXPORT
+        self.deps=['${BLD}/setup.sh'] # DGBUILD-NO-EXPORT
+        self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "%sInstalling global script: setup.sh%s"; fi'%(col.bldcol('global'),col.bldend), # DGBUILD-NO-EXPORT
+                     'mkdir -p ${INST}', # DGBUILD-NO-EXPORT
+                     'cp -f ${BLD}/setup.sh ${INST}/setup.sh'] # DGBUILD-NO-EXPORT
 
 def create_global_targets():
     return [
         TargetGlobalScripts(), # DGBUILD-NO-EXPORT
         TargetGlobalSysModules(),
-        TargetSetupScript()
+        TargetSetupScript() # DGBUILD-NO-EXPORT
     ]
