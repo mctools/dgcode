@@ -84,9 +84,12 @@ def is_backup_filename( name ):
 def ignore_filename( name ):
     return not name or is_backup_filename(name) or name[0]=='.' or name.startswith('__pycache__') or name.endswith('.egg-info')
 
-def create_pymodfiles( srcdir, tgtdir ):
+def create_pymodfiles( srcdir, tgtdir, ignorefct = None ):
     tgtdir.mkdir( parents = True )
     for f in sorted(srcdir.glob('*.py')):
+        if ignorefct and ignorefct(f.name):
+            print("WARNING: Ignoring %s"%f)
+            continue
         ( tgtdir / f.name ).write_text( extract_file_content(f) )
 
 def create_pymodfiles_g4( tgtdir ):
@@ -100,6 +103,9 @@ def dgbuild_bundle_name():
 
 def dgbuild_bundle_pkgroot():
     return ( pathlib.Path(__file__).parent / 'data' / 'pkgs' ).absolute().resolve()
+
+def dgbuild_bundle_envpaths():
+    return [ 'NCRYSTAL_DATA_PATH:<install>/data' ]
 """
     )
 
@@ -184,7 +190,9 @@ def main():
     destdir_cmake = destdir_data / 'cmake'
     destdir_pkgs = destdir_data / 'pkgs/Framework'
     destdir_pkgsg4 = destdir_datag4 / 'pkgs'
-    create_pymodfiles( opt.srcdir / 'mods' , destdir_mods )
+    create_pymodfiles( opt.srcdir / 'mods' , destdir_mods,
+                       ignorefct = ( lambda fname : fname in ['create_setup_file.py'] ),
+                      )
     create_pymodfiles_g4( destdir_modsg4 )
     create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs,

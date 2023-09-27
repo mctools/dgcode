@@ -58,10 +58,15 @@ def perform_configuration(cmakeargs=[],
 
     #Inspect environment via cmake (caching the result of previous runs).
 
+    _current_reconf_environment_cache = [None]
     def current_reconf_environment(envdict):
-        return ( dict( install_dir = str(conf.install_dir()), build_dir = str(conf.build_dir()) ),
-                 dict( (b,shutil.which(b)) for b in set(envdict['autoreconf']['bin_list'].split(';'))),
-                 dict( (e,os.getenv(e)) for e in set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc])))
+        if _current_reconf_environment_cache[0] is None:
+            _current_reconf_environment_cache[0] = (
+                ( ( 'install_dir',str(conf.install_dir())), ('build_dir',str(conf.build_dir()))),
+                tuple( (b,shutil.which(b)) for b in sorted(set(envdict['autoreconf']['bin_list'].split(';')))),
+                tuple( (e,envdict.get(e)) for e in sorted(set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc])) ),
+            )
+        return _current_reconf_environment_cache[0]
 
     assert dirs.blddir.is_dir()
     assert ( dirs.blddir / '.dgbuilddir' ).exists()
@@ -115,10 +120,11 @@ def perform_configuration(cmakeargs=[],
         utils.pkl_dump(envdict,dirs.envcache)
         #configuration fully extracted:
         env.env=envdict
-        #(re)create setup file whenever extracting env via cmake:
-        from . import create_setup_file
-        create_setup_file.recreate()
-        create_setup_file.recreate_unsetup()
+
+        #(re)create setup file whenever extracting env via cmake: # DGBUILD-NO-EXPORT
+        from . import create_setup_file # DGBUILD-NO-EXPORT
+        create_setup_file.recreate()    # DGBUILD-NO-EXPORT
+        create_setup_file.recreate_unsetup() # DGBUILD-NO-EXPORT
         #(re)create any libs_to_symlink whenever extracting env via cmake:
         dirs.create_install_dir()
         linkdir = dirs.installdir / 'lib' / 'links'

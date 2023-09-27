@@ -331,8 +331,8 @@ if False: #DGBUILD-NO-EXPORT
 
 # DGBUILD-EXPORT-ONLY>>if opt.env_unsetup:
 if False: #DGBUILD-NO-EXPORT
-    from .envsetup import emit_envunsetup
-    emit_envunsetup()
+    from .envsetup import emit_env_unsetup
+    emit_env_unsetup()
     raise SystemExit
 
 if opt.cfginfo:
@@ -426,8 +426,13 @@ if not opt.insist and oldsysts!=systs:
 if dirs.envcache.exists():
     envdict=utils.pkl_load(dirs.envcache)
     #insist rebuilding from scratch if install dir was changed since the build dir was last used
-    if ( envdict['_autoreconf_environment'][0]['install_dir'] != str(conf.install_dir())
-         or envdict['_autoreconf_environment'][0]['build_dir'] != str(conf.build_dir()) ):
+    _autoreconf_cache_dirs = envdict['_autoreconf_environment'][0]
+    assert _autoreconf_cache_dirs[0][0]=='install_dir'
+    assert _autoreconf_cache_dirs[1][0]=='build_dir'
+    _autoreconf_inst_dir = _autoreconf_cache_dirs[0][1]
+    _autoreconf_bld_dir = _autoreconf_cache_dirs[1][1]
+    if ( _autoreconf_inst_dir != str(conf.install_dir())
+         or _autoreconf_bld_dir != str(conf.build_dir()) ):
         opt.insist = True
 
 if opt.insist:

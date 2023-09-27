@@ -132,7 +132,8 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
 
     mf.write('all: %s\n\n'%(' '.join(alltests)))
     mf.close()
-    from .create_setup_file import create_install_env_clone
+
+    from .envsetup import create_install_env_clone
     test_env = create_install_env_clone()
     test_env['DISPLAY']=''
     test_env['PYTHONUNBUFFERED']='1'

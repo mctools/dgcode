@@ -48,7 +48,9 @@ class SingleCfg:
                 default_dir = p
 
         if srcdescr is None:
-            if hasattr(obj,'__name__'):
+            if hasattr( obj, 'dgbuild_srcdescr_override' ):
+                srcdescr = obj.dgbuild_srcdescr_override()
+            elif hasattr(obj,'__name__'):
                 if isinstance(obj,types.ModuleType):
                     srcdescr = f'Python module {obj.__name__}'
                 else:
@@ -67,9 +69,18 @@ class SingleCfg:
             error.error(f'dgbuild Python plugin ({srcdescr}) is missing an dgbuild_bundle_pkgroot function')
         pkg_root = obj.dgbuild_bundle_pkgroot()
         if not isinstance(pkg_root,pathlib.Path) and not isinstance(pkg_root,str):
-            error.error(f'dgbuild Python plugin ({srcdescr}) got invalid type from dgbuild_bundle_pkgroot function (must be str or pathlib.Path object)')
+            error.error(f'dgbuild Python plugin ({srcdescr}) got invalid type from dgbuild_bundle_pkgroot'
+                        ' function (must be str or pathlib.Path object)')
+
+        env_paths_fct = getattr( obj, 'dgbuild_bundle_envpaths', None )
+        if env_paths_fct:
+            env_paths = env_paths_fct()
+            if not isinstance( env_paths, list ) or not all( isinstance(e,str) for e in env_paths ):
+                error.error(f'dgbuild Python plugin ({srcdescr}) got invalid type'
+                            ' from dgbuild_bundle_envpaths function (must be list of str objects)')
         cfgdict = dict( project = dict( name = obj.dgbuild_bundle_name(),
                                         pkg_root = pkg_root,
+                                        env_paths = env_paths,
                                         #extdeps = ( obj.dgbuild_bundle_extdeps()
                                         #            if hasattr(obj,'dgbuild_bundle_extdeps')
                                         #            else None ),
@@ -87,6 +98,11 @@ class SingleCfg:
                                                     defaultdir = default_dir,
                                                     srcdescr = srcdescr,
                                                     ignore_build = ignore_build )
+
+        if o.project_name != 'dgbuildcore' and 'dgbuildcore' not in o.depend_projects:
+            #Always add the core project as a dependency:
+            o.depend_projects = list(e for e in o.depend_projects) + ['dgbuildcore']
+
         o._is_locked = True
         return o
 

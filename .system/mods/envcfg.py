@@ -16,9 +16,10 @@ class EnvCfgClassic:
     legacy_mode = True
 
     #These are the basic ones:
-    build_dir_resolved = _query('DGCODE_BUILD_DIR_RESOLVED')
-    install_dir_resolved = _query('DGCODE_INSTALL_DIR_RESOLVED')
-    projects_dir = _query('DGCODE_PROJECTS_DIR')
+    import pathlib
+    build_dir_resolved = pathlib.Path(_query('DGCODE_BUILD_DIR_RESOLVED')).resolve().absolute()
+    install_dir_resolved = pathlib.Path(_query('DGCODE_INSTALL_DIR_RESOLVED')).resolve().absolute()
+    projects_dir = pathlib.Path(_query('DGCODE_PROJECTS_DIR')).resolve().absolute()
     extra_pkg_path = _query('DGCODE_EXTRA_PKG_PATH')
     enable_projects_pkg_selection_flag = _query('DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG',boolean=True)
 
@@ -43,6 +44,7 @@ class EnvCfgClassic:
         'DGCODE_USECONDABOOSTPYTHON'
     ]
 
+    env_paths = {}
 
 def _newcfg():
     from .cfgbuilder import locate_master_cfg_file, CfgBuilder

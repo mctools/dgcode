@@ -29,6 +29,20 @@ def locate_master_cfg_file():
         if f.exists():
             return f
 
+def load_core_cfg():
+    import pathlib
+    class CoreBundleCfg:
+        def dgbuild_srcdescr_override( self ):
+            return 'dgbuildcore bundle (builtin)'
+        def dgbuild_bundle_name( self ):
+            return 'dgbuildcore'
+        def dgbuild_bundle_pkgroot( self ):
+            return ( pathlib.Path(__file__).absolute().parent
+                     / 'data' / 'pkgs' / 'Framework' ).absolute().resolve()
+        def dgbuild_bundle_envpaths( self ):
+            return [ 'PATH:<install>/bin:<install>/scripts',
+                     'PYTHONPATH:<install>/python' ]
+    return SingleCfg.create_from_object_methods(CoreBundleCfg(),ignore_build=True)
 
 class CfgBuilder:
 
@@ -44,7 +58,6 @@ class CfgBuilder:
     def __init__(self, master_cfg : SingleCfg ):
         #Input:
         #Take build settings straight from master_cfg:
-
         self.__build_mode = master_cfg.build_mode
         self.__build_njobs = master_cfg.build_njobs
         self.__build_cachedir = master_cfg.build_cachedir
@@ -56,6 +69,7 @@ class CfgBuilder:
         self.__env_paths = {}#result 2
         self.__cfg_search_path_already_considered = set()
         self.__available_unused_cfgs = []#only needed during build up
+        self.__available_unused_cfgs.append( load_core_cfg() )#dgbuildcore bundle always available
         self.__cfg_names_used = set()
         self.__cfg_names_missing = set([ master_cfg.project_name ])
         self.__use_cfg( master_cfg, is_top_level = True )
@@ -70,7 +84,7 @@ class CfgBuilder:
             _s = 's' if len(self.__cfg_names_missing)>2 else ''
             error.error('Could not find dependent project%s: "%s"'%(_s,_p))
         self.__pkg_path = tuple( self.__pkg_path )
-        self.__env_paths = tuple( self.__env_paths )
+        #self.__env_paths = tuple( self.__env_paths )
         del self.__available_unused_cfgs
 
     @property

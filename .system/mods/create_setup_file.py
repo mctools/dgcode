@@ -3,32 +3,6 @@ from . import dirs
 from . import conf
 from . import env
 
-def create_install_env_clone():
-    #Return clone of os.environ + the effects of sourcing the setup.sh file
-    #below, for launcing subprocesses as if they had indeed sourced this
-    #setup.sh file:
-    from . import dirs
-    prefix = dirs.installdir
-    env = os.environ.copy()
-    env['ESS_INSTALL_PREFIX'] = str( prefix )
-    env['ESS_INCLUDE_DIR'] = str( prefix / 'include' )
-    env['ESS_LIB_DIR'] = str( prefix / 'lib' )
-    env['ESS_DATA_DIR'] = str( prefix / 'data' )
-    env['ESS_TESTREF_DIR'] = str( prefix / 'tests/testref' )
-    def prepend_to_path_var( env, pathvar, *args ):
-        items = list(e for e in args)
-        old = env.get(pathvar)
-        if old:
-            items.append(old)
-        env[pathvar] = ':'.join(str(e) for e in items)
-    prepend_to_path_var( env, 'PATH',
-                         prefix / 'sysbin',
-                         prefix / 'bin',
-                         prefix / 'scripts' )
-    prepend_to_path_var( env, 'PYTHONPATH', prefix / 'python' )
-    prepend_to_path_var( env, 'NCRYSTAL_DATA_PATH', prefix / 'data' )
-    return env
-
 def recreate():
     fn=dirs.blddir / 'setup.sh'
 
