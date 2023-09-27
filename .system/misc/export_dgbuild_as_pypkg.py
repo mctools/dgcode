@@ -62,6 +62,8 @@ classifiers = [
 dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main"
 unwrapped_dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:unwrapped_main"
 dgtests2 = "ess_dgbuild_internals._cli_dgtests:main"
+dgenv2 = "ess_dgbuild_internals._cli_dgbuild:dgenv_main"
+dgrun2 = "ess_dgbuild_internals._cli_dgbuild:dgrun_main"
 """)
 
 def extract_file_content( f ):

@@ -23,5 +23,50 @@ def unwrapped_main():
     sys.argv[0] = 'dgbuild2'#FIXME: after migration put to 'dgbuild'!
     main( prevent_env_setup_msg = True )
 
+def dgenv_main():
+    import sys
+    args = sys.argv[1:]
+    if not args:
+        print("""Usage:
+
+dgenv <program> [args]
+
+Runs <program> within the dgbuild runtime environment. Note that if you wish to
+make sure the codebase has been built first (with dgbuild) you should use dgrun
+rather than dgenv.
+""")
+        sys.exit(1)
+        return
+    from .envsetup import create_install_env_clone
+    run_env = create_install_env_clone()
+    from . import utils
+    import shlex
+    cmd = ' '.join(shlex.quote(e) for e in args)
+    utils.system(cmd,env=run_env)
+
+def dgrun_main():
+    import sys
+    args = sys.argv[1:]
+    if not args:
+        print("""Usage:
+
+dgrun <program> [args]
+
+Runs dgbuild (quietly) and if it finishes successfully, then proceeds to launch
+<program> within the dgbuild runtime environment.
+""")
+        sys.exit(1)
+        return
+    from .envsetup import create_install_env_clone
+    run_env = create_install_env_clone()
+    from . import utils
+    import shlex
+    cmd = ' '.join(shlex.quote(e) for e in args)
+    from . import frontend
+    frontend.dgbuild_main( argv = ['dgbuild2',#FIXME: after migration put to 'dgbuild'!
+                                   '--quiet'],
+                           prevent_env_setup_msg = True )
+    utils.system(cmd,env=run_env)
+
 if __name__=='__main__':
     main()
