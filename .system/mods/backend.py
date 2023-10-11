@@ -64,7 +64,7 @@ def perform_configuration(cmakeargs=[],
             _current_reconf_environment_cache[0] = (
                 ( ( 'install_dir',str(conf.install_dir())), ('build_dir',str(conf.build_dir()))),
                 tuple( (b,shutil.which(b)) for b in sorted(set(envdict['autoreconf']['bin_list'].split(';')))),
-                tuple( (e,envdict.get(e)) for e in sorted(set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc])) ),
+                tuple( (e,os.environ.get(e)) for e in sorted(set([*envdict['autoreconf']['env_list'].split(';'),*volatile_misc])) ),
             )
         return _current_reconf_environment_cache[0]
 
@@ -147,8 +147,9 @@ def perform_configuration(cmakeargs=[],
 
         #Also symlink the system boost includes as dgboost:
         if env.env['system']['general']['sysboostpython_use']:
-            sysboostincdir = pathlib.Path(env.env['system']['general']['sysboostpython_incdir'])
-            if sysboostincdir.is_dir():
+            _ = env.env['system']['general']['sysboostpython_incdir']
+            sysboostincdir = pathlib.Path(_) if _!='notavailable' else None
+            if sysboostincdir is not None and sysboostincdir.is_dir():
                 def ensure_dir_link( src, tgt ):
                     if tgt.is_dir():
                         if tgt.samefile(src):

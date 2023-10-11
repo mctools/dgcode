@@ -90,12 +90,16 @@ def write_main(global_targets,enabled_pkgnames):
 
     use_sysboostpy = env.env['system']['general']['sysboostpython_use']
     if use_sysboostpy:
+        is_pybind11 = env.env['system']['general']['sysboostpython_incdir'] in ('notavailable','')
         _c = env.env['system']['general']['sysboostpython_cflags'].strip()
-        _ = shlex.quote( str( (dirs.blddir/'sysboostinc').absolute().resolve() ) )
-        _c += ' -DDGCODE_USESYSBOOSTPYTHON -I%s -isystem%s'%(_,_)
+        if is_pybind11:
+            _c += ' -DDGCODE_USEPYBIND11'
+        else:
+            _ = shlex.quote( str( (dirs.blddir/'sysboostinc').absolute().resolve() ) )
+            _c += ' -DDGCODE_USESYSBOOSTPYTHON -I%s -isystem%s'%(_,_)
         _l = env.env['system']['general']['sysboostpython_linkflags'].strip()
     else:
-# DGBUILD-EXPORT-ONLY>>        assert False, "Needs a suitable boost python"
+# DGBUILD-EXPORT-ONLY>>        assert False, "Needs a suitable boost python or pybind11"
         _c, _l = '',''  # DGBUILD-NO-EXPORT
         if dirs.sysinc_shippedboost:  # DGBUILD-NO-EXPORT
             _c = ' -I%s -isystem%s'%(dirs.sysinc_shippedboost,dirs.sysinc_shippedboost)  # DGBUILD-NO-EXPORT

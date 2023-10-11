@@ -22,15 +22,21 @@ if ( "x${strategy_syspyboost}" STREQUAL "x" )
   set( strategy_syspyboost NEVER )
 endif()
 
-set( strategy_syspyboost_allowed_values "AUTO" "ALWAYS" "NEVER" )
+set( strategy_syspyboost_allowed_values "AUTO" "ALWAYS" "NEVER" "PYBIND11" )
 if ( NOT strategy_syspyboost IN_LIST strategy_syspyboost_allowed_values )
   message( FATAL_ERROR "Invalid value of DGCODE_USECONDABOOSTPYTHON env var."
     " Must be unset or one of: ${strategy_syspyboost_allowed_values}")
 endif()
 
-cmake_policy(PUSH)
-include("ExtDep_Boost.cmake")
-cmake_policy(POP)
+if ( strategy_syspyboost STREQUAL "PYBIND11" )
+  cmake_policy(PUSH)
+  include("ExtDep_pybind11.cmake")
+  cmake_policy(POP)
+else()
+  cmake_policy(PUSH)
+  include("ExtDep_Boost.cmake")
+  cmake_policy(POP)
+endif()
 
 #Declare include dirs added above as -isystem (and remove /usr/include):
 declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_CXX)
