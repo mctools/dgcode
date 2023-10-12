@@ -13,5 +13,5 @@ namespace Core {
 
 PYTHON_MODULE
 {
-  py::def("is_debug_build",&Core::is_debug_build);
+  PYDEF("is_debug_build",&Core::is_debug_build);
 }
