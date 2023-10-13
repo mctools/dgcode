@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  StepFilterPyExport::exportFilter<StepFilterPrimary>("StepFilterPrimary");
+  StepFilterPyExport::exportFilter<StepFilterPrimary>(PYMOD "StepFilterPrimary");
 }

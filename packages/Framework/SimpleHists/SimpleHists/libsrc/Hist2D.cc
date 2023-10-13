@@ -394,18 +394,21 @@ void SimpleHists::Hist2D::fill(double valx, double valy, double weight)
   }
 }
 
-void SimpleHists::Hist2D::fillMany(double* valsx, double* valsy, unsigned n)
+void SimpleHists::Hist2D::fillMany(const double* valsx, const double* valsy, unsigned n)
 {
-  double *vx(valsx), *vxE(valsx+n);
-  double *vy(valsy);
+  const double *vx(valsx);
+  const double *vxE(valsx+n);
+  const double *vy(valsy);
   for(;vx!=vxE;++vx,++vy)
     fill(*vx,*vy);
 }
 
-void SimpleHists::Hist2D::fillMany(double* valsx, double* valsy, double* weights, unsigned n)
+void SimpleHists::Hist2D::fillMany(const double* valsx, const double* valsy, const double* weights, unsigned n)
 {
-  double *vx(valsx), *vxE(valsx+n), *w(weights);
-  double *vy(valsy);
+  const double *vx(valsx);
+  const double *vxE(valsx+n);
+  const double *w(weights);
+  const double *vy(valsy);
   for(;vx!=vxE;++vx,++vy,++w)
     fill(*vx,*vy,*w);
 }

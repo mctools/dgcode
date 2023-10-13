@@ -7,7 +7,7 @@
 #include "NCG4RngEngine.hh"
 
 class RndmSeedCB;
-static RndmSeedCB * s_theRndmSeedCB = 0;
+static std::shared_ptr<RndmSeedCB> s_theRndmSeedCB = nullptr;
 class RndmSeedCB : public G4Interfaces::PreGenCallBack {
 public:
 
@@ -78,8 +78,8 @@ public:
   }
   virtual ~RndmSeedCB()
   {
-    assert(s_theRndmSeedCB==this);
-    s_theRndmSeedCB=0;
+    assert(s_theRndmSeedCB.get()==this);
+    s_theRndmSeedCB = nullptr;
   }
 private:
   uint64_t m_nextseed;
@@ -91,10 +91,10 @@ private:
 void RandomManager::init(uint64_t seed_of_first_event,EVTMSGLEVEL lvl)
 {
   assert(!s_theRndmSeedCB);
-  s_theRndmSeedCB = new RndmSeedCB(seed_of_first_event,lvl);
+  s_theRndmSeedCB = std::make_shared<RndmSeedCB>(seed_of_first_event,lvl);
 }
 
 void RandomManager::attach(G4Interfaces::ParticleGenBase* pg)
 {
-  pg->installPreGenCallBack(s_theRndmSeedCB,true);
+  pg->installPreGenCallBack(s_theRndmSeedCB);
 }

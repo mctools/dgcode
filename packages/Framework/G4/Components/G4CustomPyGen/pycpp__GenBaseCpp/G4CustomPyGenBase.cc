@@ -21,7 +21,11 @@ G4CustomPyGen::GenBaseCpp::~GenBaseCpp()
 void G4CustomPyGen::GenBaseCpp::init()
 {
   m_gunwrapper = new G4GunWrapper;
+#ifdef DGCODE_USEPYBIND11
+  m_gunwrapper_pyobj = py::cast(m_gunwrapper);
+#else
   m_gunwrapper_pyobj = py::object(boost::ref(m_gunwrapper));
+#endif
   assert(getNameStr()!="_tmpname_");
   if (m_pyfct_initGen)
     m_pyfct_initGen(m_gunwrapper_pyobj);
@@ -43,8 +47,14 @@ void G4CustomPyGen::GenBaseCpp::gen( G4Event * evt )
 
 bool G4CustomPyGen::GenBaseCpp::validateParameters()
 {
-  if (m_pyfct_validatePars)
+  if (m_pyfct_validatePars) {
+#ifdef DGCODE_USEPYBIND11
+    py::object res = m_pyfct_validatePars();
+    return res.cast<bool>();
+#else
     return m_pyfct_validatePars();
+#endif
+  }
   return true;
 }
 

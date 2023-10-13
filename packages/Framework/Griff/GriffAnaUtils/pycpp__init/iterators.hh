@@ -14,9 +14,18 @@ namespace GriffAnaUtils {
   //simply return null (None) and implement the iterator on the python
   //side. This is a lot faster, go figure.
 
+#ifdef DGCODE_USEPYBIND11
+  void pyexport_iterators( py::module_ themod)
+#else
   void pyexport_iterators()
+#endif
   {
+#ifdef DGCODE_USEPYBIND11
+    py::class_<TrackIterator>(themod,"TrackIterator_cpp")
+      .def(py::init<GriffDataReader*>())
+#else
     py::class_<TrackIterator,boost::noncopyable>("TrackIterator_cpp",py::init<GriffDataReader*>())
+#endif
       .def("_next_cpp",&TrackIterator::next,py::return_ptr())
       .def("_reset_cpp",&TrackIterator::reset)
       .def("addFilter",&TrackIterator::addFilter,py::return_ptr());
@@ -24,7 +33,12 @@ namespace GriffAnaUtils {
     ITrackFilter* (SegmentIterator::*segit_addtrackfilter)(ITrackFilter*) = &SegmentIterator::addFilter;
     ISegmentFilter* (SegmentIterator::*segit_addsegmentfilter)(ISegmentFilter*) = &SegmentIterator::addFilter;
 
+#ifdef DGCODE_USEPYBIND11
+    py::class_<SegmentIterator>(themod,"SegmentIterator_cpp")
+      .def(py::init<GriffDataReader*>())
+#else
     py::class_<SegmentIterator,boost::noncopyable>("SegmentIterator_cpp",py::init<GriffDataReader*>())
+#endif
       .def("_next_cpp",&SegmentIterator::next,py::return_ptr())
       .def("_reset_cpp",&SegmentIterator::reset)
       .def("addFilter",segit_addtrackfilter,py::return_ptr())
@@ -34,7 +48,12 @@ namespace GriffAnaUtils {
     ISegmentFilter* (StepIterator::*stepit_addsegmentfilter)(ISegmentFilter*) = &StepIterator::addFilter;
     IStepFilter* (StepIterator::*stepit_addstepfilter)(IStepFilter*) = &StepIterator::addFilter;
 
+#ifdef DGCODE_USEPYBIND11
+    py::class_<StepIterator>(themod,"StepIterator_cpp")
+      .def( py::init<GriffDataReader*>() )
+#else
     py::class_<StepIterator,boost::noncopyable>("StepIterator_cpp",py::init<GriffDataReader*>())
+#endif
       .def("_next_cpp",&StepIterator::next,py::return_ptr())
       .def("_reset_cpp",&StepIterator::reset)
       .def("addFilter",stepit_addtrackfilter,py::return_ptr())

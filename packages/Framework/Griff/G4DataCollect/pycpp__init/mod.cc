@@ -3,13 +3,19 @@
 
 PYTHON_MODULE
 {
-  py::def("installHooks",&G4DataCollect::installHooks,
+#if defined(DGCODE_USEPYBIND11)
+  PYDEF("installHooks",&G4DataCollect::installHooks,
+        "Installs hooks necessary to record the output of the Geant4 simulation.",
+        py::arg("outputFile"), py::arg("mode")="FULL"
+        );
+#else
+  PYDEF("installHooks",&G4DataCollect::installHooks,
           ( py::arg("outputFile"), py::arg("mode")="FULL" ),
-          "install hooks necessary to record the output of the Geant4 simulation");
+          "Installs hooks necessary to record the output of the Geant4 simulation.");
+#endif
+  PYDEF("finish",&G4DataCollect::finish,"Uninstall hooks and close output file.");
 
-  py::def("finish",&G4DataCollect::finish,"de-install hooks and close output file");
-
-  py::def("setMetaData",&G4DataCollect::setMetaData);
-  py::def("setUserData",&G4DataCollect::setUserData);
+  PYDEF("setMetaData",&G4DataCollect::setMetaData);
+  PYDEF("setUserData",&G4DataCollect::setUserData);
 
 }

@@ -8,7 +8,9 @@ class G4VPhysicalVolume;
 
 namespace G4Interfaces {
 
-  class GeoConstructBase : public G4VUserDetectorConstruction, public GeoBase
+  //NB: Very important for python export that first listed base-class is GeoBase!
+
+  class GeoConstructBase : public GeoBase, public G4VUserDetectorConstruction
   {
   public:
     //Derived classes must:

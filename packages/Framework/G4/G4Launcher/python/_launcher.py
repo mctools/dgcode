@@ -1,11 +1,11 @@
-from __future__ import print_function, absolute_import
-from . _init import *
 __doc__="Geant4 launcher"
+from . _init import *
 def _extrapars(self):
     if not hasattr(self,'_extrapars_obj'):
         self._extrapars_obj = LauncherExtraPars()
     return self._extrapars_obj
 Launcher._extrapars = _extrapars
+Launcher._keepalive = []
 
 def _create_f(n):
     def f(self,*a,**kw):

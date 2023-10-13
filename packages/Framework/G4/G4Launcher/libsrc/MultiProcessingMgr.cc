@@ -13,8 +13,8 @@
 void G4Launcher::MultiProcessingMgr::scheduleMP(G4Interfaces::ParticleGenBase*gen,unsigned nprocs)
 {
   assert(gen);
-  auto mgr = new MultiProcessingMgr(nprocs);
-  gen->installPreGenCallBack(mgr,true);
+  //Not using std::make_shared due to private constructor.
+  gen->installPreGenCallBack( std::shared_ptr<MultiProcessingMgr>(new MultiProcessingMgr(nprocs)) );
 }
 
 G4Launcher::MultiProcessingMgr::MultiProcessingMgr(unsigned nprocs)

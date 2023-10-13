@@ -294,16 +294,19 @@ void SimpleHists::Hist1D::fill(double val, double weight)
   }
 }
 
-void SimpleHists::Hist1D::fillMany(double* vals, unsigned n)
+void SimpleHists::Hist1D::fillMany(const double* vals, unsigned n)
 {
-  double *v(vals), *vE(vals+n);
+  const double *v(vals);
+  const double *vE(vals+n);
   for(;v!=vE;++v)
     fill(*v);
 }
 
-void SimpleHists::Hist1D::fillMany(double* vals, double* weights, unsigned n)
+void SimpleHists::Hist1D::fillMany(const double* vals, const double* weights, unsigned n)
 {
-  double *v(vals), *vE(vals+n), *w(weights);
+  const double *v(vals);
+  const double *vE(vals+n);
+  const double *w(weights);
   for(;v!=vE;++v,++w)
     fill(*v,*w);
 }

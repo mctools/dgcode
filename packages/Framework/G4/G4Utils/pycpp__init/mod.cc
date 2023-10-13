@@ -10,7 +10,7 @@ namespace pyG4Utils {
 
 PYTHON_MODULE
 {
-  py::def("flush", &G4Utils::flush, "flushes the G4cout and G4cerr buffers");
-  py::def("G4Version", &pyG4Utils::g4version, "Geant4 version string from G4Version.hh");
-  py::def("G4Date", &pyG4Utils::g4version, "Geant4 date string from G4Version.hh");
+  PYDEF("flush", &G4Utils::flush, "flushes the G4cout and G4cerr buffers");
+  PYDEF("G4Version", &pyG4Utils::g4version, "Geant4 version string from G4Version.hh");
+  PYDEF("G4Date", &pyG4Utils::g4version, "Geant4 date string from G4Version.hh");
 }

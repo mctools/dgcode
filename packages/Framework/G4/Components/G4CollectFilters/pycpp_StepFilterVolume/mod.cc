@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  StepFilterPyExport::exportFilter<StepFilterVolume>("StepFilterVolume");
+  StepFilterPyExport::exportFilter<StepFilterVolume>(PYMOD "StepFilterVolume");
 }

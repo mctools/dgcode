@@ -64,8 +64,8 @@ namespace SimpleHists {
 
     //Convenient filling from arrays (not exposed to python where arrays can
     //instead be fed to the fill method):
-    void fillMany(double* valsx, double* valsy, unsigned n);
-    void fillMany(double* valsx, double* valsy, double* weights, unsigned n);
+    void fillMany(const double* valsx, const double* valsy, unsigned n);
+    void fillMany(const double* valsx, const double* valsy, const double* weights, unsigned n);
 
     virtual char histType() const { return 0x02; }
     virtual void serialise(std::string&) const;

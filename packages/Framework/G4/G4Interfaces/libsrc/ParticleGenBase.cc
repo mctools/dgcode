@@ -26,7 +26,7 @@ public:
       auto cbIt = m_gen->m_pregencallbacks.begin();
       auto cbItE = m_gen->m_pregencallbacks.end();
       for (;cbIt!=cbItE;++cbIt)
-        cbIt->first->preGen();
+        (*cbIt)->preGen();
     }
 
     //Actual event generation:
@@ -37,7 +37,7 @@ public:
       auto cbIt = m_gen->m_postgencallbacks.begin();
       auto cbItE = m_gen->m_postgencallbacks.end();
       for (;cbIt!=cbItE;++cbIt)
-        cbIt->first->postGen(evt);
+        (*cbIt)->postGen(evt);
     }
   }
 private:
@@ -96,49 +96,49 @@ long G4Interfaces::ParticleGenBase::randPoisson(double mu)
   return CLHEP::RandPoisson::shoot(CLHEP::HepRandom::getTheEngine(),mu);
 }
 
-void G4Interfaces::ParticleGenBase::installPreGenCallBack(PreGenCallBack* cb, bool owned)
+void G4Interfaces::ParticleGenBase::installPreGenCallBack( std::shared_ptr<PreGenCallBack> cb )
 {
-  m_pregencallbacks.push_back(std::make_pair(cb,owned));
+  m_pregencallbacks.push_back(std::move(cb));
 }
 
-void G4Interfaces::ParticleGenBase::uninstallPreGenCallBack(PreGenCallBack*pg)
+void G4Interfaces::ParticleGenBase::uninstallPreGenCallBack( std::shared_ptr<PreGenCallBack> pg)
 {
-  assert(!m_pregencallbacks.empty()&&"ParticleGenBase::uninstallPreGenCallBack callback not previously installed!");
   unsigned itarget = m_pregencallbacks.size();
   for (unsigned i=0;i<m_pregencallbacks.size();++i) {
-    if (m_pregencallbacks[i].first==pg) {
+    if (m_pregencallbacks[i]==pg) {
       itarget=i;
       break;
     }
   }
-  assert(itarget<m_pregencallbacks.size()&&"ParticleGenBase::uninstallPreGenCallBack callback not previously installed!");
+  if ( itarget == m_pregencallbacks.size() )
+    throw std::runtime_error("ParticleGenBase::uninstallPreGenCallBack callback not previously installed!");
   if (itarget+1<m_pregencallbacks.size()) {
     for (unsigned i=itarget;i+1<m_pregencallbacks.size();++i)
-      m_pregencallbacks.at(i)=m_pregencallbacks.at(i+1);
+      m_pregencallbacks.at(i) = std::move(m_pregencallbacks.at(i+1));
   }
   m_pregencallbacks.resize(m_pregencallbacks.size()-1);
 }
 
 
-void G4Interfaces::ParticleGenBase::installPostGenCallBack(PostGenCallBack* cb, bool owned)
+void G4Interfaces::ParticleGenBase::installPostGenCallBack(std::shared_ptr<PostGenCallBack> cb)
 {
-  m_postgencallbacks.push_back(std::make_pair(cb,owned));
+  m_postgencallbacks.push_back(std::move(cb));
 }
 
-void G4Interfaces::ParticleGenBase::uninstallPostGenCallBack(PostGenCallBack*pg)
+void G4Interfaces::ParticleGenBase::uninstallPostGenCallBack(std::shared_ptr<PostGenCallBack> pg)
 {
-  assert(!m_postgencallbacks.empty()&&"ParticleGenBase::uninstallPostGenCallBack callback not postviously installed!");
   unsigned itarget = m_postgencallbacks.size();
   for (unsigned i=0;i<m_postgencallbacks.size();++i) {
-    if (m_postgencallbacks[i].first==pg) {
+    if (m_postgencallbacks[i]==pg) {
       itarget=i;
       break;
     }
   }
-  assert(itarget<m_postgencallbacks.size()&&"ParticleGenBase::uninstallPostGenCallBack callback not postviously installed!");
+  if ( itarget == m_postgencallbacks.size() )
+    throw std::runtime_error("ParticleGenBase::uninstallPostGenCallBack callback not previously installed!");
   if (itarget+1<m_postgencallbacks.size()) {
     for (unsigned i=itarget;i+1<m_postgencallbacks.size();++i)
-      m_postgencallbacks.at(i)=m_postgencallbacks.at(i+1);
+      m_postgencallbacks.at(i) = std::move(m_postgencallbacks.at(i+1));
   }
   m_postgencallbacks.resize(m_postgencallbacks.size()-1);
 }
@@ -152,21 +152,6 @@ G4Interfaces::ParticleGenBase::ParticleGenBase(const char* name)
 
 G4Interfaces::ParticleGenBase::~ParticleGenBase()
 {
-  //cleanup owned callbacks:
-  {
-    auto cbIt = m_pregencallbacks.begin();
-    auto cbItE = m_pregencallbacks.end();
-    for (;cbIt!=cbItE;++cbIt)
-      if (cbIt->second)
-        delete cbIt->first;
-  }
-  {
-    auto cbIt = m_postgencallbacks.begin();
-    auto cbItE = m_postgencallbacks.end();
-    for (;cbIt!=cbItE;++cbIt)
-      if (cbIt->second)
-        delete cbIt->first;
-  }
 }
 
 void G4Interfaces::ParticleGenBase::signalEndOfEvents(bool including_current_event)

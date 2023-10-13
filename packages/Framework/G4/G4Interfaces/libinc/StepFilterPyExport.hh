@@ -14,11 +14,19 @@ namespace StepFilterPyExport {
   }
 
   template <class T>
+#ifdef DGCODE_USEPYBIND11
+  void exportFilter(py::module_ themod,const char* name)
+#else
   void exportFilter(const char* name)
+#endif
   {
-    py::import("G4Interfaces");
-    def("create",&_internal_create<T>,py::return_ptr());
+    py::pyimport("G4Interfaces");
+    PYDEF2("create",&_internal_create<T>,py::return_ptr());
+#ifdef DGCODE_USEPYBIND11
+    py::class_<T,G4Interfaces::StepFilterBase>(themod,name)
+#else
     py::class_<T,boost::noncopyable,py::bases<G4Interfaces::StepFilterBase> >(name,py::no_init)
+#endif
       ;
   }
 

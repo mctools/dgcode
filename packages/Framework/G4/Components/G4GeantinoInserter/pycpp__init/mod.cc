@@ -13,9 +13,9 @@
 //have intersected the geometry, in case there were no interactions.
 
 namespace G4GeantinoInserter {
-  class PostGenCB : public  G4Interfaces::PostGenCallBack {
+  class PostGenCB : public G4Interfaces::PostGenCallBack {
   private:
-    G4ParticleGun * m_gun;
+    G4ParticleGun * m_gun = nullptr;
     void delayedInit() {
       m_gun = new G4ParticleGun(1);
       auto particle = G4ParticleTable::GetParticleTable()->FindParticle("geantino");
@@ -24,8 +24,7 @@ namespace G4GeantinoInserter {
       m_gun->SetParticleDefinition(particle);
     }
   public:
-    PostGenCB() : m_gun(0) {
-    }
+    PostGenCB() = default;
     virtual ~PostGenCB(){ delete m_gun; }
     virtual void postGen(G4Event*evt)
     {
@@ -63,18 +62,25 @@ namespace G4GeantinoInserter {
   void install()
   {
     //Get launcher:
-    py::object pylauncher = py::import("G4Launcher").attr("getTheLauncher")();
+    py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
     if (!pylauncher)
       throw std::runtime_error("G4GeantinoInserter.install called before G4Launcher object was created");
     //Create our call-back and register it:
-    py::import("G4Interfaces");
-    G4Interfaces::PostGenCallBack* cb = new PostGenCB;
+    py::pyimport("G4Interfaces");
+#ifdef DGCODE_USEPYBIND11
+    auto cb = std::make_shared<PostGenCB>();
+    std::shared_ptr<G4Interfaces::PostGenCallBack> cb_base = cb;
+    py::object pycb = py::cast(cb_base);//,py::return_value_policy::copy);
+#else
+    auto shptr_cb = std::make_shared<PostGenCB>();//create with this, so shared_from_this works
+    G4Interfaces::PostGenCallBack* cb = static_cast<G4Interfaces::PostGenCallBack*>(shptr_cb.get());
     py::object pycb(boost::ref(cb));
+#endif
     pylauncher.attr("addPostGenHook")(pycb);
   }
 }
 
 PYTHON_MODULE
 {
-  py::def("install",&G4GeantinoInserter::install);
+  PYDEF("install",&G4GeantinoInserter::install);
 }

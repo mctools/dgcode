@@ -36,14 +36,30 @@ namespace GriffDataRead {
 
 }
 
-void GriffDataRead::pyexport_Step()
+#ifdef DGCODE_USEPYBIND11
+namespace {
+  template < typename T>
+  struct BlankDeleter
+  {
+    void operator()(T *) const {}
+  };
+}
+
+void GriffDataRead::pyexport_Step( py::module_ themod )
+#else
+void GriffDataRead::pyexport_Step( )
+#endif
 {
+#ifdef DGCODE_USEPYBIND11
+  py::class_<Step,std::unique_ptr<Step, BlankDeleter<Step>> >(themod,"Step")
+#else
   py::class_<Step,boost::noncopyable>("Step",py::no_init)
-    .def("getTrack",&Step::getTrack,py::return_value_policy<py::reference_existing_object>())
-    .def("getSegment",&Step::getSegment,py::return_value_policy<py::reference_existing_object>())
+#endif
+    .def("getTrack",&Step::getTrack,py::return_ptr())
+    .def("getSegment",&Step::getSegment,py::return_ptr())
     .def("iStep",&Step::iStep)
-    .def("getNextStep",&Step::getNextStep,py::return_value_policy<py::reference_existing_object>())
-    .def("getPreviousStep",&Step::getPreviousStep,py::return_value_policy<py::reference_existing_object>())
+    .def("getNextStep",&Step::getNextStep,py::return_ptr())
+    .def("getPreviousStep",&Step::getPreviousStep,py::return_ptr())
     .def("eDep",&Step::eDep)
     .def("eDepNonIonising",&Step::eDepNonIonising)
     .def("preGlobalX",&Step::preGlobalX)

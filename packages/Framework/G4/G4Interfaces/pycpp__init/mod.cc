@@ -50,11 +50,15 @@ namespace G4Interfaces_py {
 
 PYTHON_MODULE
 {
-  py::import("Utils.ParametersBase");
+  py::pyimport("Utils.ParametersBase");
 
-  py::class_<G4Interfaces::PhysListProviderBase,boost::noncopyable>("PhysListProviderBase",py::no_init);
+  py::class_<G4Interfaces::PhysListProviderBase PYBOOSTNONCOPYABLE>(PYMOD "PhysListProviderBase" PYBOOSTNOINIT);
 
+#ifdef DGCODE_USEPYBIND11
+  py::class_<G4Interfaces::GeoBase,Utils::ParametersBase>(m,"GeoBase")
+#else
   py::class_<G4Interfaces::GeoBase,boost::noncopyable,py::bases<Utils::ParametersBase> >("GeoBase",py::no_init)
+#endif
     .def("getName",&G4Interfaces::GeoBase::getName)
     .def("dump",&G4Interfaces::GeoBase::dump)
     .def("dump",&G4Interfaces_py::GeoBase_dump_0args)
@@ -63,14 +67,24 @@ PYTHON_MODULE
   //We are not exposing the base G4VUserDetectorConstruction since we have not
   //defined it on the python side (and probably have no need to):
 
+#ifdef DGCODE_USEPYBIND11
+  py::class_<G4Interfaces::GeoConstructBase, G4Interfaces::GeoBase>(m,"GeoConstructBase");
+  py::class_<G4Interfaces::PreGenCallBack, std::shared_ptr<G4Interfaces::PreGenCallBack>>(m,"PreGenCallBack");
+  py::class_<G4Interfaces::PostGenCallBack, std::shared_ptr<G4Interfaces::PostGenCallBack>>(m, "PostGenCallBack");
+#else
   py::class_<G4Interfaces::GeoConstructBase,boost::noncopyable,py::bases<G4Interfaces::GeoBase> >("GeoConstructBase",py::no_init)
     ;
-  py::class_<G4Interfaces::PreGenCallBack,boost::noncopyable>("PreGenCallBack",py::no_init)
+  py::class_<G4Interfaces::PreGenCallBack PYBOOSTNONCOPYABLE>(PYMOD "PreGenCallBack" PYBOOSTNOINIT)
     ;
-  py::class_<G4Interfaces::PostGenCallBack,boost::noncopyable>("PostGenCallBack",py::no_init)
+  py::class_<G4Interfaces::PostGenCallBack PYBOOSTNONCOPYABLE>(PYMOD "PostGenCallBack" PYBOOSTNOINIT)
     ;
+#endif
 
+#ifdef DGCODE_USEPYBIND11
+  py::class_<G4Interfaces::ParticleGenBase,Utils::ParametersBase>(m,"ParticleGenBase")
+#else
   py::class_<G4Interfaces::ParticleGenBase,boost::noncopyable,py::bases<Utils::ParametersBase> >("ParticleGenBase",py::no_init)
+#endif
     .def("getName",&G4Interfaces::ParticleGenBase::getName)
     .def("dump",&G4Interfaces::ParticleGenBase::dump)
     .def("dump",&G4Interfaces_py::ParticleGenBase_dump_0args)
@@ -89,16 +103,20 @@ PYTHON_MODULE
     .def("unlimited",&G4Interfaces::ParticleGenBase::unlimited)
     ;
 
+#ifdef DGCODE_USEPYBIND11
+  py::class_<G4Interfaces::StepFilterBase,Utils::ParametersBase>(m,"StepFilterBase")
+#else
   py::class_<G4Interfaces::StepFilterBase,boost::noncopyable,py::bases<Utils::ParametersBase> >("StepFilterBase",py::no_init)
+#endif
     .def("getName",&G4Interfaces::StepFilterBase::getName)
     .def("dump",&G4Interfaces::StepFilterBase::dump)
     .def("dump",&G4Interfaces_py::StepFilterBase_dump_0args)
     ;
 
-  py::def("isForked",&FrameworkGlobals::isForked);
-  py::def("isParent",&FrameworkGlobals::isParent);
-  py::def("isChild",&FrameworkGlobals::isChild);
-  py::def("mpID",&FrameworkGlobals::mpID);
-  py::def("nProcs",&FrameworkGlobals::nProcs);
+  PYDEF("isForked",&FrameworkGlobals::isForked);
+  PYDEF("isParent",&FrameworkGlobals::isParent);
+  PYDEF("isChild",&FrameworkGlobals::isChild);
+  PYDEF("mpID",&FrameworkGlobals::mpID);
+  PYDEF("nProcs",&FrameworkGlobals::nProcs);
 
 }

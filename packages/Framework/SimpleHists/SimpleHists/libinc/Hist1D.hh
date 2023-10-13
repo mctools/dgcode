@@ -52,8 +52,8 @@ namespace SimpleHists {
 
     //Convenient filling from arrays (not exposed to python where arrays can
     //instead be fed to the fill method):
-    void fillMany(double* vals, unsigned n);
-    void fillMany(double* vals, double* weights, unsigned n);
+    void fillMany(const double* vals, unsigned n);
+    void fillMany(const double* vals, const double* weights, unsigned n);
 
     //Multiple fillings - just like N calls to fill(val,weight). Note that
     //concerning errors this is not the same as fill(val,N).

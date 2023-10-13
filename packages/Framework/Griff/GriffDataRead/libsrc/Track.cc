@@ -9,45 +9,62 @@ namespace GriffDataRead {
   void dump_track_withpdginfo(Track*trk) { dump(trk,true); }
 }
 
-void GriffDataRead::pyexport_Track()
+
+#ifdef DGCODE_USEPYBIND11
+namespace {
+  template < typename T>
+  struct BlankDeleter
+  {
+    void operator()(T *) const {}
+  };
+}
+
+void GriffDataRead::pyexport_Track( py::module_ themod )
+#else
+void GriffDataRead::pyexport_Track( )
+#endif
 {
-  py::class_<GriffDataRead::Track,boost::noncopyable>("Track",py::no_init)
-    .def("trackID",&GriffDataRead::Track::trackID)
-    .def("parentID",&GriffDataRead::Track::parentID)
-    .def("nDaughters",&GriffDataRead::Track::nDaughters)
-    .def("nSegments",&GriffDataRead::Track::nSegments)
-    .def("weight",&GriffDataRead::Track::weight)
-    .def("isPrimary",&GriffDataRead::Track::isPrimary)
-    .def("isSecondary",&GriffDataRead::Track::isSecondary)
-    .def("startTime",&GriffDataRead::Track::startTime)
-    .def("startEKin",&GriffDataRead::Track::startEKin)
-    .def("pdgCode",&GriffDataRead::Track::pdgCode)
-    .def("pdgName",&GriffDataRead::Track::pdgNameCStr)
-    .def("pdgType",&GriffDataRead::Track::pdgTypeCStr)
-    .def("pdgSubType",&GriffDataRead::Track::pdgSubTypeCStr)
-    .def("creatorProcess",&GriffDataRead::Track::creatorProcessCStr)
-    .def("mass",&GriffDataRead::Track::mass)
-    .def("width",&GriffDataRead::Track::width)
-    .def("charge",&GriffDataRead::Track::charge)
-    .def("lifeTime",&GriffDataRead::Track::lifeTime)
-    .def("atomicNumber",&GriffDataRead::Track::atomicNumber)
-    .def("atomicMass",&GriffDataRead::Track::atomicMass)
-    .def("magneticMoment",&GriffDataRead::Track::magneticMoment)
-    .def("spin",&GriffDataRead::Track::spin)
-    .def("stable",&GriffDataRead::Track::stable)
-    .def("shortLived",&GriffDataRead::Track::shortLived)
-    .def("getDaughterID",&GriffDataRead::Track::getDaughterID)
-    .def("getParent",&GriffDataRead::Track::getParent,py::return_value_policy<py::reference_existing_object>())
-    .def("getDaughter",&GriffDataRead::Track::getDaughter,py::return_value_policy<py::reference_existing_object>())
-    .def("getSegment",&GriffDataRead::Track::getSegment,py::return_value_policy<py::reference_existing_object>())
-    .def("segmentBegin",&GriffDataRead::Track::segmentBegin,py::return_value_policy<py::reference_existing_object>())
-    .def("segmentEnd",&GriffDataRead::Track::segmentEnd,py::return_value_policy<py::reference_existing_object>())
-    .def("firstSegment",&GriffDataRead::Track::firstSegment,py::return_value_policy<py::reference_existing_object>())
-    .def("lastSegment",&GriffDataRead::Track::lastSegment,py::return_value_policy<py::reference_existing_object>())
-    .def("firstStep",&GriffDataRead::Track::firstStep,py::return_value_policy<py::reference_existing_object>())
-    .def("lastStep",&GriffDataRead::Track::lastStep,py::return_value_policy<py::reference_existing_object>())
-    .def("dump",&GriffDataRead::dump_track)
-    .def("dump_full",&GriffDataRead::dump_track_withpdginfo)
+#ifdef DGCODE_USEPYBIND11
+  py::class_<Track,std::unique_ptr<Track, BlankDeleter<Track>> >(themod,"Track")
+#else
+  py::class_<Track,boost::noncopyable>("Track",py::no_init)
+#endif
+    .def("trackID",&Track::trackID)
+    .def("parentID",&Track::parentID)
+    .def("nDaughters",&Track::nDaughters)
+    .def("nSegments",&Track::nSegments)
+    .def("weight",&Track::weight)
+    .def("isPrimary",&Track::isPrimary)
+    .def("isSecondary",&Track::isSecondary)
+    .def("startTime",&Track::startTime)
+    .def("startEKin",&Track::startEKin)
+    .def("pdgCode",&Track::pdgCode)
+    .def("pdgName",&Track::pdgNameCStr)
+    .def("pdgType",&Track::pdgTypeCStr)
+    .def("pdgSubType",&Track::pdgSubTypeCStr)
+    .def("creatorProcess",&Track::creatorProcessCStr)
+    .def("mass",&Track::mass)
+    .def("width",&Track::width)
+    .def("charge",&Track::charge)
+    .def("lifeTime",&Track::lifeTime)
+    .def("atomicNumber",&Track::atomicNumber)
+    .def("atomicMass",&Track::atomicMass)
+    .def("magneticMoment",&Track::magneticMoment)
+    .def("spin",&Track::spin)
+    .def("stable",&Track::stable)
+    .def("shortLived",&Track::shortLived)
+    .def("getDaughterID",&Track::getDaughterID)
+    .def("getParent",&Track::getParent,py::return_ptr())
+    .def("getDaughter",&Track::getDaughter,py::return_ptr())
+    .def("getSegment",&Track::getSegment,py::return_ptr())
+    .def("segmentBegin",&Track::segmentBegin,py::return_ptr())
+    .def("segmentEnd",&Track::segmentEnd,py::return_ptr())
+    .def("firstSegment",&Track::firstSegment,py::return_ptr())
+    .def("lastSegment",&Track::lastSegment,py::return_ptr())
+    .def("firstStep",&Track::firstStep,py::return_ptr())
+    .def("lastStep",&Track::lastStep,py::return_ptr())
+    .def("dump",&dump_track)
+    .def("dump_full",&dump_track_withpdginfo)
     ;
 
 }

@@ -4,6 +4,7 @@
 #include "Utils/ParametersBase.hh"
 #include <vector>
 #include <utility>
+#include <memory>
 
 class G4VUserPrimaryGeneratorAction;
 class G4Event;
@@ -41,14 +42,12 @@ namespace G4Interfaces {
     G4VUserPrimaryGeneratorAction * getAction();
 
     //The last method can be used to install callbacks *before* each event
-    //generation (this is not possible with G4UserEventAction). The callback
-    //object will be owned by ParticleGenBase unless the second parameter is put
-    //to false:
-    void installPreGenCallBack(PreGenCallBack*, bool owned = true);
-    void uninstallPreGenCallBack(PreGenCallBack*);//uninstall (and unown)
+    //generation (this is not possible with G4UserEventAction).
+    void installPreGenCallBack(std::shared_ptr<PreGenCallBack>);
+    void uninstallPreGenCallBack(std::shared_ptr<PreGenCallBack>);//uninstall
     //And right after (to monitor or modify the event):
-    void installPostGenCallBack(PostGenCallBack*, bool owned = true);
-    void uninstallPostGenCallBack(PostGenCallBack*);//uninstall (and unown)
+    void installPostGenCallBack(std::shared_ptr<PostGenCallBack>);
+    void uninstallPostGenCallBack(std::shared_ptr<PostGenCallBack>);//uninstall
 
     //Override and return false if generator does not have unlimited events
     //available (like for a generator reading particles from an input file). In
@@ -81,24 +80,25 @@ namespace G4Interfaces {
     friend class ::ParticleGenBaseAction;
     std::string m_name;
     G4VUserPrimaryGeneratorAction * m_action;
-    std::vector<std::pair<PreGenCallBack*,bool> > m_pregencallbacks;
-    std::vector<std::pair<PostGenCallBack*,bool> > m_postgencallbacks;
+    std::vector<std::shared_ptr<PreGenCallBack>> m_pregencallbacks;
+    std::vector<std::shared_ptr<PostGenCallBack>> m_postgencallbacks;
     bool m_signalledEOE;
   };
 
-  class PreGenCallBack{
+  class PreGenCallBack : public std::enable_shared_from_this<PreGenCallBack> {
   public:
     virtual void preGen() = 0;
     PreGenCallBack(){}
     virtual ~PreGenCallBack(){}
   };
 
-  class PostGenCallBack{
+  class PostGenCallBack : public std::enable_shared_from_this<PostGenCallBack> {
   public:
     virtual void postGen(G4Event*) = 0;
     PostGenCallBack(){}
     virtual ~PostGenCallBack(){}
   };
+
 
 }
 

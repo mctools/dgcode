@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  ParticleGenPyExport::exportGen<FlexGen>("FlexGen");
+  ParticleGenPyExport::exportGen<FlexGen>(PYMOD "FlexGen");
 }

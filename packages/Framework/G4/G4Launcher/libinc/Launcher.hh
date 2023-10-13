@@ -2,6 +2,7 @@
 #define G4Launcher_Launcher_hh
 
 #include "Core/Types.hh"
+#include <memory>
 
 // This Launcher class wraps G4RunManager and takes care of most of the setup of
 // a Geant4 job. At the end you should call either startSimulation or
@@ -62,9 +63,9 @@ namespace G4Launcher {
 
     static Launcher * getTheLauncher();
 
-    Launcher(G4Interfaces::GeoConstructBase*geo=0,
-             G4Interfaces::ParticleGenBase* gen=0,
-             G4Interfaces::StepFilterBase* filter=0);//supply geo/gen/filter here or with setVis/setGeo/setFilter calls
+    Launcher(G4Interfaces::GeoConstructBase* geo = nullptr,
+             G4Interfaces::ParticleGenBase* gen = nullptr,
+             G4Interfaces::StepFilterBase* filter = nullptr);//supply geo/gen/filter here or with setVis/setGeo/setFilter calls
     ~Launcher();
 
     //Geometry must be set before beam-on either by the next method or by
@@ -181,20 +182,21 @@ namespace G4Launcher {
       virtual ~HookFct(){};
       virtual void operator()() = 0;
     };
+    using HookFctPtr = std::shared_ptr<HookFct>;
 
-    void addPrePreInitHook(HookFct*);
-    void addPreInitHook(HookFct*);
-    void addPostInitHook(HookFct*);
+    void addPrePreInitHook(HookFctPtr);
+    void addPreInitHook(HookFctPtr);
+    void addPostInitHook(HookFctPtr);
     //hook called after simulation is done (will be called in all process in
     //case of multiprocessing):
-    void addPostSimHook(HookFct*);
+    void addPostSimHook(HookFctPtr);
     //hook called in parent process only, when multiprocessing only, and only
     //after all children finished successfully (can be used to merge output
     //files):
-    void addPostMPHook(HookFct*);
+    void addPostMPHook(HookFctPtr);
     //Hooks to be installed on the generator:
-    void addPreGenHook(G4Interfaces::PreGenCallBack*);
-    void addPostGenHook(G4Interfaces::PostGenCallBack*);
+    void addPreGenHook(std::shared_ptr<G4Interfaces::PreGenCallBack>);
+    void addPostGenHook(std::shared_ptr<G4Interfaces::PostGenCallBack>);
 
     //Internal method for well-defined shut-down order, independent of python's
     //garbage collection. It releases all internal objects and deletes the run
@@ -203,9 +205,23 @@ namespace G4Launcher {
     //after a shutdown.
     void shutdown();
 
+    //Internal method for advanced lifetime synchronisation, register shared
+    //pointer which will be cleared upon shutdown();
+    class ResourceGuard {
+    public:
+      virtual ~ResourceGuard() = default;
+    };
+    void addResourceGuard( std::shared_ptr<ResourceGuard> );
+
+    //Forbid both moves and copies (so getTheLauncher() will always return the same object:
+    Launcher( const Launcher& ) = delete;
+    Launcher& operator=( const Launcher& ) = delete;
+    Launcher( Launcher&& ) = delete;
+    Launcher& operator=( Launcher&& ) = delete;
+
   private:
     struct Imp;
-    Imp * m_imp;
+    Imp * m_imp = nullptr;
   };
 }
 

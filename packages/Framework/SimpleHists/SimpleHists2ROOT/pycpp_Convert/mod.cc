@@ -54,13 +54,13 @@ PYTHON_MODULE
     " be avoided by using the sister module " BOOST_STRINGIZE(PACKAGE_NAME) ".ConvertFile"
     " instead, when only file-level manipulations are needed.";
 
-  py::import("ROOT");
+  py::pyimport("ROOT");
 
-  py::def("convertToROOT",&SimpleHists_pycpp::convertToROOT_1D);
-  py::def("convertToROOT",&SimpleHists_pycpp::convertToROOT_2D);
-  py::def("convertToROOT",&SimpleHists_pycpp::convertToROOT_Counts);
-  py::def("convertToROOT",&SimpleHists_pycpp::convertToROOT_Base);
-  py::def("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_hc);
-  py::def("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_fn);
+  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_1D);
+  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_2D);
+  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_Counts);
+  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_Base);
+  PYDEF("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_hc);
+  PYDEF("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_fn);
 }
 

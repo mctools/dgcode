@@ -4,6 +4,7 @@
 #include "G4Interfaces/ParticleGenBase.hh"
 #include <sys/types.h>//pid_t
 #include "G4Types.hh"
+#include <memory>
 
 //If your generator is mygen, then you schedule a fork into N processes by
 //performing a call like the following during initialisation:
@@ -23,10 +24,12 @@ namespace G4Launcher {
     //trouble. If nowait==true it will simply query children rather than wait
     //for them to finish:
     static void checkAnyChildren(bool wait_finish=false);
+
+    virtual ~MultiProcessingMgr();
+
   private:
     virtual void preGen();
     MultiProcessingMgr(unsigned nprocs);
-    virtual ~MultiProcessingMgr();
     static void killAllChildren();
     void checkParent();
     void doFork();

@@ -42,7 +42,11 @@
 
 
 struct G4Launcher::Launcher::Imp {
-  static Launcher * s_theLauncher;
+  static Launcher *& singleTonLauncherPtr()
+  {
+    static Launcher * ptr = nullptr;
+    return ptr;
+  }
 
   Imp()
     : m_rm(0),
@@ -100,14 +104,17 @@ struct G4Launcher::Launcher::Imp {
   std::vector<std::string> m_cmdlog;//for recording cmds in GRIFF output
   std::vector<std::pair<std::string,std::string> > m_userdata;
 
-  std::vector<HookFct*> m_prepreinithooks;
-  std::vector<HookFct*> m_preinithooks;
-  std::vector<HookFct*> m_postinithooks;
-  std::vector<HookFct*> m_postsimhooks;
-  std::vector<HookFct*> m_postmphooks;
+  std::vector<HookFctPtr> m_prepreinithooks;
+  std::vector<HookFctPtr> m_preinithooks;
+  std::vector<HookFctPtr> m_postinithooks;
+  std::vector<HookFctPtr> m_postsimhooks;
+  std::vector<HookFctPtr> m_postmphooks;
   bool m_postmphooks_alreadyfired;
-  std::vector<G4Interfaces::PostGenCallBack*> m_postgenhooks;
-  std::vector<G4Interfaces::PreGenCallBack*> m_pregenhooks;
+  std::vector<std::shared_ptr<G4Interfaces::PostGenCallBack>> m_postgenhooks;
+  std::vector<std::shared_ptr<G4Interfaces::PreGenCallBack>> m_pregenhooks;
+
+  std::vector<std::shared_ptr<ResourceGuard>> m_resourceGuards;
+
 
   //random:
   bool m_norandom;
@@ -157,23 +164,23 @@ struct G4Launcher::Launcher::Imp {
   void finalMetadata();//just before launch, to catch the last user cmds
 };
 
-G4Launcher::Launcher * G4Launcher::Launcher::Imp::s_theLauncher = 0;
+//G4Launcher::Launcher * G4Launcher::Launcher::Imp::s_theLauncher = nullptr;
 
 G4Launcher::Launcher * G4Launcher::Launcher::getTheLauncher()
 {
-  return Imp::s_theLauncher;
+  return Imp::singleTonLauncherPtr();
 }
 
 G4Launcher::Launcher::Launcher(G4Interfaces::GeoConstructBase*geo,
-                            G4Interfaces::ParticleGenBase* gen,
-                            G4Interfaces::StepFilterBase*filter)
+                               G4Interfaces::ParticleGenBase* gen,
+                               G4Interfaces::StepFilterBase*filter)
   : m_imp(new Imp)
 {
-  if (Imp::s_theLauncher) {
+  if (Imp::singleTonLauncherPtr()) {
     m_imp->print("ERROR: Multiple instances of Launcher are not allowed!");
     exit(1);
   }
-  Imp::s_theLauncher = this;
+  Imp::singleTonLauncherPtr() = this;
 
   if (geo)
     setGeo(geo);
@@ -187,16 +194,6 @@ void G4Launcher::Launcher::shutdown()
 {
   if (!m_imp)
     return;
-  for (auto it=m_imp->m_prepreinithooks.begin();it!=m_imp->m_prepreinithooks.end();++it)
-    delete *it;
-  for (auto it=m_imp->m_preinithooks.begin();it!=m_imp->m_preinithooks.end();++it)
-    delete *it;
-  for (auto it=m_imp->m_postinithooks.begin();it!=m_imp->m_postinithooks.end();++it)
-    delete *it;
-  for (auto it=m_imp->m_postsimhooks.begin();it!=m_imp->m_postsimhooks.end();++it)
-    delete *it;
-  for (auto it=m_imp->m_postmphooks.begin();it!=m_imp->m_postmphooks.end();++it)
-    delete *it;
   delete m_imp;
   m_imp = 0;
 }
@@ -356,8 +353,8 @@ void G4Launcher::Launcher::Imp::preinit()
     return;//silent return, might not be an error
   m_isinit_pre = true;
 
-  for (auto it=m_prepreinithooks.begin();it!=m_prepreinithooks.end();++it)
-    (**it)();
+  for ( auto& e : m_prepreinithooks )
+    (*e)();
 
   print("Pre-init started");
 
@@ -688,8 +685,8 @@ void G4Launcher::Launcher::init()
   m_imp->m_isinit_rm=true;
   m_imp->preinit();
 
-  for (auto it=m_imp->m_preinithooks.begin();it!=m_imp->m_preinithooks.end();++it)
-    (**it)();
+  for ( auto& e : m_imp->m_preinithooks )
+    (*e)();
 
   m_imp->ensureCreateRM();
   {
@@ -722,8 +719,8 @@ void G4Launcher::Launcher::init()
   if (m_imp->m_physicsListName!="ESS_Empty")
     G4NCrystalRel::installOnDemand();
 
-  for (auto it=m_imp->m_postinithooks.begin();it!=m_imp->m_postinithooks.end();++it)
-    (**it)();
+  for (auto& e : m_imp->m_postinithooks )
+    (*e)();
 
 }
 
@@ -752,10 +749,10 @@ void G4Launcher::Launcher::startSimulation(unsigned nevents)
   std::cout.flush();
 
   for (auto it = m_imp->m_pregenhooks.begin(); it!=m_imp->m_pregenhooks.end(); ++it)
-    m_imp->m_gen->installPreGenCallBack(*it,false);//TODO: Better solution than the leaky ownership=false used here?
+    m_imp->m_gen->installPreGenCallBack(*it);
   m_imp->m_pregenhooks.clear();
   for (auto it = m_imp->m_postgenhooks.begin(); it!=m_imp->m_postgenhooks.end(); ++it)
-    m_imp->m_gen->installPostGenCallBack(*it,false);//TODO: Better solution than the leaky ownership=false used here?
+    m_imp->m_gen->installPostGenCallBack(*it);
   m_imp->m_postgenhooks.clear();
 
   m_imp->m_rm->BeamOn(nevents);
@@ -766,8 +763,8 @@ void G4Launcher::Launcher::startSimulation(unsigned nevents)
 
   m_imp->print("Simulation done");
 
-  for (auto it=m_imp->m_postsimhooks.begin();it!=m_imp->m_postsimhooks.end();++it)
-    (**it)();
+  for ( auto& e : m_imp->m_postsimhooks )
+    (*e)();
 
   if (FrameworkGlobals::isForked()&&FrameworkGlobals::isParent()) {
     G4Launcher::MultiProcessingMgr::checkAnyChildren(true);
@@ -775,7 +772,7 @@ void G4Launcher::Launcher::startSimulation(unsigned nevents)
     //fire post mp hooks (should be safe even if more are added from inside hooks):
     unsigned i = 0;
     while (i<m_imp->m_postmphooks.size()) {
-      HookFct* hf = m_imp->m_postmphooks[i++];
+      HookFct* hf = m_imp->m_postmphooks[i++].get();
       (*hf)();
     }
     m_imp->m_postmphooks_alreadyfired = true;
@@ -893,8 +890,8 @@ void G4Launcher::Launcher::cmd(const char* cmdstr)
   G4int returnVal= UImgr->ApplyCommand(cmdstr);
   if( returnVal == fCommandSucceeded ) return;
 
-  G4int paramIndex= returnVal % 100;
-  G4int commandStatus= returnVal - paramIndex;
+  G4int paramIndex = returnVal % 100;
+  G4int commandStatus = returnVal - paramIndex;
 
   switch(commandStatus) {
     case fCommandSucceeded:
@@ -1069,18 +1066,23 @@ void G4Launcher::Launcher::allowFPE()
   m_imp->m_dofpe = false;
 }
 
-void G4Launcher::Launcher::addPrePreInitHook(HookFct* hf) { m_imp->m_prepreinithooks.push_back(hf); }
-void G4Launcher::Launcher::addPreInitHook(HookFct* hf) { m_imp->m_preinithooks.push_back(hf); }
-void G4Launcher::Launcher::addPostInitHook(HookFct* hf) { m_imp->m_postinithooks.push_back(hf); }
-void G4Launcher::Launcher::addPostSimHook(HookFct* hf) { m_imp->m_postsimhooks.push_back(hf); }
-void G4Launcher::Launcher::addPreGenHook(G4Interfaces::PreGenCallBack* hf) { m_imp->m_pregenhooks.push_back(hf); }
-void G4Launcher::Launcher::addPostGenHook(G4Interfaces::PostGenCallBack* hf) { m_imp->m_postgenhooks.push_back(hf); }
+void G4Launcher::Launcher::addPrePreInitHook(HookFctPtr hf) { m_imp->m_prepreinithooks.push_back(std::move(hf)); }
+void G4Launcher::Launcher::addPreInitHook(HookFctPtr hf) { m_imp->m_preinithooks.push_back(std::move(hf)); }
+void G4Launcher::Launcher::addPostInitHook(HookFctPtr hf) { m_imp->m_postinithooks.push_back(std::move(hf)); }
+void G4Launcher::Launcher::addPostSimHook(HookFctPtr hf) { m_imp->m_postsimhooks.push_back(std::move(hf)); }
+void G4Launcher::Launcher::addPreGenHook(std::shared_ptr<G4Interfaces::PreGenCallBack> hf) { m_imp->m_pregenhooks.push_back(std::move(hf)); }
+void G4Launcher::Launcher::addPostGenHook(std::shared_ptr<G4Interfaces::PostGenCallBack> hf) { m_imp->m_postgenhooks.push_back(std::move(hf)); }
 
-void G4Launcher::Launcher::addPostMPHook(HookFct* hf) {
+void G4Launcher::Launcher::addPostMPHook(HookFctPtr hf) {
   if (m_imp->m_postmphooks_alreadyfired)
     (*hf)();
   else {
-    m_imp->m_postmphooks.push_back(hf);
+    m_imp->m_postmphooks.push_back(std::move(hf));
   }
 }
 
+void G4Launcher::Launcher::addResourceGuard( std::shared_ptr<ResourceGuard> rg )
+{
+  assert(m_imp);
+  m_imp->m_resourceGuards.push_back(std::move(rg));
+}

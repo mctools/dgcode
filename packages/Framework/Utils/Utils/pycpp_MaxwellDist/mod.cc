@@ -3,25 +3,25 @@
 
 PYTHON_MODULE
 {
-  py::def("maxwellDist",Utils::maxwellDist);
-  py::def("maxwellDistCommulative",Utils::maxwellDistCommulative);
-  py::def("maxwellShoot",Utils::maxwellShoot);
-  py::def("maxwellParFromMean",Utils::maxwellParFromMean);
-  py::def("maxwellParFromPeak",Utils::maxwellParFromPeak);
-  py::def("maxwellMean",Utils::maxwellMean);
-  py::def("maxwellPeak",Utils::maxwellPeak);
-  py::def("maxwellRMS",Utils::maxwellRMS);
-  py::def("thermalMaxwellPar",Utils::thermalMaxwellPar);
-  py::def("shootThermalSpeed",Utils::shootThermalSpeed);
-  py::def("shootThermalEKin",Utils::shootThermalEKin);
-  py::def("shootThermalWavelength",Utils::shootThermalWavelength);
-  py::def("thermalNeutronMaxwellPar",Utils::thermalNeutronMaxwellPar);
-  py::def("shootThermalNeutronSpeed",Utils::shootThermalNeutronSpeed);
-  py::def("shootThermalNeutronEKin",Utils::shootThermalNeutronEKin);
-  py::def("shootThermalNeutronWavelength",Utils::shootThermalNeutronWavelength);
-  py::def("thermalEnergyDistPeak",Utils::thermalEnergyDistPeak);
-  py::def("thermalEnergyDistMean",Utils::thermalEnergyDistMean);
-  py::def("thermalEnergyDistMedian",Utils::thermalEnergyDistMedian);
-  py::def("thermalEnergyDist",Utils::thermalEnergyDist);
-  py::def("thermalEnergyDistCommulative",Utils::thermalEnergyDistCommulative);
+  PYDEF("maxwellDist",Utils::maxwellDist);
+  PYDEF("maxwellDistCommulative",Utils::maxwellDistCommulative);
+  PYDEF("maxwellShoot",Utils::maxwellShoot);
+  PYDEF("maxwellParFromMean",Utils::maxwellParFromMean);
+  PYDEF("maxwellParFromPeak",Utils::maxwellParFromPeak);
+  PYDEF("maxwellMean",Utils::maxwellMean);
+  PYDEF("maxwellPeak",Utils::maxwellPeak);
+  PYDEF("maxwellRMS",Utils::maxwellRMS);
+  PYDEF("thermalMaxwellPar",Utils::thermalMaxwellPar);
+  PYDEF("shootThermalSpeed",Utils::shootThermalSpeed);
+  PYDEF("shootThermalEKin",Utils::shootThermalEKin);
+  PYDEF("shootThermalWavelength",Utils::shootThermalWavelength);
+  PYDEF("thermalNeutronMaxwellPar",Utils::thermalNeutronMaxwellPar);
+  PYDEF("shootThermalNeutronSpeed",Utils::shootThermalNeutronSpeed);
+  PYDEF("shootThermalNeutronEKin",Utils::shootThermalNeutronEKin);
+  PYDEF("shootThermalNeutronWavelength",Utils::shootThermalNeutronWavelength);
+  PYDEF("thermalEnergyDistPeak",Utils::thermalEnergyDistPeak);
+  PYDEF("thermalEnergyDistMean",Utils::thermalEnergyDistMean);
+  PYDEF("thermalEnergyDistMedian",Utils::thermalEnergyDistMedian);
+  PYDEF("thermalEnergyDist",Utils::thermalEnergyDist);
+  PYDEF("thermalEnergyDistCommulative",Utils::thermalEnergyDistCommulative);
 }

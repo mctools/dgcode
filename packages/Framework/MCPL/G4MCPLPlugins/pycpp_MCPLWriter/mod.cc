@@ -5,7 +5,9 @@
 #include "G4Interfaces/GeoConstructBase.hh"
 #include "G4Interfaces/ParticleGenBase.hh"
 #include "G4ExprParser/G4SteppingASTBuilder.hh"
-#include "Utils/RefCountBase.hh"
+#ifndef DGCODE_USEPYBIND11
+#  include "Utils/RefCountBase.hh"
+#endif
 #include "MCPL/mcpl.h"
 
 #include "G4VSensitiveDetector.hh"
@@ -272,8 +274,13 @@ namespace G4MCPLWriter {
       if (FrameworkGlobals::isForked()&&FrameworkGlobals::isParent()) {
         py::ensurePyInit();
         m_om = new MCPLOutputMerger(this);
-        py::object pylauncher = py::import("G4Launcher").attr("getTheLauncher")();
+        py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
+#ifdef DGCODE_USEPYBIND11
+        py::object pyhook = py::cast(m_om);
+        pylauncher.attr("postmp_hook")(pyhook);
+#else
         pylauncher.attr("postmp_hook")(py::object(boost::ref(m_om)));
+#endif
       }
     }
 
@@ -312,7 +319,11 @@ namespace G4MCPLWriter {
     mcpl_gzip_file(filename.c_str());
   }
 
+#ifdef DGCODE_USEPYBIND11
+  class MCPLWriter {
+#else
   class MCPLWriter : public Utils::RefCountBase {
+#endif
   private:
     std::string m_filename;
     bool m_opt_writedoubleprec;
@@ -352,6 +363,7 @@ namespace G4MCPLWriter {
       if (m_filename.size()<5||strcmp(&m_filename.at(m_filename.size()-5),".mcpl")!=0)
         m_filename += ".mcpl";
     }
+    //NB: If !defined(DGCODE_USEPYBIND11) the following destructor should actually be private due to inheriting RefCountBase:
     ~MCPLWriter()
     {
       //don't delete m_sd here (G4SDManager owns)
@@ -513,7 +525,7 @@ namespace G4MCPLWriter {
         out.emplace_back("comment",tmp.str());
       }
 
-      auto mod = py::import("G4Launcher");//must work since we use it in inithook()
+      auto mod = py::pyimport("G4Launcher");//must work since we use it in inithook()
       auto launcher = mod.attr("getTheLauncher")();
       auto pygeo = launcher.attr("getGeo")();
       auto pygen = launcher.attr("getGen")();
@@ -626,8 +638,13 @@ PYTHON_MODULE
 {
   using namespace G4MCPLWriter;
 
+#ifdef DGCODE_USEPYBIND11
+  py::class_<MCPLWriter,std::shared_ptr<MCPLWriter>>(m,"MCPLWriter")
+    .def( py::init<const char*>() )
+#else
   py::class_<MCPLWriter,RefCountHolder<MCPLWriter>,
              boost::noncopyable>("MCPLWriter",py::init<const char*>())
+#endif
     .def("addVolume",&MCPLWriter::addVolume)
     .def("setFilter",&MCPLWriter::setFilter)
     .def("setUserFlags",&MCPLWriter::setUserFlags)
@@ -640,7 +657,11 @@ PYTHON_MODULE
     .def("inithook",&MCPLWriter::inithook)
     ;
 
+#ifdef DGCODE_USEPYBIND11
+  py::class_<MCPLOutputMerger>(m,"_MCPLOutputMerger")
+#else
   py::class_<MCPLOutputMerger,boost::noncopyable>("_MCPLOutputMerger",py::no_init)
+#endif
     .def("__call__",&MCPLOutputMerger::merge)
     ;
 }

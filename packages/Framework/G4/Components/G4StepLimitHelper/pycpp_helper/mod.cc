@@ -3,7 +3,7 @@
 
 PYTHON_MODULE
 {
-  py::class_<G4StepLimitHelper>("G4StepLimitHelper")
+  py::class_<G4StepLimitHelper>(PYMOD "G4StepLimitHelper")
               .def("setLimit", &G4StepLimitHelper::setLimit)
               .def("addLimit", &G4StepLimitHelper::addLimit)
               .def("setWorldLimit", &G4StepLimitHelper::setWorldLimit)

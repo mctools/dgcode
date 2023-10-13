@@ -152,15 +152,19 @@ int main(int argc, char** argv) {
       py::ensurePyInit();
       if (opt_plotexpr.empty()) {
         //bring up browser for file:
-        py::object mod = py::import("SimpleHists.browser");
+        py::object mod = py::pyimport("SimpleHists.browser");
         mod.attr("interactive_browser")(outfile);
       } else {
         //just display the single custom histogram:
-        py::object mod = py::import("SimpleHists.browser");
+        py::object mod = py::pyimport("SimpleHists.browser");
         mod.attr("interactive_plot_hist_from_file")(outfile,"custom");
       }
     } catch (py::error_already_set&) {
+#if defined(DGCODE_USEPYBIND11)
+      throw;//TODO: better handling in pybind11 than this?
+#else
       py::print_and_handle_exception();
+#endif
     }
   }
 

@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  ParticleGenPyExport::exportGen<G4Launcher::SingleParticleGun>("SingleParticleGun");
+  ParticleGenPyExport::exportGen<G4Launcher::SingleParticleGun>(PYMOD "SingleParticleGun");
 }

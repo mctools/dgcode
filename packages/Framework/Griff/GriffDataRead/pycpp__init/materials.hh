@@ -1,4 +1,15 @@
-#include <dgboost/python/operators.hpp>
+#ifdef DGCODE_USEPYBIND11
+namespace {
+  template < typename T>
+  struct BlankDeleter
+  {
+    void operator()(T *) const {}
+  };
+}
+#else
+#  include <dgboost/python/operators.hpp>
+#endif
+
 namespace GriffDataRead {
 
   py::object py_get_elem_list( const Material*m )
@@ -8,7 +19,11 @@ namespace GriffDataRead {
     const unsigned n = m->numberElements();
     for ( unsigned i = 0; i < n; ++i ) {
       auto elem = m->getElement(i);
+#ifdef DGCODE_USEPYBIND11
+      l.append( py::cast( elem ) );
+#else
       l.append( py::dg_ptr2pyobj_refexisting( elem ) );
+#endif
     }
     return std::move(l);
   }
@@ -18,7 +33,11 @@ namespace GriffDataRead {
     assert(elem);
     const unsigned n = elem->numberIsotopes();
     for ( unsigned i = 0; i < n; ++i ) {
+#ifdef DGCODE_USEPYBIND11
+      l.append( py::cast( elem->getIsotope(i) ) );
+#else
       l.append( py::dg_ptr2pyobj_refexisting( elem->getIsotope(i) ) );
+#endif
     }
     return std::move(l);
   }
@@ -29,53 +48,68 @@ namespace GriffDataRead {
   void dump_iso(const Isotope*m) { dump(m); }
   intptr_t py_mat_id(const Material*ptr) { return intptr_t(ptr); }
 
+#ifdef DGCODE_USEPYBIND11
+  void pyexport_Material( py::module_ themod )
+#else
   void pyexport_Material()
+#endif
   {
 
-    py::class_<GriffDataRead::Material,GriffDataRead::Material*,boost::noncopyable>("Material",py::no_init)
-      .def("getName",&GriffDataRead::Material::getNameCStr)
-      .def("density",&GriffDataRead::Material::density)
-      .def("temperature",&GriffDataRead::Material::temperature)
-      .def("pressure",&GriffDataRead::Material::pressure)
-      .def("radiationLength",&GriffDataRead::Material::radiationLength)
-      .def("nuclearInteractionLength",&GriffDataRead::Material::nuclearInteractionLength)
-      .def("hasMeanExitationEnergy",&GriffDataRead::Material::hasMeanExitationEnergy)
-      .def("meanExitationEnergy",&GriffDataRead::Material::meanExitationEnergy)
-      .def("isSolid",&GriffDataRead::Material::isSolid)
-      .def("isGas",&GriffDataRead::Material::isGas)
-      .def("isLiquid",&GriffDataRead::Material::isLiquid)
-      .def("isUndefinedState",&GriffDataRead::Material::isUndefinedState)
-      .def("stateStr",&GriffDataRead::Material::stateCStr)
-      .def("numberElements",&GriffDataRead::Material::numberElements)
-      .def("elementFraction",&GriffDataRead::Material::elementFraction)
-      .def("getElement",&GriffDataRead::Material::getElement,py::return_ptr())
-      .add_property("elements", &GriffDataRead::py_get_elem_list)
-
-      .def("dump",&GriffDataRead::dump_mat)
-      .def("transient_id",&GriffDataRead::py_mat_id)//temporary workaround...
+#ifdef DGCODE_USEPYBIND11
+    py::class_<Material,std::unique_ptr<Material, BlankDeleter<Material>>>(themod, "Material")
+#else
+    py::class_<Material,Material*,boost::noncopyable>("Material",py::no_init)
+#endif
+      .def("getName",&Material::getNameCStr)
+      .def("density",&Material::density)
+      .def("temperature",&Material::temperature)
+      .def("pressure",&Material::pressure)
+      .def("radiationLength",&Material::radiationLength)
+      .def("nuclearInteractionLength",&Material::nuclearInteractionLength)
+      .def("hasMeanExitationEnergy",&Material::hasMeanExitationEnergy)
+      .def("meanExitationEnergy",&Material::meanExitationEnergy)
+      .def("isSolid",&Material::isSolid)
+      .def("isGas",&Material::isGas)
+      .def("isLiquid",&Material::isLiquid)
+      .def("isUndefinedState",&Material::isUndefinedState)
+      .def("stateStr",&Material::stateCStr)
+      .def("numberElements",&Material::numberElements)
+      .def("elementFraction",&Material::elementFraction)
+      .def("getElement",&Material::getElement,py::return_ptr())
+      .PYADDREADONLYPROPERTY("elements", &py_get_elem_list)
+      .def("dump",&dump_mat)
+      .def("transient_id",&py_mat_id)//temporary workaround...
       ;
 
-    py::class_<GriffDataRead::Element,boost::noncopyable>("Element",py::no_init)
-      .def("getName",&GriffDataRead::Element::getNameCStr)
-      .def("getSymbol",&GriffDataRead::Element::getSymbolCStr)
-      .def("Z",&GriffDataRead::Element::Z)
-      .def("N",&GriffDataRead::Element::N)
-      .def("A",&GriffDataRead::Element::A)
-      .def("naturalAbundances",&GriffDataRead::Element::naturalAbundances)
-      .def("numberIsotopes",&GriffDataRead::Element::numberIsotopes)
-      .def("isotopeRelativeAbundance",&GriffDataRead::Element::isotopeRelativeAbundance)
-      .def("getIsotope",&GriffDataRead::Element::getIsotope,py::return_ptr())
-      .add_property("isotopes", &GriffDataRead::py_get_isotope_list)
-      .def("dump",&GriffDataRead::dump_elem)
+#ifdef DGCODE_USEPYBIND11
+    py::class_<Element,std::unique_ptr<Element, BlankDeleter<Element>>>(themod, "Element")
+#else
+    py::class_<Element,boost::noncopyable>("Element",py::no_init)
+#endif
+      .def("getName",&Element::getNameCStr)
+      .def("getSymbol",&Element::getSymbolCStr)
+      .def("Z",&Element::Z)
+      .def("N",&Element::N)
+      .def("A",&Element::A)
+      .def("naturalAbundances",&Element::naturalAbundances)
+      .def("numberIsotopes",&Element::numberIsotopes)
+      .def("isotopeRelativeAbundance",&Element::isotopeRelativeAbundance)
+      .def("getIsotope",&Element::getIsotope,py::return_ptr())
+      .PYADDREADONLYPROPERTY("isotopes", &py_get_isotope_list)
+      .def("dump",&dump_elem)
       ;
 
-    py::class_<GriffDataRead::Isotope,boost::noncopyable>("Isotope",py::no_init)
-      .def("getName",&GriffDataRead::Isotope::getNameCStr)
-      .def("Z",&GriffDataRead::Isotope::Z)
-      .def("N",&GriffDataRead::Isotope::N)
-      .def("A",&GriffDataRead::Isotope::A)
-      .def("m",&GriffDataRead::Isotope::m)
-      .def("dump",&GriffDataRead::dump_iso)
+#ifdef DGCODE_USEPYBIND11
+    py::class_<Isotope,std::unique_ptr<Isotope, BlankDeleter<Isotope>>>(themod, "Isotope")
+#else
+    py::class_<Isotope,boost::noncopyable>("Isotope",py::no_init)
+#endif
+      .def("getName",&Isotope::getNameCStr)
+      .def("Z",&Isotope::Z)
+      .def("N",&Isotope::N)
+      .def("A",&Isotope::A)
+      .def("m",&Isotope::m)
+      .def("dump",&dump_iso)
       ;
 
   }

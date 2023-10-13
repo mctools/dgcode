@@ -25,7 +25,7 @@ namespace G4Interfaces {
 
     const char* getName() const { return m_name.c_str(); }
 
-    virtual void dump(const char * prefix="") const;
+    void dump(const char * prefix="") const override;
 
 
     //Convenience method which feeds the value of a string constructs a material from the value of a string

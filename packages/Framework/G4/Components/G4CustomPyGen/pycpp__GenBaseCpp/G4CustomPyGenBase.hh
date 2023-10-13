@@ -7,7 +7,9 @@
 
 namespace G4CustomPyGen {
 
-  class GenBaseCpp : public G4Interfaces::ParticleGenBase {
+  //NB: Hidden, since py::object is hidden (OK, since this is a private header
+  //intended for a single shared library).
+  class __attribute__ ((visibility ("hidden"))) GenBaseCpp : public G4Interfaces::ParticleGenBase {
   public:
     GenBaseCpp();
     virtual ~GenBaseCpp();

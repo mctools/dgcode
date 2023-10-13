@@ -4,6 +4,7 @@
 #include "G4VSolid.hh"
 #include "G4VisAttributes.hh"
 #include <map>
+#include <iostream>
 
 G4Interfaces::GeoBase::GeoBase(const char* name)
   : m_name(name),
@@ -16,7 +17,8 @@ G4Interfaces::GeoBase::~GeoBase()
 }
 
 void G4Interfaces::GeoBase::dump(const char * prefix) const {
-  printf("%sGeoConstructor[%s]:\n",prefix,m_name.c_str());
+  std::cout<<std::flush;
+  std::cout<<prefix<<"GeoConstructor["<<m_name<<"]:"<<std::endl;
   std::string p = prefix;
   p+="  ";
   Utils::ParametersBase::dump(p.c_str());

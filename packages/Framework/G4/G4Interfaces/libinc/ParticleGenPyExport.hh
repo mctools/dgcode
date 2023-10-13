@@ -15,15 +15,25 @@ namespace ParticleGenPyExport {
     return new T;
   }
 
+#ifdef DGCODE_USEPYBIND11
+  template <class T>
+  py::class_<T,G4Interfaces::ParticleGenBase> exportGen(py::module_ m, const char* name)
+  {
+    py::pyimport("G4Interfaces");
+    m.def("create",&_internal_create<T>,py::return_ptr());
+    return py::class_<T,G4Interfaces::ParticleGenBase>(m,name)
+      .def("getAction",&T::getAction,py::return_ptr());
+  }
+#else
   template <class T>
   py::class_<T,boost::noncopyable,py::bases<G4Interfaces::ParticleGenBase> > exportGen(const char* name)
   {
-    py::import("G4Interfaces");
+    py::pyimport("G4Interfaces");
     def("create",&_internal_create<T>,py::return_ptr());
     return py::class_<T,boost::noncopyable,py::bases<G4Interfaces::ParticleGenBase> >(name,py::no_init)
       .def("getAction",&T::getAction,py::return_ptr());
   }
-
+#endif
 }
 
 #endif

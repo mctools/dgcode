@@ -72,9 +72,25 @@ namespace GriffDataRead {
   const Material* segment_material_0args(Segment*s) { return s->material(); }
 }
 
-void GriffDataRead::pyexport_Segment()
+#ifdef DGCODE_USEPYBIND11
+namespace {
+  template < typename T>
+  struct BlankDeleter
+  {
+    void operator()(T *) const {}
+  };
+}
+
+void GriffDataRead::pyexport_Segment( py::module_ themod )
+#else
+void GriffDataRead::pyexport_Segment( )
+#endif
 {
+#ifdef DGCODE_USEPYBIND11
+  py::class_<Segment,std::unique_ptr<Segment, BlankDeleter<Segment>> >(themod,"Segment")
+#else
   py::class_<Segment,boost::noncopyable>("Segment",py::no_init)
+#endif
     .def("iSegment",&Segment::iSegment)
     .def("nStepsOriginal",&Segment::nStepsOriginal)
     .def("nStepsStored",&Segment::nStepsStored)

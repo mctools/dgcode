@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  ParticleGenPyExport::exportGen<GriffGen>("GriffGen");
+  ParticleGenPyExport::exportGen<GriffGen>(PYMOD "GriffGen");
 }

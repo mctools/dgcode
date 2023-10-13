@@ -25,7 +25,7 @@ PYTHON_MODULE
     " Convert.hh. If the convertToROOT functions are needed, one"
     " must use the sister module " BOOST_STRINGIZE(PACKAGE_NAME) ".Convert instead.";
 
-  py::def("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_hc);
-  py::def("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_fn);
+  PYDEF("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_hc);
+  PYDEF("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_fn);
 }
 

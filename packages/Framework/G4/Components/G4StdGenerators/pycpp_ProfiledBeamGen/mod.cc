@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  ParticleGenPyExport::exportGen<ProfiledBeamGen>("ProfiledBeamGen");
+  ParticleGenPyExport::exportGen<ProfiledBeamGen>(PYMOD "ProfiledBeamGen");
 }

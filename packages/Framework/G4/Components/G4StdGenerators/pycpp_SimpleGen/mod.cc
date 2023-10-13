@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  ParticleGenPyExport::exportGen<SimpleGen>("SimpleGen");
+  ParticleGenPyExport::exportGen<SimpleGen>(PYMOD "SimpleGen");
 }

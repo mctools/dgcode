@@ -17,44 +17,44 @@ namespace Utils_ParametersBase_py {
 
   //TODO exposeParametersv2 with exclusion list
 
-  boost::python::list getParameterListDouble(Utils::ParametersBase*p)
+  py::list getParameterListDouble(Utils::ParametersBase*p)
   {
     std::vector<std::string> v;
     p->getParameterListDouble(v);
-    boost::python::list pylist = boost::python::list();
+    py::list pylist = py::list();
     auto itE=v.end();
     for (auto it=v.begin();it!=itE;++it) {
       pylist.append(*it);
     }
     return pylist;
   }
-  boost::python::list getParameterListInt(Utils::ParametersBase*p)
+  py::list getParameterListInt(Utils::ParametersBase*p)
   {
     std::vector<std::string> v;
     p->getParameterListInt(v);
-    boost::python::list pylist = boost::python::list();
+    py::list pylist = py::list();
     auto itE=v.end();
     for (auto it=v.begin();it!=itE;++it) {
       pylist.append(*it);
     }
     return pylist;
   }
-  boost::python::list getParameterListBoolean(Utils::ParametersBase*p)
+  py::list getParameterListBoolean(Utils::ParametersBase*p)
   {
     std::vector<std::string> v;
     p->getParameterListBoolean(v);
-    boost::python::list pylist = boost::python::list();
+    py::list pylist = py::list();
     auto itE=v.end();
     for (auto it=v.begin();it!=itE;++it) {
       pylist.append(*it);
     }
     return pylist;
   }
-  boost::python::list getParameterListString(Utils::ParametersBase*p)
+  py::list getParameterListString(Utils::ParametersBase*p)
   {
     std::vector<std::string> v;
     p->getParameterListString(v);
-    boost::python::list pylist = boost::python::list();
+    py::list pylist = py::list();
     auto itE=v.end();
     for (auto it=v.begin();it!=itE;++it) {
       pylist.append(*it);
@@ -82,7 +82,7 @@ namespace Utils_ParametersBase_py {
 
 PYTHON_MODULE
 {
-  py::class_<Utils::ParametersBase,boost::noncopyable>("ParametersBase",py::no_init)
+  py::class_<Utils::ParametersBase PYBOOSTNONCOPYABLE>(PYMOD "ParametersBase" PYBOOSTNOINIT)
     .def("setParameterDouble",&Utils::ParametersBase::setParameterDouble)
     .def("setParameterInt",&Utils::ParametersBase::setParameterInt)
     .def("setParameterBoolean",&Utils::ParametersBase::setParameterBoolean)

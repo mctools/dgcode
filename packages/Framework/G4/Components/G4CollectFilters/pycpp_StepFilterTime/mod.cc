@@ -3,5 +3,5 @@
 
 PYTHON_MODULE
 {
-  StepFilterPyExport::exportFilter<StepFilterTime>("StepFilterTime");
+  StepFilterPyExport::exportFilter<StepFilterTime>(PYMOD "StepFilterTime");
 }

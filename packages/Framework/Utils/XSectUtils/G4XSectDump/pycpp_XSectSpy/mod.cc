@@ -24,9 +24,9 @@ void spyOneG4XSect()
 
 PYTHON_MODULE
 {
-  py::def("install",&spyG4XSect);
-  py::def("installForOneFile",&spyOneG4XSect);
-  py::def("lastWrittenFile",&XSectSpySteppingAction::lastWrittenFile);
-  py::def("lastG4MaterialPrinted",&XSectSpySteppingAction::lastG4MaterialPrinted);
+  PYDEF("install",&spyG4XSect);
+  PYDEF("installForOneFile",&spyOneG4XSect);
+  PYDEF("lastWrittenFile",&XSectSpySteppingAction::lastWrittenFile);
+  PYDEF("lastG4MaterialPrinted",&XSectSpySteppingAction::lastG4MaterialPrinted);
 
 }

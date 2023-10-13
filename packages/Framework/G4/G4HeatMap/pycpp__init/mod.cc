@@ -1,7 +1,9 @@
 #include "Core/Python.hh"
 #include "Mesh/Mesh.hh"
 #include "G4ExprParser/G4SteppingASTBuilder.hh"
-#include "Utils/RefCountBase.hh"
+#ifndef DGCODE_USEPYBIND11
+#  include "Utils/RefCountBase.hh"
+#endif
 #include "G4Interfaces/FrameworkGlobals.hh"
 
 #include "G4Utils/GeoUtils.hh"
@@ -11,7 +13,11 @@
 
 #include <sys/types.h>
 #include <unistd.h>
-#include <dgboost/mpl/vector.hpp>
+#ifdef DGCODE_USEPYBIND11
+#  include <memory>
+#else
+#  include <dgboost/mpl/vector.hpp>
+#endif
 
 // HeatMapWriter is the user visible class which will be instantiated by the user
 // on the python side and has its "inithook" method hooked into the framework by
@@ -24,10 +30,16 @@ namespace DMWriter {
 
   class HeatMapWriter;
 
+#ifdef DGCODE_USEPYBIND11
+  using HeatMapWriterPtr = std::shared_ptr<HeatMapWriter>;
+#else
+  using HeatMapWriterPtr = HeatMapWriter*;
+#endif
+
   class HeatMapSteppingAction : public G4UserSteppingAction
   {
   public:
-    static void registerWriter(HeatMapWriter*writer);
+    static void registerWriter( HeatMapWriterPtr );
     virtual void UserSteppingAction(const G4Step* step);
     static void beginEvt();
     static double stat_nevts() { assert(m_theInstance); return m_theInstance->m_meshstat_nevts; }
@@ -37,7 +49,7 @@ namespace DMWriter {
     HeatMapSteppingAction()
       : m_meshstat_nevts(0), m_meshstat_nsteps(0), m_meshstat_wsteps(0) {}
     virtual ~HeatMapSteppingAction();
-    std::vector<HeatMapWriter*> m_heatmapwriters;
+    std::vector<HeatMapWriterPtr> m_heatmapwriters;
     static HeatMapSteppingAction * m_theInstance;
     double m_meshstat_nevts;
     double m_meshstat_nsteps;
@@ -56,7 +68,11 @@ namespace DMWriter {
     }
   };
 
+#ifdef DGCODE_USEPYBIND11
+  class HeatMapWriter : public std::enable_shared_from_this<HeatMapWriter> {
+#else
   class HeatMapWriter : public Utils::RefCountBase {
+#endif
     //Class exposed to python for users to enable and configure heatmap writing.
   public:
     HeatMapWriter( const char * filename,
@@ -70,7 +86,7 @@ namespace DMWriter {
     void delayedInitIfNeeded();
 
     virtual void processG4Step(const G4Step* step, double weight);
-    ~HeatMapWriter(){}
+    ~HeatMapWriter() = default;
     void inithook();
     void setComments(const char *);
     void setFilterExpression(const char *);
@@ -100,16 +116,21 @@ namespace DMWriter {
 
   HeatMapSteppingAction::~HeatMapSteppingAction()
   {
+#ifdef DGCODE_USEPYBIND11
+    for ( auto& e : m_theInstance->m_heatmapwriters )
+      e->ensureWrite();
+#else
     auto it = m_theInstance->m_heatmapwriters.begin();
     auto itE = m_theInstance->m_heatmapwriters.end();
     for (;it!=itE;++it) {
       (*it)->ensureWrite();
       (*it)->unref();
     }
+#endif
     if (!FrameworkGlobals::isForked()||FrameworkGlobals::isParent()) {
       printf("HeatMapWriter: ==> All requested heatmap files were created successfully.\n");
       printf("HeatMapWriter: ==> Browse the files immediately with the ess_mesh3d_browse command.\n");
-      printf("HeatMapWriter: ==> More info is at https://confluence.esss.lu.se/display/DG/G4HeatMap\n");
+      printf("HeatMapWriter: ==> More info is at https://confluence.esss.lu.se/display/DGCODE/G4HeatMap\n");
     }
   }
 
@@ -118,26 +139,33 @@ namespace DMWriter {
     ++(m_theInstance->m_meshstat_nevts);
   }
 
-  void HeatMapSteppingAction::registerWriter(HeatMapWriter*writer)
+  void HeatMapSteppingAction::registerWriter( HeatMapWriterPtr writer )
   {
     if (!m_theInstance) {
       m_theInstance = new HeatMapSteppingAction;
       G4UserSteppingAction* stepact = m_theInstance;
       G4UserEventAction * evtact = new HeatMapEventAction;
-      py::object pylauncher = py::import("G4Launcher").attr("getTheLauncher")();
+      py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
+#ifdef DGCODE_USEPYBIND11
+      py::object py_stepact = py::cast(stepact);
+      py::object py_evtact = py::cast(evtact);
+      pylauncher.attr("setUserSteppingAction")(py_stepact);
+      pylauncher.attr("setUserEventAction")(py_evtact);
+#else
       pylauncher.attr("setUserSteppingAction")(py::object(boost::ref(stepact)));
       pylauncher.attr("setUserEventAction")(py::object(boost::ref(evtact)));
+#endif
     }
-    auto it = m_theInstance->m_heatmapwriters.begin();
-    auto itE = m_theInstance->m_heatmapwriters.end();
-    for (;it!=itE;++it) {
-      if (*it==writer)
+    for ( auto& e : m_theInstance->m_heatmapwriters ) {
+      if ( e == writer )
         throw std::runtime_error("Attempting to register the same HeatMapWriter more than once");
-      if ((*it)->outputFile()==writer->outputFile())
+      if ( e->outputFile() == writer->outputFile() )
         throw std::runtime_error("Attempting to register two HeatMapWriters writing to the same file");
     }
-    m_theInstance->m_heatmapwriters.push_back(writer);
+    m_theInstance->m_heatmapwriters.push_back( writer );
+#ifndef DGCODE_USEPYBIND11
     writer->ref();
+#endif
   }
 
   void HeatMapSteppingAction::UserSteppingAction(const G4Step* step)
@@ -146,13 +174,10 @@ namespace DMWriter {
     ++m_meshstat_nsteps;
     m_meshstat_wsteps += w;
     if (w) {
-      auto it = m_theInstance->m_heatmapwriters.begin();
-      auto itE = m_theInstance->m_heatmapwriters.end();
-      for (;it!=itE;++it)
-        (*it)->processG4Step(step,w);
+      for ( auto& e : m_theInstance->m_heatmapwriters )
+        e->processG4Step(step,w);
     }
   }
-
 
   void HeatMapWriter::meshInit(const long(&n)[3], const double(&lw)[3], const double(&up)[3])
   {
@@ -248,15 +273,24 @@ namespace DMWriter {
     delayedInitIfNeeded();
 
     //register to get g4 stepping callbacks and a ensure_write_file call after G4 loop:
+#ifdef DGCODE_USEPYBIND11
+    HeatMapSteppingAction::registerWriter(this->shared_from_this());
+#else
     HeatMapSteppingAction::registerWriter(this);
-
+#endif
     //Register a merge callback (will only ever get invoked in parent proc in true MP jobs):
-    py::object pylauncher = py::import("G4Launcher").attr("getTheLauncher")();
+    py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
+
+#ifdef DGCODE_USEPYBIND11
+    py::cpp_function py_merge_function( [this](){ this->merge(); } );
+    pylauncher.attr("postmp_hook")( py_merge_function );
+#else
     std::function<void()> merge_function = std::bind(&HeatMapWriter::merge,this);
     typedef boost::mpl::vector<void> function_signature;
     pylauncher.attr("postmp_hook")(py::make_function(merge_function,
                                                      boost::python::default_call_policies(),
                                                      function_signature()));
+#endif
   }
 
   void HeatMapWriter::setComments(const char * c)
@@ -367,12 +401,22 @@ namespace DMWriter {
 
 PYTHON_MODULE
 {
+#ifdef DGCODE_USEPYBIND11
+  py::class_<DMWriter::HeatMapWriter,
+             std::shared_ptr<DMWriter::HeatMapWriter> >(m,"HeatMapWriter")
+    .def(py::init<const char*,long,double,double,long,double,double,long,double,double>(),
+         py::arg("filename"),py::arg("nx"),py::arg("xlow"),py::arg("xup"),py::arg("ny"),
+         py::arg("ylow"),py::arg("yup"),py::arg("nz"),py::arg("zlow"),py::arg("zup"))
+    .def(py::init<const char *, long, long, long>(),
+         py::arg("filename"),py::arg("nx"),py::arg("ny"),py::arg("nz"))
+#else
   py::class_<DMWriter::HeatMapWriter,
              RefCountHolder<DMWriter::HeatMapWriter>,
              boost::noncopyable>("HeatMapWriter",
-    py::init<const char*,long,double,double,long,double,double,long,double,double>(
-      py::args("filename","nx","xlow","xup","ny","ylow","yup","nz","zlow","zup")))
+                                 py::init<const char*,long,double,double,long,double,double,long,double,double>(
+                                          py::args("filename","nx","xlow","xup","ny","ylow","yup","nz","zlow","zup")))
     .def(py::init<const char *, long, long, long>(py::args("filename","nx","ny","nz")))
+#endif
     .def("inithook",&DMWriter::HeatMapWriter::inithook)
     .def("setQuantity",&DMWriter::HeatMapWriter::setQuantityExpression)
     .def("setFilter",&DMWriter::HeatMapWriter::setFilterExpression)

@@ -12,7 +12,7 @@ public:
   G4VPhysicalVolume* Construct();
 };
 
-PYTHON_MODULE { GeoConstructPyExport::exportGeo<GeoEmptyWorld>("GeoEmptyWorld"); }
+PYTHON_MODULE { GeoConstructPyExport::exportGeo<GeoEmptyWorld>(PYMOD "GeoEmptyWorld"); }
 
 ////////////////////////////////////////////
 // Implementation of our geometry module: //

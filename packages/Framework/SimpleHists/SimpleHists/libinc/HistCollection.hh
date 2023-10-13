@@ -21,7 +21,6 @@ namespace SimpleHists {
     //from it's destructor:
     HistCollection( AutoSave_t, const std::string& filename );
 
-
     //Load histogram collection which was previously persistified by saveToFile(..):
     HistCollection(const std::string& filename);
 
