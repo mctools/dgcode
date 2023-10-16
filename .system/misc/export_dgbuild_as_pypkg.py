@@ -124,7 +124,7 @@ def create_cmakefiles( srcdir, tgtdir ):
                 continue
         else:
             if f.suffix in ('.cmake','.txt','.py'):
-                if f.name !=  'ExtDep_NoSystemNCrystal.cmake':
+                if f.name not in ('ExtDep_NoSystemNCrystal.cmake', 'ExtDep_Boost.cmake'):
                     ( tgtdir / f.name ).write_text( extract_file_content(f) )
                     continue
         print("WARNING: Ignoring %s"%f)

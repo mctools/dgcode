@@ -9,34 +9,42 @@ cmake_policy(POP)
 
 include( "ExtractFlags.cmake")
 
-##########################################################
-###   boost-python can either come from our shipped    ###
-###   version, or optionally from conda-boost-python   ###
-##########################################################
+# DGBUILD-EXPORT-ONLY>>#####################
+# DGBUILD-EXPORT-ONLY>>###   pybind11    ###
+# DGBUILD-EXPORT-ONLY>>#####################
+# DGBUILD-EXPORT-ONLY>>
+# DGBUILD-EXPORT-ONLY>>set( strategy_syspyboost "PYBIND11" )
+# DGBUILD-EXPORT-ONLY>>cmake_policy(PUSH)
+# DGBUILD-EXPORT-ONLY>>include("ExtDep_pybind11.cmake")
+# DGBUILD-EXPORT-ONLY>>cmake_policy(POP)
+##########################################################                           # DGBUILD-NO-EXPORT
+###   boost-python can either come from our shipped    ###                           # DGBUILD-NO-EXPORT
+###   version, or optionally from conda-boost-python   ###                           # DGBUILD-NO-EXPORT
+##########################################################                           # DGBUILD-NO-EXPORT
+set( strategy_syspyboost "$ENV{DGCODE_USECONDABOOSTPYTHON}" )                        # DGBUILD-NO-EXPORT
+string( TOUPPER "${strategy_syspyboost}" strategy_syspyboost )                       # DGBUILD-NO-EXPORT
+                                                                                     # DGBUILD-NO-EXPORT
+if ( "x${strategy_syspyboost}" STREQUAL "x" )                                        # DGBUILD-NO-EXPORT
+  #Default value:                                                                    # DGBUILD-NO-EXPORT
+  set( strategy_syspyboost PYBIND11 )                                                # DGBUILD-NO-EXPORT
+endif()                                                                              # DGBUILD-NO-EXPORT
+                                                                                     # DGBUILD-NO-EXPORT
+set( strategy_syspyboost_allowed_values "AUTO" "ALWAYS" "NEVER" "PYBIND11" )         # DGBUILD-NO-EXPORT
+if ( NOT strategy_syspyboost IN_LIST strategy_syspyboost_allowed_values )            # DGBUILD-NO-EXPORT
+  message( FATAL_ERROR "Invalid value of DGCODE_USECONDABOOSTPYTHON env var."        # DGBUILD-NO-EXPORT
+    " Must be unset or one of: ${strategy_syspyboost_allowed_values}")               # DGBUILD-NO-EXPORT
+endif()                                                                              # DGBUILD-NO-EXPORT
+                                                                                     # DGBUILD-NO-EXPORT
+if ( strategy_syspyboost STREQUAL "PYBIND11" )                                       # DGBUILD-NO-EXPORT
+  cmake_policy(PUSH)                                                                 # DGBUILD-NO-EXPORT
+  include("ExtDep_pybind11.cmake")                                                   # DGBUILD-NO-EXPORT
+  cmake_policy(POP)                                                                  # DGBUILD-NO-EXPORT
+else()                                                                               # DGBUILD-NO-EXPORT
+  cmake_policy(PUSH)                                                                 # DGBUILD-NO-EXPORT
+  include("ExtDep_Boost.cmake")                                                      # DGBUILD-NO-EXPORT
+  cmake_policy(POP)                                                                  # DGBUILD-NO-EXPORT
+endif()                                                                              # DGBUILD-NO-EXPORT
 
-set( strategy_syspyboost "$ENV{DGCODE_USECONDABOOSTPYTHON}" )
-string( TOUPPER "${strategy_syspyboost}" strategy_syspyboost )
-
-if ( "x${strategy_syspyboost}" STREQUAL "x" )
-  #Default value:
-  set( strategy_syspyboost PYBIND11 )
-endif()
-
-set( strategy_syspyboost_allowed_values "AUTO" "ALWAYS" "NEVER" "PYBIND11" )
-if ( NOT strategy_syspyboost IN_LIST strategy_syspyboost_allowed_values )
-  message( FATAL_ERROR "Invalid value of DGCODE_USECONDABOOSTPYTHON env var."
-    " Must be unset or one of: ${strategy_syspyboost_allowed_values}")
-endif()
-
-if ( strategy_syspyboost STREQUAL "PYBIND11" )
-  cmake_policy(PUSH)
-  include("ExtDep_pybind11.cmake")
-  cmake_policy(POP)
-else()
-  cmake_policy(PUSH)
-  include("ExtDep_Boost.cmake")
-  cmake_policy(POP)
-endif()
 
 #Declare include dirs added above as -isystem (and remove /usr/include):
 declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_CXX)
