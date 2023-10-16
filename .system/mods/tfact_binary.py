@@ -139,6 +139,9 @@ class TargetBinary(target_base.Target):
         d=join('${INST}',instsubdir)
         #contains_message=True
         pattern = 'create_lib' if shlib else 'create_exe'
+        if shlib and '-pie' in extra_flags:
+            #-pie is for position independent executables, not libraries:
+            extra_flags = [e for e in extra_flags if e!='-pie']
         self.code=['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sCreating %s%s"; fi'%(dcol,descr,dcolend),
                    'mkdir -p %s'%d,
                    langinfo[pattern]%(' '.join(extra_flags),

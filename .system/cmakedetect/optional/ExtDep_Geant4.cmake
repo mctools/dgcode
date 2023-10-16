@@ -92,7 +92,7 @@ if (geant4_config_file)
   #Leave C flags empty, Geant4 is for C++ only:
   set(ExtDep_Geant4_COMPILE_FLAGS_C "")
 
-  if(DEFINED ENV{CONDA_PREFIX})
+  if( DEFINED ENV{CONDA_PREFIX} AND NOT APPLE )
     #Sadly, it seems on at least ubuntu 20.04 on August 7 2023, geant4 in
     #conda-forge has unresolved but unused symbols (possible memcpy@GLIBC2.17
     #and two others, through the Qt dependency). So if CONDA_PREFIX is set, and
