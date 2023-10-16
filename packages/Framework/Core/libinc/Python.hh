@@ -76,6 +76,20 @@ namespace py = dgboost::python;
 #  define PYADDPROPERTY def_property
 #  define PYADDREADONLYPROPERTY def_property_readonly
 
+namespace pyextra {
+  bool isPyInit();//whether or not initialisation has been done (same as Py_IsInitialized())
+  void ensurePyInit();//call pyInit only if !isPyInit (will initialise with dummy sys.argv[0])
+  void pyInit(const char * argv0 = 0);//only provide sys.argv[0] (defaulting to "dummyargv0")
+  void pyInit(int argc, char** argv);//Transfer C++ cmdline to sys.argv
+
+#ifdef DGCODE_USEPYBIND11
+  inline py::object pyimport( const char * name ) { return py::module_::import(name); }
+#else
+  inline py::object pyimport( const char * name ) { return py::import(name); }
+#endif
+
+}
+
 namespace pybind11 {
   bool isPyInit();//whether or not initialisation has been done (same as Py_IsInitialized())
   void ensurePyInit();//call pyInit only if !isPyInit (will initialise with dummy sys.argv[0])
