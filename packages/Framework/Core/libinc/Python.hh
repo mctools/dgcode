@@ -51,10 +51,17 @@ namespace py = dgboost::python;
 #endif
 
 namespace pyextra {
-  bool isPyInit();//whether or not initialisation has been done (same as Py_IsInitialized())
-  void ensurePyInit();//call pyInit only if !isPyInit (will initialise with dummy sys.argv[0])
+
+  inline bool isPyInit() { return Py_IsInitialized(); }
+
   void pyInit(const char * argv0 = 0);//only provide sys.argv[0] (defaulting to "dummyargv0")
   void pyInit(int argc, char** argv);//Transfer C++ cmdline to sys.argv
+
+  inline void ensurePyInit()
+  {
+    if (!Py_IsInitialized())
+      pyInit();
+  }
 
 #ifdef DGCODE_USEPYBIND11
   inline py::object pyimport( const char * name ) { return py::module_::import(name); }

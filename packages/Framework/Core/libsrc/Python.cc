@@ -1,11 +1,6 @@
 #include "Core/Python.hh"
 #include <stdexcept>
 
-bool pyextra::isPyInit()
-{
-  return Py_IsInitialized();
-}
-
 namespace {
   void raw_dgbuild_pyInit()
   {
@@ -37,10 +32,4 @@ void pyextra::pyInit(int argc, char** argv)
   for (int i = 0; i < argc; ++i)
     pysysargv.append(std::string(argv[i]));
   pyextra::pyimport("sys").attr("argv")=pysysargv;
-}
-
-void pyextra::ensurePyInit()
-{
-  if (!Py_IsInitialized())
-    ::pyextra::pyInit();
 }

@@ -9,7 +9,7 @@ namespace G4CustomPyGen {
 
 PYTHON_MODULE
 {
-  py::pyimport("G4Interfaces");
+  pyextra::pyimport("G4Interfaces");
 #ifdef DGCODE_USEPYBIND11
   py::class_<G4CustomPyGen::GenBaseCpp,G4Interfaces::ParticleGenBase>( m, "_GenBaseCpp" )
     .def(py::init<>())
