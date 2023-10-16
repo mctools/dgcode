@@ -5,7 +5,7 @@
 
 G4VUserPhysicsList * PhysicsListFactory::attemptCreateCustomPhysicsList(const std::string& name)
 {
-  py::ensurePyInit();
+  pyextra::ensurePyInit();
   auto mod = py::pyimport("G4PhysicsLists");
   auto pyp = mod.attr("extractProvider")(name);
   if (!pyp)

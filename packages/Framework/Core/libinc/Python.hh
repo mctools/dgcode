@@ -86,24 +86,20 @@ namespace pyextra {
 #  define PYADDREADONLYPROPERTY def_property_readonly
 
 namespace pybind11 {
-  bool isPyInit();//whether or not initialisation has been done (same as Py_IsInitialized())
-  void ensurePyInit();//call pyInit only if !isPyInit (will initialise with dummy sys.argv[0])
-  void pyInit(const char * argv0 = 0);//only provide sys.argv[0] (defaulting to "dummyargv0")
-  void pyInit(int argc, char** argv);//Transfer C++ cmdline to sys.argv
 
-
+  //Adding this for migration purposes:
   constexpr return_value_policy return_ptr() noexcept { return return_value_policy::reference; }
-  //  constexpr auto return_ptr = return_value_policy::reference;
 
+  //Stop using this, start using pyextra::import (which can also ensurePyInit then!)
   inline py::object pyimport( const char * name )
   {
     return py::module_::import(name);
   }
 
+  //Adding this for migration purposes:
   template <class T>
   inline T extract( py::object o )
   {
-    //if (!py::isinstance<T>( o )
     return o.cast<T>();
   }
 
@@ -127,12 +123,6 @@ namespace boost {
 
   namespace python {
     typedef return_value_policy<reference_existing_object> return_ptr;
-
-    //initialise Python interpreter, setting also sys.argv array:
-    void pyInit(const char * argv0 = 0);//only provide sys.argv[0] (defaulting to "dummyargv0")
-    void pyInit(int argc, char** argv);//Transfer C++ cmdline to sys.argv
-    bool isPyInit();//whether or not initialisation has been done (same as Py_IsInitialized())
-    void ensurePyInit();//call pyInit only if !isPyInit (will initialise with dummy sys.argv[0])
 
     inline py::object pyimport( const char * name )
     {

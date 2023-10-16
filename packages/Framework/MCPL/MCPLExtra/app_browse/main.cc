@@ -149,7 +149,7 @@ int main(int argc, char** argv) {
 
   if (!opt_nographics) {
     try {
-      py::ensurePyInit();
+      pyextra::ensurePyInit();
       if (opt_plotexpr.empty()) {
         //bring up browser for file:
         py::object mod = py::pyimport("SimpleHists.browser");
