@@ -9,7 +9,7 @@ bool pyextra::isPyInit()
 namespace {
   void raw_dgbuild_pyInit()
   {
-    if (Py_IsInitialized()())
+    if (Py_IsInitialized())
       throw std::runtime_error("Attempt at initialising Python interpreter twice detected");
     Py_Initialize();
   }
@@ -41,6 +41,6 @@ void pyextra::pyInit(int argc, char** argv)
 
 void pyextra::ensurePyInit()
 {
-  if (!Py_IsInitialized()())
+  if (!Py_IsInitialized())
     Py_Initialize();
 }
