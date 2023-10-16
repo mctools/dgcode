@@ -4,7 +4,7 @@
 namespace {
   void raw_dgbuild_pyInit()
   {
-    if (pyextra::isPyInit())
+    if (::pyextra::isPyInit())
       throw std::runtime_error("Attempt at initialising Python interpreter twice detected");
     Py_Initialize();
   }
