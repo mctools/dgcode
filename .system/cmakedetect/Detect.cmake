@@ -18,8 +18,8 @@ set( strategy_syspyboost "$ENV{DGCODE_USECONDABOOSTPYTHON}" )
 string( TOUPPER "${strategy_syspyboost}" strategy_syspyboost )
 
 if ( "x${strategy_syspyboost}" STREQUAL "x" )
-  #Default value ( TODO: Change to "auto" at some point in the future ):
-  set( strategy_syspyboost NEVER )
+  #Default value:
+  set( strategy_syspyboost PYBIND11 )
 endif()
 
 set( strategy_syspyboost_allowed_values "AUTO" "ALWAYS" "NEVER" "PYBIND11" )
