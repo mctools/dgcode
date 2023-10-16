@@ -21,7 +21,7 @@
 
 PYTHON_MODULE
 {
-  py::pyimport("GriffDataRead");
+  pyextra::pyimport("GriffDataRead");
 #ifdef DGCODE_USEPYBIND11
   GriffAnaUtils::pyexport_filters(m);
   GriffAnaUtils::pyexport_iterators(m);

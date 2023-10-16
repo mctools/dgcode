@@ -43,7 +43,7 @@ namespace PhysicsListPyExport {
     std::string bstr = dg_stringify(PYMODNAME);
     const char * class_name = &bstr[11];
 
-    py::pyimport("G4Interfaces");
+    pyextra::pyimport("G4Interfaces");
 
     PYDEF("create_provider",&_internal_create_provider<T>,py::return_ptr());
 

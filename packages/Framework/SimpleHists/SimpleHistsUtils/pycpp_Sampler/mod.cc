@@ -39,7 +39,7 @@ namespace SimpleHists_Sampler_py {
 
 PYTHON_MODULE
 {
-  py::pyimport("SimpleHists");
+  pyextra::pyimport("SimpleHists");
 #ifdef DGCODE_USEPYBIND11
   py::class_<SimpleHists::Sampler >(m,"Sampler")
     .def(py::init<SimpleHists::Hist1D*>())

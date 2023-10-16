@@ -10,7 +10,7 @@ py::object NumpyUtils::create_numpyarray(size_t n, double*& buf)
   //Create numpy arrays for results:
   py::object numpy;
   try {
-    numpy = py::pyimport("numpy");
+    numpy = pyextra::pyimport("numpy");
   } catch (const py::error_already_set &) {
     numpy = py::object();
   }

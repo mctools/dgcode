@@ -220,8 +220,8 @@ namespace G4Launcher_py {
 
 PYTHON_MODULE
 {
-  py::pyimport("G4Interfaces");
-  py::pyimport("Utils.ParametersBase");
+  pyextra::pyimport("G4Interfaces");
+  pyextra::pyimport("Utils.ParametersBase");
 
   //We could expose G4RunManager, G4UserSteppingAction and G4UserEventAction as
   //well (at least register_ptr so it can be passed around on the python side)

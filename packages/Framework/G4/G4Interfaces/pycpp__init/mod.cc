@@ -50,7 +50,7 @@ namespace G4Interfaces_py {
 
 PYTHON_MODULE
 {
-  py::pyimport("Utils.ParametersBase");
+  pyextra::pyimport("Utils.ParametersBase");
 
   py::class_<G4Interfaces::PhysListProviderBase PYBOOSTNONCOPYABLE>(PYMOD "PhysListProviderBase" PYBOOSTNOINIT);
 

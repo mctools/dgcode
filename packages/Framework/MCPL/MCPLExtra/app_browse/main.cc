@@ -152,11 +152,11 @@ int main(int argc, char** argv) {
       pyextra::ensurePyInit();
       if (opt_plotexpr.empty()) {
         //bring up browser for file:
-        py::object mod = py::pyimport("SimpleHists.browser");
+        py::object mod = pyextra::pyimport("SimpleHists.browser");
         mod.attr("interactive_browser")(outfile);
       } else {
         //just display the single custom histogram:
-        py::object mod = py::pyimport("SimpleHists.browser");
+        py::object mod = pyextra::pyimport("SimpleHists.browser");
         mod.attr("interactive_plot_hist_from_file")(outfile,"custom");
       }
     } catch (py::error_already_set&) {

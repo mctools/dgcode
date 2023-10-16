@@ -20,7 +20,7 @@ namespace StepFilterPyExport {
   void exportFilter(const char* name)
 #endif
   {
-    py::pyimport("G4Interfaces");
+    pyextra::pyimport("G4Interfaces");
     PYDEF2("create",&_internal_create<T>,py::return_ptr());
 #ifdef DGCODE_USEPYBIND11
     py::class_<T,G4Interfaces::StepFilterBase>(themod,name)

@@ -73,8 +73,8 @@ void pyGriffDataRead_FilterParams_dump_0args(GriffDataRead::FilterParams*self) {
 
 PYTHON_MODULE
 {
-  py::pyimport("Utils.DummyParamHolder");
-  py::pyimport("Utils.RefCountBase");
+  pyextra::pyimport("Utils.DummyParamHolder");
+  pyextra::pyimport("Utils.RefCountBase");
 
 #ifdef DGCODE_USEPYBIND11
   GriffDataRead::pyexport_Step(m);

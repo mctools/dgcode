@@ -40,7 +40,7 @@ public:
     std::size_t ntot = static_cast<std::size_t>( m_data.size() );
     double * buf = m_data.mutable_data();
 #else
-    auto numpy = py::pyimport("numpy");
+    auto numpy = pyextra::pyimport("numpy");
     auto shape = py::make_tuple(mesh.filler().nCells(0),
                                 mesh.filler().nCells(1),
                                 mesh.filler().nCells(2));

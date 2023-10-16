@@ -3,7 +3,7 @@
 
 PYTHON_MODULE
 {
-  py::pyimport("Utils.ParametersBase");
+  pyextra::pyimport("Utils.ParametersBase");
 #ifdef DGCODE_USEPYBIND11
   py::class_<Utils::DummyParamHolder PYBOOSTNONCOPYABLE , Utils::ParametersBase >(PYMOD "DummyParamHolder" PYBOOSTNOINIT)
 #else

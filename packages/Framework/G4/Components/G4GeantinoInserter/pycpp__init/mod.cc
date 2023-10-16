@@ -62,11 +62,11 @@ namespace G4GeantinoInserter {
   void install()
   {
     //Get launcher:
-    py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
+    py::object pylauncher = pyextra::pyimport("G4Launcher").attr("getTheLauncher")();
     if (!pylauncher)
       throw std::runtime_error("G4GeantinoInserter.install called before G4Launcher object was created");
     //Create our call-back and register it:
-    py::pyimport("G4Interfaces");
+    pyextra::pyimport("G4Interfaces");
 #ifdef DGCODE_USEPYBIND11
     auto cb = std::make_shared<PostGenCB>();
     std::shared_ptr<G4Interfaces::PostGenCallBack> cb_base = cb;

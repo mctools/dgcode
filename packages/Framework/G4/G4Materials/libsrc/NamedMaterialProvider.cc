@@ -425,7 +425,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
                                  "users should use \"NCrystal\" instead of \"NCrystalDev\".\n");
       }
       pyextra::ensurePyInit();
-      py::object mod = py::pyimport("NCrystalPreview");
+      py::object mod = pyextra::pyimport("NCrystalPreview");
       py::object py_g4mat_str = mod.attr("createMaterial_AsSafeStr")(py::str(cfgstr));
 #ifdef DGCODE_USEPYBIND11
       if ( !py::isinstance<py::str>( py_g4mat_str ) )

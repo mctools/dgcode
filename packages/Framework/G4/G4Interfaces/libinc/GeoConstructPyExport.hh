@@ -20,7 +20,7 @@ namespace GeoConstructPyExport {
   py::class_<T,boost::noncopyable,py::bases<G4Interfaces::GeoConstructBase> > exportGeo(const char* name)
 #endif
   {
-    py::pyimport("G4Interfaces");
+    pyextra::pyimport("G4Interfaces");
     PYDEF2("create",&_internal_create<T>,py::return_ptr());
 #ifdef DGCODE_USEPYBIND11
     return py::class_<T,G4Interfaces::GeoConstructBase>(themod,name)

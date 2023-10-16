@@ -145,7 +145,7 @@ namespace DMWriter {
       m_theInstance = new HeatMapSteppingAction;
       G4UserSteppingAction* stepact = m_theInstance;
       G4UserEventAction * evtact = new HeatMapEventAction;
-      py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
+      py::object pylauncher = pyextra::pyimport("G4Launcher").attr("getTheLauncher")();
 #ifdef DGCODE_USEPYBIND11
       py::object py_stepact = py::cast(stepact);
       py::object py_evtact = py::cast(evtact);
@@ -279,7 +279,7 @@ namespace DMWriter {
     HeatMapSteppingAction::registerWriter(this);
 #endif
     //Register a merge callback (will only ever get invoked in parent proc in true MP jobs):
-    py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
+    py::object pylauncher = pyextra::pyimport("G4Launcher").attr("getTheLauncher")();
 
 #ifdef DGCODE_USEPYBIND11
     py::cpp_function py_merge_function( [this](){ this->merge(); } );

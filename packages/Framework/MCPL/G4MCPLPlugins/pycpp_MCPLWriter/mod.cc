@@ -274,7 +274,7 @@ namespace G4MCPLWriter {
       if (FrameworkGlobals::isForked()&&FrameworkGlobals::isParent()) {
         pyextra::ensurePyInit();
         m_om = new MCPLOutputMerger(this);
-        py::object pylauncher = py::pyimport("G4Launcher").attr("getTheLauncher")();
+        py::object pylauncher = pyextra::pyimport("G4Launcher").attr("getTheLauncher")();
 #ifdef DGCODE_USEPYBIND11
         py::object pyhook = py::cast(m_om);
         pylauncher.attr("postmp_hook")(pyhook);
@@ -525,7 +525,7 @@ namespace G4MCPLWriter {
         out.emplace_back("comment",tmp.str());
       }
 
-      auto mod = py::pyimport("G4Launcher");//must work since we use it in inithook()
+      auto mod = pyextra::pyimport("G4Launcher");//must work since we use it in inithook()
       auto launcher = mod.attr("getTheLauncher")();
       auto pygeo = launcher.attr("getGeo")();
       auto pygen = launcher.attr("getGen")();

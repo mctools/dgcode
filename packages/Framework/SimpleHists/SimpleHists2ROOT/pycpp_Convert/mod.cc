@@ -54,7 +54,7 @@ PYTHON_MODULE
     " be avoided by using the sister module " BOOST_STRINGIZE(PACKAGE_NAME) ".ConvertFile"
     " instead, when only file-level manipulations are needed.";
 
-  py::pyimport("ROOT");
+  pyextra::pyimport("ROOT");
 
   PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_1D);
   PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_2D);
