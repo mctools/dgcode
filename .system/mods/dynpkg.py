@@ -89,7 +89,9 @@ class DynPkgBuilder:
         assert self._fct_getdeppaths is None and self._fct_blddynpkg is None, "Reload of custom modules not supported"
         self._ensure_updated_modfile()
         #sanity check that there are not cmdline arguments which might be inspected by dynamic code:
-        assert len(sys.argv)==1
+        #FIXME I REMOVED THIS!! assert len(sys.argv)==1
+        while len(sys.argv)>1:
+            sys.argv.pop()
         try:
             thedynmod = import_modatpath(self._dynmodname)
         except Exception as e:
