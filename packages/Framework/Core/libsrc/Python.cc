@@ -42,5 +42,5 @@ void pyextra::pyInit(int argc, char** argv)
 void pyextra::ensurePyInit()
 {
   if (!Py_IsInitialized())
-    Py_Initialize();
+    ::pyextra::pyInit();
 }
