@@ -2,9 +2,13 @@
 
 import os
 import pathlib
+import sysconfig
 from . import envcfg
+
 def AbsPath( p ):
     return pathlib.Path(p).expanduser().resolve().absolute()
+
+__cache_pyextsuf = sysconfig.get_config_var('EXT_SUFFIX') #value like '.cpython-311-x86_64-linux-gnu.so' (.so even on osx)
 
 lang_extensions = {
     'cxx' : ( ['hh', 'icc'], ['cc'] ),
@@ -27,7 +31,8 @@ def runnable_is_test(runnable_name):
 
 def libldflag(pkg): return '-lPKG__%s'%pkg.name
 def namefct_lib(pkg,subdir,platform_pattern): return platform_pattern%('PKG__'+pkg.name)
-def namefct_pycpp(pkg,subdir,platform_pattern): return subdir[6:]+'.so'#python mods must always be .so
+def namefct_pycpp(pkg,subdir,platform_pattern): return subdir[6:] + __cache_pyextsuf
+
 def namefct_app(pkg,subdir,platform_pattern): return runnable_name(pkg,subdir[4:])
 
 def checkfct_pycpp(pkg,subdir,name):
