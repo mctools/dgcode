@@ -86,7 +86,7 @@ namespace DMWriter {
     void delayedInitIfNeeded();
 
     virtual void processG4Step(const G4Step* step, double weight);
-    ~HeatMapWriter() = default;
+    virtual ~HeatMapWriter() = default;
     void inithook();
     void setComments(const char *);
     void setFilterExpression(const char *);

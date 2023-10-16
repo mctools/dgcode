@@ -20,8 +20,14 @@ namespace Utils {
     typedef std::vector<std::string> ParameterList;
     typedef std::set<std::string> ParameterSet;
 
+    //Forbid copy/move completely, which seems safest:
+    ParametersBase( const ParametersBase& ) = delete;
+    ParametersBase& operator=( const ParametersBase& ) = delete;
+    ParametersBase( ParametersBase&& ) = delete;
+    ParametersBase& operator=( ParametersBase&& ) = delete;
+
     ParametersBase();
-    ~ParametersBase();
+    virtual ~ParametersBase();
 
     //Set parameters by the following methods
     void setParameterDouble(const std::string&name, double value);

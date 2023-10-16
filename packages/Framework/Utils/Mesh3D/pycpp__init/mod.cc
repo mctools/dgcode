@@ -143,7 +143,7 @@ public:
         for (std::int64_t iz = 0; iz < nz; ++iz) {
           double v = buf[ix*ny*nz+iy*nz+iz];
           if (v||include_empty)
-            printf("  cell[%li,%li,%li] = %g\n",ix,iy,iz,v);
+            printf("  cell[%" PRId64 ",%" PRId64 ",%" PRId64 "] = %g\n",ix,iy,iz,v);
         }
 #else
     double* buf;
@@ -159,7 +159,7 @@ public:
         for (std::int64_t iz = 0; iz < nz; ++iz) {
           double v = buf[ix*ny*nz+iy*nz+iz];
           if (v||include_empty)
-            printf("  cell[%li,%li,%li] = %g\n",(long)ix,(long)iy,(long)iz,v);
+            printf("  cell[%" PRId64 ",%" PRId64 ",%" PRId64 "] = %g\n",ix,iy,iz,v);
         }
 #endif
   }
