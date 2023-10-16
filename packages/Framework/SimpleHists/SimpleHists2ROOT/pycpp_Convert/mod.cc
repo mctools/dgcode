@@ -48,10 +48,14 @@ namespace SimpleHists_pycpp {
 
 PYTHON_MODULE
 {
+#ifdef DGCODE_USEPYBIND11
+  m.doc() =
+#else
   py::scope().attr("__doc__") =
+#endif
     "Python module providing the convertToROOT and convertToROOTFile"
     " functions from Convert.hh. It imports ROOT internally, which can"
-    " be avoided by using the sister module " BOOST_STRINGIZE(PACKAGE_NAME) ".ConvertFile"
+    " be avoided by using the sister module " dg_stringify(PACKAGE_NAME) ".ConvertFile"
     " instead, when only file-level manipulations are needed.";
 
   pyextra::pyimport("ROOT");

@@ -20,10 +20,14 @@ namespace SimpleHists_pycppcf {
 
 PYTHON_MODULE
 {
+#ifdef DGCODE_USEPYBIND11
+  m.doc() =
+#else
   py::scope().attr("__doc__") =
+#endif
     "Python module providing the convertToROOTFile functions from"
     " Convert.hh. If the convertToROOT functions are needed, one"
-    " must use the sister module " BOOST_STRINGIZE(PACKAGE_NAME) ".Convert instead.";
+    " must use the sister module " dg_stringify(PACKAGE_NAME) ".Convert instead.";
 
   PYDEF("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_hc);
   PYDEF("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_fn);

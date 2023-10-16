@@ -38,6 +38,7 @@ public:
 #ifdef DGCODE_USEPYBIND11
     m_data = PyNumpyArrayDbl( {mesh.filler().nCells(0),mesh.filler().nCells(1),mesh.filler().nCells(2)} );
     std::size_t ntot = static_cast<std::size_t>( m_data.size() );
+    (void)ntot;
     double * buf = m_data.mutable_data();
 #else
     auto numpy = pyextra::pyimport("numpy");
@@ -132,6 +133,7 @@ public:
   void print_cells(bool include_empty) const {
 #ifdef DGCODE_USEPYBIND11
     std::size_t ntot = static_cast<std::size_t>( m_data.size() );
+    (void)ntot;
     const double * buf = m_data.data();
     assert(buf);
     auto nx = m_cells_n[0];
