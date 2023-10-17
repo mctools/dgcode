@@ -10,7 +10,13 @@
 
 namespace SimpleHists_pycpp {
 
-  PyObject* convertToPyROOT(const SimpleHists::HistBase*h, const char* root_name)
+#ifdef DGCODE_USEPYBIND11
+  using PyObjReturnType = py::object;
+#else
+  using PyObjReturnType = PyObject*;
+#endif
+
+  PyObjReturnType convertToPyROOT(const SimpleHists::HistBase*h, const char* root_name)
   {
 #ifdef HAS_ROOT_PYTHON
     auto hr = SimpleHists::convertToROOT(h,root_name);
@@ -19,18 +25,24 @@ namespace SimpleHists_pycpp {
                              //investigate further, but for now we assume we can
                              //live with a few minor possible leaks.
     //NB: Method was called TPython::ObjectProxy_FromVoidPtr before ROOT 6.22.
+#  ifdef DGCODE_USEPYBIND11
+    PyObject * raw_o = TPython::CPPInstance_FromVoidPtr(hr, hr->ClassName(), python_owns);
+    auto handle = py::handle( raw_o );
+    return handle.cast<py::object>();
+#  else
     return TPython::CPPInstance_FromVoidPtr(hr, hr->ClassName(), python_owns);
+#  endif
 #else
     (void)h;
     (void)root_name;
-    return 0;
+    return nullptr;
 #endif
   }
 
-  PyObject* convertToROOT_1D(const SimpleHists::Hist1D*h, const char* rn) { return convertToPyROOT(h,rn); }
-  PyObject* convertToROOT_2D(const SimpleHists::Hist2D*h, const char* rn) { return convertToPyROOT(h,rn); }
-  PyObject* convertToROOT_Counts(const SimpleHists::HistCounts*h, const char* rn) { return convertToPyROOT(h,rn); }
-  PyObject* convertToROOT_Base(const SimpleHists::HistBase*h, const char* rn) { return convertToPyROOT(h,rn); }
+  PyObjReturnType convertToROOT_1D(const SimpleHists::Hist1D*h, const char* rn) { return convertToPyROOT(h,rn); }
+  PyObjReturnType convertToROOT_2D(const SimpleHists::Hist2D*h, const char* rn) { return convertToPyROOT(h,rn); }
+  PyObjReturnType convertToROOT_Counts(const SimpleHists::HistCounts*h, const char* rn) { return convertToPyROOT(h,rn); }
+  PyObjReturnType convertToROOT_Base(const SimpleHists::HistBase*h, const char* rn) { return convertToPyROOT(h,rn); }
 
   void convertToROOTFile_hc( const SimpleHists::HistCollection* hc,
                              const char* filename_root )
