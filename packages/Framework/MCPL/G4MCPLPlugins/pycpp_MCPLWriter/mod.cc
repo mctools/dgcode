@@ -272,7 +272,6 @@ namespace G4MCPLWriter {
       if (m_opt_universalweight) mcpl_enable_universal_weight(m_f,m_opt_universalweight);
 
       if (FrameworkGlobals::isForked()&&FrameworkGlobals::isParent()) {
-        pyextra::ensurePyInit();
         m_om = new MCPLOutputMerger(this);
         py::object pylauncher = pyextra::pyimport("G4Launcher").attr("getTheLauncher")();
 #ifdef DGCODE_USEPYBIND11
