@@ -800,7 +800,7 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
         extdeps_avail = sorted(k for (k,v) in env.env['extdeps'].items() if v['present'])
         extdeps_missing = sorted(k for (k,v) in env.env['extdeps'].items() if not v['present'])
 
-        #Compilers (Fortran is considered optional), CMake, and required externals deps like Python and Boost:
+        #Compilers (Fortran is considered optional), CMake, and required externals deps like Python and pybind11:
         reqdep = [('CMake',env.env['system']['general']['cmake_version'])]
         for lang,info in env.env['system']['langs'].items():
             if not info:

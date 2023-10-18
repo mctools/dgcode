@@ -39,9 +39,6 @@ class EnvCfgClassic:
         'DGCODE_PROJECTS_DIR', 'DGCODE_INSTALL_DIR_RESOLVED','DGCODE_BUILD_DIR_RESOLVED',
         'DGCODE_EXTRA_PKG_PATH', 'DGCODE_ENABLE_PROJECTS_PKG_SELECTION_FLAG','DGCODE_COLOR_FIX',
         'CONDA_PREFIX','CMAKE_ARGS',
-        #Then some more used in our cmake modules (but not most of those marked for
-        #reconf inside the ExtDep_xxx.cmake files):
-        'DGCODE_USECONDABOOSTPYTHON'
     ]
 
     env_paths = {}
@@ -90,9 +87,6 @@ def _newcfg():
         reconf_env_vars = [
             #All of the above except DGCODE_ALLOWSYSDEV:
             'PATH','DGCODE_COLOR_FIX','CONDA_PREFIX','CMAKE_ARGS','PYTHONPATH',
-            #Then some more used in our cmake modules (but not those marked for
-            #reconf inside the optional/ExtDep_xxx.cmake files):
-            'DGCODE_USECONDABOOSTPYTHON',
             #Also this one of course:
             'DGBUILD_CFG',
         ]
