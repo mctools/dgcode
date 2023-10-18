@@ -1,4 +1,8 @@
-#include "Core/Python.hh"//for dynamic NCrystalDev support
+#define DOSUPPORT_NCRYSTALDEV_MATERIALS
+
+#ifdef DOSUPPORT_NCRYSTALDEV_MATERIALS
+#  include "Core/Python.hh"//for dynamic NCrystalDev support
+#endif
 #include "G4Materials/NamedMaterialProvider.hh"
 #include "G4Materials/CommonMaterials.hh"
 #include "G4Materials/ShieldingMaterials.hh"
@@ -410,6 +414,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     // mat->GetIonisation()->SetMeanExcitationEnergy(mat_orig->GetIonisation()->GetMeanExcitationEnergy());
 
   } else if (matinfo.name=="NCrystalDev") {
+#ifdef DOSUPPORT_NCRYSTALDEV_MATERIALS
     std::string cfgstr = matinfo.propertyAsString("cfg","");
     cfgstr += matinfo.getTempAsNCrystalCfgStrPostfix();
     cfgstr += matinfo.getDensityAsNCrystalCfgStrPostfix();
@@ -427,16 +432,16 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
       pyextra::ensurePyInit();
       py::object mod = pyextra::pyimport("NCrystalPreview");
       py::object py_g4mat_str = mod.attr("createMaterial_AsSafeStr")(py::str(cfgstr));
-#ifdef DGCODE_USEPYBIND11
+#  ifdef DGCODE_USEPYBIND11
       if ( !py::isinstance<py::str>( py_g4mat_str ) )
         throw std::runtime_error("Unexpected problem getting G4Material pointer for NCrystalDev material.");
       std::string g4mat_str =  py_g4mat_str.cast<std::string>();
-#else
+#  else
       auto try_g4mat_str =  py::extract<std::string>( py_g4mat_str );
       if ( !try_g4mat_str.check() )
         throw std::runtime_error("Unexpected problem getting G4Material pointer for NCrystalDev material.");
       std::string g4mat_str = try_g4mat_str();
-#endif
+#  endif
       std::stringstream ss_int;
       ss_int << g4mat_str;
       std::uintptr_t g4mat_int;
@@ -445,6 +450,9 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
       if (!mat)
         throw std::runtime_error("Got null G4Material pointer for NCrystalDev material.");
     }
+#else
+    throw std::runtime_error("NamedMaterialProvider was compiled without support for NCrystalDev materials");
+#endif
   } else if (matinfo.name=="NCrystal") {
     const std::string& overridebaseg4mat = matinfo.propertyAsString("overridebaseg4mat","");
     std::string cfgstr = matinfo.propertyAsString("cfg","");
