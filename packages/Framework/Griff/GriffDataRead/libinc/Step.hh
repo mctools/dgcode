@@ -4,10 +4,6 @@
 #include <cmath>
 #include <string>
 
-#ifdef DGCODE_USEPYBIND11
-namespace pybind11{ class module_; }
-#endif
-
 namespace GriffDataRead {
 
   class Segment;
@@ -93,11 +89,6 @@ namespace GriffDataRead {
     friend class Segment;
     void set(const Segment *s,const char *d);
   };
-#ifdef DGCODE_USEPYBIND11
-  void pyexport_Step( pybind11::module_ );
-#else
-  void pyexport_Step();
-#endif
 }
 
 #ifndef GriffDataRead_Segment_hh

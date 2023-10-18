@@ -8,10 +8,6 @@
 #include <cassert>
 #include <string>
 
-#ifdef DGCODE_USEPYBIND11
-namespace pybind11{ class module_; }
-#endif
-
 class GriffDataReader;
 
 namespace GriffDataRead
@@ -105,11 +101,6 @@ namespace GriffDataRead
     void lookupPartDef() const;
     const GriffFormat::ParticleDefinition * pdef() const;
   };
-#ifdef DGCODE_USEPYBIND11
-  void pyexport_Track( pybind11::module_ );
-#else
-  void pyexport_Track();
-#endif
 }
 
 #ifndef GriffDataRead_Segment_hh

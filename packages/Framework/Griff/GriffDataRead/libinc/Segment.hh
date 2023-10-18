@@ -6,10 +6,6 @@
 #include "GriffDataRead/Touchable.hh"
 #include "GriffDataRead/Material.hh"
 
-#ifdef DGCODE_USEPYBIND11
-namespace pybind11{ class module_; }
-#endif
-
 class GriffDataReader;
 
 namespace GriffDataRead {
@@ -86,11 +82,6 @@ namespace GriffDataRead {
     mutable const Step* m_stepsEnd;//0 means steps are not setup, 0x1 means the mode is minimal.
     EvtFile::index_type touchableIndex() const;
   };
-#ifdef DGCODE_USEPYBIND11
-  void pyexport_Segment( pybind11::module_ );
-#else
-  void pyexport_Segment();
-#endif
 }
 
 #ifndef GriffDataRead_GriffDataReader_hh

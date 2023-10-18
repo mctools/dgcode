@@ -1,3 +1,5 @@
+#include "Core/Python.hh"
+
 #include "GriffDataRead/GriffDataReader.hh"
 #include "GriffDataRead/Track.hh"
 #include "GriffDataRead/Segment.hh"
@@ -6,70 +8,82 @@
 #include "GriffDataRead/Material.hh"
 #include "GriffDataRead/Element.hh"
 #include "GriffDataRead/Isotope.hh"
-#include "Core/Python.hh"
 
+namespace {
+  template < typename T>
+  struct BlankDeleter
+  {
+    void operator()(T *) const {}
+  };
+}
+
+#include "step.hh"
+#include "segment.hh"
+#include "track.hh"
 #include "materials.hh"
 
-#ifndef DGCODE_USEPYBIND11
-boost::shared_ptr<GriffDataReader> pyGriffDataReader_init_pylist1(py::list& l)
-{
-  std::vector<std::string> v;
-  for (int i = 0; i < len(l); ++i)
-    v.push_back(boost::python::extract<std::string>(l[i]));
-  return boost::shared_ptr<GriffDataReader>(new GriffDataReader(v));
-}
-boost::shared_ptr<GriffDataReader> pyGriffDataReader_init_pylist2(py::list& l,unsigned n)
-{
-  std::vector<std::string> v;
-  for (int i = 0; i < len(l); ++i)
-    v.push_back(boost::python::extract<std::string>(l[i]));
-  return boost::shared_ptr<GriffDataReader>(new GriffDataReader(v,n));
-}
-#endif
+// #ifndef DGCODE_USEPYBIND11
+// boost::shared_ptr<GriffDataReader> pyGriffDataReader_init_pylist1(py::list& l)
+// {
+//   std::vector<std::string> v;
+//   for (int i = 0; i < len(l); ++i)
+//     v.push_back(boost::python::extract<std::string>(l[i]));
+//   return boost::shared_ptr<GriffDataReader>(new GriffDataReader(v));
+// }
+// boost::shared_ptr<GriffDataReader> pyGriffDataReader_init_pylist2(py::list& l,unsigned n)
+// {
+//   std::vector<std::string> v;
+//   for (int i = 0; i < len(l); ++i)
+//     v.push_back(boost::python::extract<std::string>(l[i]));
+//   return boost::shared_ptr<GriffDataReader>(new GriffDataReader(v,n));
+// }
+// #endif
 
-py::dict pyGriffDataReadSetup_metaData(GriffDataRead::Setup*self)
-{
-  py::dict d;
-  const auto& m = self->metaData();
-  auto itE = m.end();
-  for (auto it=m.begin();it!=itE;++it) {
+namespace {
+  py::dict pyGriffDataReadSetup_metaData(GriffDataRead::Setup*self)
+  {
+    py::dict d;
+    const auto& m = self->metaData();
+    auto itE = m.end();
+    for (auto it=m.begin();it!=itE;++it) {
 #ifdef DGCODE_USEPYBIND11
-    d[it->first.c_str()]=it->second.c_str();
+      d[it->first.c_str()]=it->second.c_str();
 #else
-    d[it->first]=it->second;
+      d[it->first]=it->second;
 #endif
+    }
+    return d;
   }
-  return d;
-}
 
-py::dict pyGriffDataReadSetup_userData(GriffDataRead::Setup*self)
-{
-  py::dict d;
-  const auto& m = self->userData();
-  auto itE = m.end();
-  for (auto it=m.begin();it!=itE;++it)
+  py::dict pyGriffDataReadSetup_userData(GriffDataRead::Setup*self)
+  {
+    py::dict d;
+    const auto& m = self->userData();
+    auto itE = m.end();
+    for (auto it=m.begin();it!=itE;++it)
 #ifdef DGCODE_USEPYBIND11
-    d[it->first.c_str()]=it->second.c_str();
+      d[it->first.c_str()]=it->second.c_str();
 #else
     d[it->first]=it->second;
 #endif
-  return d;
-}
+    return d;
+  }
 
-py::list pyGriffDataReadSetup_cmds(GriffDataRead::Setup*self)
-{
-  py::list l;
-  const auto& cmds = self->cmds();
-  auto itE = cmds.end();
-  for (auto it=cmds.begin();it!=itE;++it)
-    l.append(*it);
-  return l;
-}
+  py::list pyGriffDataReadSetup_cmds(GriffDataRead::Setup*self)
+  {
+    py::list l;
+    const auto& cmds = self->cmds();
+    auto itE = cmds.end();
+    for (auto it=cmds.begin();it!=itE;++it)
+      l.append(*it);
+    return l;
+  }
 
-void pyGriffDataReadSetup_dump_0args(GriffDataRead::Setup*self) { self->dump(); }
-void pyGriffDataRead_GeoParams_dump_0args(GriffDataRead::GeoParams*self) { self->dump(); }
-void pyGriffDataRead_GenParams_dump_0args(GriffDataRead::GenParams*self) { self->dump(); }
-void pyGriffDataRead_FilterParams_dump_0args(GriffDataRead::FilterParams*self) { self->dump(); }
+  void pyGriffDataReadSetup_dump_0args(GriffDataRead::Setup*self) { self->dump(); }
+  void pyGriffDataRead_GeoParams_dump_0args(GriffDataRead::GeoParams*self) { self->dump(); }
+  void pyGriffDataRead_GenParams_dump_0args(GriffDataRead::GenParams*self) { self->dump(); }
+  void pyGriffDataRead_FilterParams_dump_0args(GriffDataRead::FilterParams*self) { self->dump(); }
+}
 
 PYTHON_MODULE
 {
@@ -77,15 +91,15 @@ PYTHON_MODULE
   pyextra::pyimport("Utils.RefCountBase");
 
 #ifdef DGCODE_USEPYBIND11
-  GriffDataRead::pyexport_Step(m);
-  GriffDataRead::pyexport_Segment(m);
-  GriffDataRead::pyexport_Track(m);
-  GriffDataRead::pyexport_Material(m);
+  GDR_step::pyexport(m);
+  GDR_segment::pyexport(m);
+  GDR_track::pyexport(m);
+  GDR_material::pyexport(m);
 #else
-  GriffDataRead::pyexport_Step();
-  GriffDataRead::pyexport_Segment();
-  GriffDataRead::pyexport_Track();
-  GriffDataRead::pyexport_Material();
+  // GriffDataRead::pyexport_Step();
+  // GriffDataRead::pyexport_Segment();
+  // GriffDataRead::pyexport_Track();
+  //  GriffDataRead::pyexport_Material();
 #endif
 #ifdef DGCODE_USEPYBIND11
   py::class_<GriffDataRead::GeoParams,
@@ -164,9 +178,9 @@ PYTHON_MODULE
       return std::make_shared<GriffDataReader>(v,narg);
     }))
 #else
-  py::class_<GriffDataReader,boost::noncopyable>("GriffDataReader",py::init<std::string>())
-    .def("__init__", py::make_constructor(&pyGriffDataReader_init_pylist1))
-    .def("__init__", py::make_constructor(&pyGriffDataReader_init_pylist2))
+  // py::class_<GriffDataReader,boost::noncopyable>("GriffDataReader",py::init<std::string>())
+  //   .def("__init__", py::make_constructor(&pyGriffDataReader_init_pylist1))
+  //   .def("__init__", py::make_constructor(&pyGriffDataReader_init_pylist2))
 #endif
     .def(py::init<std::string, unsigned>())
     .def(py::init<std::vector<std::string> >())
