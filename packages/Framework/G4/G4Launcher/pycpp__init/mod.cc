@@ -36,7 +36,6 @@ namespace G4Launcher_py {
       throw std::runtime_error("pytuple2g4vect got tuple of invalid length.");
     assert(py::len(t)==3);
 
-#ifdef DGCODE_USEPYBIND11
     double x,y,z;
     try {
       x = t[0].cast<double>();
@@ -46,15 +45,6 @@ namespace G4Launcher_py {
       throw std::runtime_error("pytuple2g4vect got tuple of invalid content (must be floats).");
     }
     return G4ThreeVector(x,y,z);
-#else
-    auto x = py::extract<float>(t[0]);
-    auto y = py::extract<float>(t[1]);
-    auto z = py::extract<float>(t[2]);
-    if ( !x.check() || !y.check() || !z.check() )
-      throw std::runtime_error("pytuple2g4vect got tuple of invalid content (must be floats).");
-    return G4ThreeVector(x(),y(),z());
-#endif
-
   }
 
   void Launcher_addPreGenHook( G4Launcher::Launcher& launcher, G4Interfaces::PreGenCallBack * cb )
@@ -70,7 +60,6 @@ namespace G4Launcher_py {
     launcher.addPostGenHook(shptr_cb);
   }
 
-#ifdef DGCODE_USEPYBIND11
   void Launcher_setGeo( G4Launcher::Launcher& launcher, py::object o )
   {
     if ( !py::isinstance<G4Interfaces::GeoConstructBase>( o ) )
@@ -136,44 +125,6 @@ namespace G4Launcher_py {
     }
     return new G4Launcher::Launcher( geo, gen, filter );//Returning new object, due to singleton nature of G4Launcher.
   }
-#else
-  G4Launcher::Launcher* Launcher_pyinit( py::list args )
-  {
-    G4Interfaces::GeoConstructBase* geo(nullptr);
-    G4Interfaces::ParticleGenBase* gen(nullptr);
-    G4Interfaces::StepFilterBase* filter(nullptr);
-    for ( int i = 0; i < py::len(args); ++i ) {
-      py::object e = args[i];
-      auto try_geo = py::extract<G4Interfaces::GeoConstructBase*>( e );
-      if ( try_geo.check() ) {
-        if ( geo )
-          throw std::runtime_error("Too many geometry objects passed to Launcher.");
-        geo = try_geo();
-        continue;
-      }
-      auto try_gen = py::extract<G4Interfaces::ParticleGenBase*>( e );
-      if ( try_gen.check() ) {
-        if ( gen )
-          throw std::runtime_error("Too many particle generator objects passed to Launcher.");
-        gen = try_gen();
-        continue;
-      }
-      auto try_filter = py::extract<G4Interfaces::StepFilterBase*>( e );
-      if ( try_filter.check() ) {
-        if ( filter )
-          throw std::runtime_error("Too many step filter objects passed to Launcher.");
-        filter = try_filter();
-        continue;
-      }
-      //error:
-      std::ostringstream ss;
-      std::string as_str = py::extract<std::string>(py::str(e))();
-      ss<<"Unknown argument for Launcher: \""<< as_str<<"\"";
-      throw std::runtime_error(ss.str());
-    }
-    return new G4Launcher::Launcher( geo, gen, filter );//Returning new object, due to singleton nature of G4Launcher.
-  }
-#endif
 
   void Launcher_setParticleGun1(G4Launcher::Launcher& l,int pdgcode, double eKin,
                                 const py::tuple& pos,const py::tuple& momdir)
@@ -227,47 +178,26 @@ PYTHON_MODULE
   //well (at least register_ptr so it can be passed around on the python side)
   //... update: can't find register_ptr anymore, so here is a very basic
   //declaration of at least the stepping and event actions:
-#ifdef DGCODE_USEPYBIND11
   py::class_<G4UserSteppingAction>(m,"G4UserSteppingAction")
     ;
   py::class_<G4UserEventAction>(m,"G4UserEventAction")
     ;
-#else
-  py::class_<G4UserSteppingAction ,boost::noncopyable>("G4UserSteppingAction",py::no_init)
-    ;
-  py::class_<G4UserEventAction,boost::noncopyable>("G4UserEventAction",py::no_init)
-    ;
-#endif
-
   PYDEF("g4version",G4Launcher_py::g4version);
   PYDEF("g4versionstr",G4Launcher_py::g4versionstr);
-#ifdef DGCODE_USEPYBIND11
   py::class_<G4Launcher_py::LauncherExtraPars,Utils::ParametersBase>(m,"LauncherExtraPars")
     .def(py::init<>())
-#else
-  py::class_<G4Launcher_py::LauncherExtraPars,boost::noncopyable,py::bases<Utils::ParametersBase> >("LauncherExtraPars")
-#endif
     .def("addParameterBoolean",&G4Launcher_py::LauncherExtraPars::pyaddPB)
     .def("addParameterInt",&G4Launcher_py::LauncherExtraPars::pyaddPI)
     .def("addParameterString",&G4Launcher_py::LauncherExtraPars::pyaddPS)
     .def("addParameterDouble",&G4Launcher_py::LauncherExtraPars::pyaddPD)
     ;
 
-#ifdef DGCODE_USEPYBIND11
   py::class_<G4Launcher::Launcher>(m,"Launcher",py::dynamic_attr())//py::dynamic_attr to allow py-layer to add attributes (in _launcher.py)
     .def(py::init(&G4Launcher_py::Launcher_pyinit),py::return_ptr())
     .def("setGeo",&G4Launcher_py::Launcher_setGeo)
     .def("setGen",&G4Launcher_py::Launcher_setGen)
     .def("setFilter",&G4Launcher_py::Launcher_setFilter)
     .def("setKillFilter",&G4Launcher_py::Launcher_setKillFilter)
-#else
-    py::class_<G4Launcher::Launcher,boost::noncopyable>("Launcher",py::no_init)
-    .def("__init__", make_constructor(&G4Launcher_py::Launcher_pyinit))
-    .def("setGeo",&G4Launcher::Launcher::setGeo)
-    .def("setGen",&G4Launcher::Launcher::setGen)
-    .def("setFilter",&G4Launcher::Launcher::setFilter)
-    .def("setKillFilter",&G4Launcher::Launcher::setKillFilter)
-#endif
     .def("setMultiProcessing",&G4Launcher::Launcher::setMultiProcessing)
     .def("getRunManager",&G4Launcher::Launcher::getRunManager,py::return_ptr())
     .def("setVis",&G4Launcher::Launcher::setVis)

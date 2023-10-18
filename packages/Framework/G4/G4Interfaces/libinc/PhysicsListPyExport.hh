@@ -33,13 +33,8 @@ namespace PhysicsListPyExport {
   //The reason being that we want to be able to identify available physics lists
   //merely from looking at module names.
 
-#if defined(DGCODE_USEPYBIND11)
   template <class T>
-  py::class_<T PYBOOSTNONCOPYABLE> exportPhysList( py::module_ m )
-#else
-  template <class T>
-  py::class_<T PYBOOSTNONCOPYABLE> exportPhysList()
-#endif
+  py::class_<T> exportPhysList( py::module_ themod )
   {
     //remember, if not using gcc, __GNUCC__ will evaluate to 0 (we want to exclude gcc <= 4.5)
     if ( strncmp("g4physlist_",dg_stringify(PYMODNAME),11)!=0 )
@@ -49,15 +44,10 @@ namespace PhysicsListPyExport {
 
     pyextra::pyimport("G4Interfaces");
 
-    PYDEF("create_provider",&_internal_create_provider<T>,py::return_ptr());
+    themod.def("create_provider",&_internal_create_provider<T>,py::return_ptr());
 
-#if defined(DGCODE_USEPYBIND11)
-    py::class_<Provider<T>,G4Interfaces::PhysListProviderBase >(m,(std::string("Provider__")+class_name).c_str());
-    return py::class_<T>(m,class_name);
-#else
-    py::class_<Provider<T>,boost::noncopyable,py::bases<G4Interfaces::PhysListProviderBase> >((std::string("Provider__")+class_name).c_str(),py::no_init);
-    return py::class_<T,boost::noncopyable>(class_name,py::no_init);
-#endif
+    py::class_<Provider<T>,G4Interfaces::PhysListProviderBase >(themod,(std::string("Provider__")+class_name).c_str());
+    return py::class_<T>(themod,class_name);
   }
 }
 

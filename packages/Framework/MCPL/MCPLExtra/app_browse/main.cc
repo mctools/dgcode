@@ -160,11 +160,7 @@ int main(int argc, char** argv) {
         mod.attr("interactive_plot_hist_from_file")(outfile,"custom");
       }
     } catch (py::error_already_set&) {
-#if defined(DGCODE_USEPYBIND11)
       throw;//TODO: better handling in pybind11 than this?
-#else
-      py::print_and_handle_exception();
-#endif
     }
   }
 

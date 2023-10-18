@@ -18,21 +18,13 @@ namespace GeoConstructPyExport {
   }
 
   template <class T>
-#ifdef DGCODE_USEPYBIND11
   py::class_<T,G4Interfaces::GeoConstructBase> exportGeo(py::module_ themod, const char* name)
-#else
-  py::class_<T,boost::noncopyable,py::bases<G4Interfaces::GeoConstructBase> > exportGeo(const char* name)
-#endif
   {
     pyextra::pyimport("G4Interfaces");
-    PYDEF2("create",&_internal_create<T>,py::return_ptr());
-#ifdef DGCODE_USEPYBIND11
+    //Fixme: std::shared_ptr instead?
+    themod.def("create",&_internal_create<T>,py::return_value_policy::reference);
     return py::class_<T,G4Interfaces::GeoConstructBase>(themod,name)
       .def("Construct",&T::Construct,py::return_ptr());
-#else
-    return py::class_<T,boost::noncopyable,py::bases<G4Interfaces::GeoConstructBase> >(name,py::no_init)
-      .def("Construct",&T::Construct,py::return_ptr());
-#endif
   }
 
 
