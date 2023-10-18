@@ -19,14 +19,9 @@
 #include "filters.hh"
 #include "iterators.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
   pyextra::pyimport("GriffDataRead");
-#ifdef DGCODE_USEPYBIND11
-  GriffAnaUtils::pyexport_filters(m);
-  GriffAnaUtils::pyexport_iterators(m);
-#else
-  GriffAnaUtils::pyexport_filters();
-  GriffAnaUtils::pyexport_iterators();
-#endif
+  GriffAnaUtils::pyexport_filters(mod);
+  GriffAnaUtils::pyexport_iterators(mod);
 }

@@ -1,12 +1,10 @@
 #include "Core/Python.hh"
 #include "Mesh/Mesh.hh"
-#include "Utils/NumpyUtils.hh"
+#include <pybind11/numpy.h>
 
 namespace {
 
-#ifdef DGCODE_USEPYBIND11
   using PyNumpyArrayDbl = py::array_t<double,py::array::c_style>;
-#endif
 
 class py_Mesh3D {
 public:
@@ -17,15 +15,8 @@ public:
     m_comments = mesh.comments();
     m_cellunits = mesh.cellunits();
 
-#ifdef DGCODE_USEPYBIND11
     for ( auto& e : mesh.statMap() )
       m_stats[py::str(e.first)] = e.second;
-#else
-    auto it = mesh.statMap().begin();
-    auto itE = mesh.statMap().end();
-    for (;it!=itE;++it)
-      m_stats[it->first] = it->second;
-#endif
     for (int i = 0; i < 3; ++i) {
       assert( mesh.filler().nCells(i) >= 0 );
       m_cells_n[i] = static_cast<std::size_t>(mesh.filler().nCells(i));
@@ -35,21 +26,10 @@ public:
     }
     auto & datavect = mesh.filler().data();
     //init m_data as numpy array and access raw buffer:
-#ifdef DGCODE_USEPYBIND11
     m_data = PyNumpyArrayDbl( {mesh.filler().nCells(0),mesh.filler().nCells(1),mesh.filler().nCells(2)} );
     std::size_t ntot = static_cast<std::size_t>( m_data.size() );
     (void)ntot;
     double * buf = m_data.mutable_data();
-#else
-    auto numpy = pyextra::pyimport("numpy");
-    auto shape = py::make_tuple(mesh.filler().nCells(0),
-                                mesh.filler().nCells(1),
-                                mesh.filler().nCells(2));
-    m_data = numpy.attr("zeros")(shape,"float64");
-    double* buf;
-    std::size_t ntot;
-    NumpyUtils::decodeBuffer(m_data,buf,ntot);
-#endif
     assert( ntot == datavect.size() );
     assert(buf);
     size_t iblock = 0;
@@ -83,11 +63,9 @@ public:
     printf("  Stats      : %s\n",tmp.c_str());
 #else
     //But we do it the hard way instead:
-#  ifdef DGCODE_USEPYBIND11
     std::string tmp[9];
     for (int i=0;i<9;++i)
       tmp[i] = py::cast<std::string>(py::str(m_cells_py[i/3].attr("__getitem__")(i%3)));//what a mess...
-    //      tmp[i] = py::cast<std::string>(py::str(std::to_string(py::cast<double>(m_cells_py[i/3].attr("__getitem__")(i%3)))));//what a mess...
     printf("  Cells      : [(%s, %s, %s), (%s, %s, %s), (%s, %s, %s)]\n",
            tmp[0].c_str(),tmp[1].c_str(),tmp[2].c_str(),
            tmp[3].c_str(),tmp[4].c_str(),tmp[5].c_str(),
@@ -107,31 +85,10 @@ public:
              tmp[0].c_str(),tmp[1].c_str(),
              (i+1==py::len(keys)?"}\n":", "));
     }
-#  else
-    std::string tmp[9];
-    for (int i=0;i<9;++i)
-      tmp[i] = py::extract<std::string>(py::str(m_cells_py[i/3][i%3]));
-    printf("  Cells      : [(%s, %s, %s), (%s, %s, %s), (%s, %s, %s)]\n",
-           tmp[0].c_str(),tmp[1].c_str(),tmp[2].c_str(),
-           tmp[3].c_str(),tmp[4].c_str(),tmp[5].c_str(),
-           tmp[6].c_str(),tmp[7].c_str(),tmp[8].c_str());
-    py::list keys = m_stats.keys();
-    keys.attr("sort")();
-    printf("  Stats      : {");
-    for (int i = 0; i<py::len(keys); ++i) {
-      tmp[0] = py::extract<std::string>(keys[i]);
-      py::object o = m_stats[keys[i]];
-      tmp[1] = py::extract<std::string>(py::str(o));
-      printf("'%s': %s%s",
-             tmp[0].c_str(),tmp[1].c_str(),
-             (i+1==py::len(keys)?"}\n":", "));
-    }
-#  endif
 #endif
   }
 
   void print_cells(bool include_empty) const {
-#ifdef DGCODE_USEPYBIND11
     std::size_t ntot = static_cast<std::size_t>( m_data.size() );
     (void)ntot;
     const double * buf = m_data.data();
@@ -147,34 +104,13 @@ public:
           if (v||include_empty)
             printf("  cell[%" PRId64 ",%" PRId64 ",%" PRId64 "] = %g\n",ix,iy,iz,v);
         }
-#else
-    double* buf;
-    std::size_t ntot;
-    NumpyUtils::decodeBuffer(m_data,buf,ntot);
-    assert(buf);
-    auto nx = m_cells_n[0];
-    auto ny = m_cells_n[1];
-    auto nz = m_cells_n[2];
-    assert(std::size_t(nx*ny*nz)==ntot);
-    for (std::int64_t ix = 0; ix < nx; ++ix)
-      for (std::int64_t iy = 0; iy < ny; ++iy)
-        for (std::int64_t iz = 0; iz < nz; ++iz) {
-          double v = buf[ix*ny*nz+iy*nz+iz];
-          if (v||include_empty)
-            printf("  cell[%" PRId64 ",%" PRId64 ",%" PRId64 "] = %g\n",ix,iy,iz,v);
-        }
-#endif
   }
 private:
   std::string m_name;
   std::string m_comments;
   std::string m_cellunits;
   py::dict m_stats;
-#ifdef DGCODE_USEPYBIND11
   PyNumpyArrayDbl m_data;
-#else
-  py::object m_data;
-#endif
   py::list m_cells_py;
   std::int64_t m_cells_n[3];
 };
@@ -196,26 +132,21 @@ void py_Mesh3D_merge_files(std::string output_file, py::list input_files) {
 }
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
 
-#ifdef DGCODE_USEPYBIND11
-  py::class_<py_Mesh3D>(m,"Mesh3D")
+  py::class_<py_Mesh3D>(mod,"Mesh3D")
     .def( py::init<std::string>() )
-#else
-  py::class_<py_Mesh3D,boost::noncopyable>( "Mesh3D",
-                                            py::init<std::string>() )
-#endif
-    .PYADDREADONLYPROPERTY("name",&py_Mesh3D::getName)
-    .PYADDREADONLYPROPERTY("comments",&py_Mesh3D::getComments)
-    .PYADDREADONLYPROPERTY("cellunits",&py_Mesh3D::getCellUnits)
-    .PYADDREADONLYPROPERTY("data",&py_Mesh3D::getData)
-    .PYADDREADONLYPROPERTY("cellinfo",&py_Mesh3D::getCellInfo_py)
-    .PYADDREADONLYPROPERTY("stats",&py_Mesh3D::getStats)
+    .def_property_readonly("name",&py_Mesh3D::getName)
+    .def_property_readonly("comments",&py_Mesh3D::getComments)
+    .def_property_readonly("cellunits",&py_Mesh3D::getCellUnits)
+    .def_property_readonly("data",&py_Mesh3D::getData)
+    .def_property_readonly("cellinfo",&py_Mesh3D::getCellInfo_py)
+    .def_property_readonly("stats",&py_Mesh3D::getStats)
     .def("dump_cells",&py_Mesh3D::print_cells)
     .def("print_summary",&py_Mesh3D::print_summary)
     ;
 
-  PYDEF("merge_files",&py_Mesh3D_merge_files);
+  mod.def("merge_files",&py_Mesh3D_merge_files);
 
 }

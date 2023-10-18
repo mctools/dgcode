@@ -7,17 +7,11 @@ namespace G4CustomPyGen {
   void gun_set_type_v2(G4GunWrapper*g,int pdg) { g->set_type(pdg); }
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
   pyextra::pyimport("G4Interfaces");
-#ifdef DGCODE_USEPYBIND11
-  py::class_<G4CustomPyGen::GenBaseCpp,G4Interfaces::ParticleGenBase>( m, "_GenBaseCpp" )
+  py::class_<G4CustomPyGen::GenBaseCpp,G4Interfaces::ParticleGenBase>( mod, "_GenBaseCpp" )
     .def(py::init<>())
-#else
-  py::class_<G4CustomPyGen::GenBaseCpp,
-             boost::noncopyable,
-             py::bases<G4Interfaces::ParticleGenBase> >( "_GenBaseCpp", py::init<>() )
-#endif
     .def("_regpyfct_validatePars",&G4CustomPyGen::GenBaseCpp::regpyfct_validatePars)
     .def("_regpyfct_initGen",&G4CustomPyGen::GenBaseCpp::regpyfct_initGen)
     .def("_regpyfct_genEvt",&G4CustomPyGen::GenBaseCpp::regpyfct_genEvt)
@@ -25,11 +19,7 @@ PYTHON_MODULE
     .def("signalEndOfEvents",&G4CustomPyGen::GenBaseCpp::py_signalEndOfEvents)
     ;
 
-#ifdef DGCODE_USEPYBIND11
-  py::class_<G4CustomPyGen::G4GunWrapper, std::shared_ptr<G4CustomPyGen::G4GunWrapper> >( m, "G4PyGun" )
-#else
-  py::class_<G4CustomPyGen::G4GunWrapper,G4CustomPyGen::G4GunWrapper*,boost::noncopyable>( "G4PyGun", py::no_init )
-#endif
+  py::class_<G4CustomPyGen::G4GunWrapper, std::shared_ptr<G4CustomPyGen::G4GunWrapper> >( mod, "G4PyGun" )
     .def("set_type",&G4CustomPyGen::gun_set_type_v1)
     .def("set_type",&G4CustomPyGen::gun_set_type_v2)
     .def("set_energy",&G4CustomPyGen::G4GunWrapper::set_energy)

@@ -3,14 +3,12 @@
 #include "SimpleHists/Hist1D.hh"
 #include "SimpleHists/Hist2D.hh"
 #include "SimpleHists/HistCollection.hh"
-#include "Utils/NumpyUtils.hh"
+#include <pybind11/numpy.h>
+#include <pybind11/operators.h>// for "py::self += float() etc.
 
-#ifdef DGCODE_USEPYBIND11
-//  for "py::self += float() etc.
-#  include <pybind11/operators.h>
-#endif
 namespace sh = SimpleHists;
 
+namespace {
 namespace SimpleHists_pycpp {
 
   void HistBase_dump_0args(const sh::HistBase*h) { h->dump(); }
@@ -20,19 +18,6 @@ namespace SimpleHists_pycpp {
   const char* HistBase_getXLabel(const sh::HistBase*h) { return h->getXLabel().c_str(); }
   const char* HistBase_getYLabel(const sh::HistBase*h) { return h->getYLabel().c_str(); }
   const char* HistBase_getComment(const sh::HistBase*h) { return h->getComment().c_str(); }
-
-#ifndef DGCODE_USEPYBIND11
-  struct HistBase_pickle_suite : py::pickle_suite
-  {
-    static py::tuple getinitargs(const sh::HistBase& h)
-    {
-      std::string s;
-      h.serialise(s);
-      py::object o( py::handle<>( PyBytes_FromStringAndSize( s.c_str(), s.size() ) ) );
-      return py::make_tuple(o);
-    }
-  };
-#endif
 
   void Hist1D_fill_1arg(sh::Hist1D*h,double val) { h->fill(val); }
   void Hist1D_fill_2args(sh::Hist1D*h,double val,double weight) { h->fill(val,weight); }
@@ -54,21 +39,11 @@ namespace SimpleHists_pycpp {
   void HistCol_mergeStr(sh::HistCollection*hc,const std::string& s) { hc->merge(s); }
   const char* HistCol_getKey(sh::HistCollection*hc,const sh::HistBase*h) { return hc->getKey(h).c_str(); }
 
-#ifdef DGCODE_USEPYBIND11
   using PyArrayDbl = py::array_t<double,py::array::c_style>;
   void Hist1D_fillFromBuffer_1arg(sh::Hist1D*h, PyArrayDbl py_vals) {
     h->fillMany(py_vals.data(),py_vals.size());
   }
-#else
-  void Hist1D_fillFromBuffer_1arg(sh::Hist1D*h,py::object py_vals) {
-    std::size_t n;
-    double * vals;
-    NumpyUtils::decodeBuffer(py_vals,vals,n);
-    h->fillMany(vals,n);
-  }
-#endif
 
-#ifdef DGCODE_USEPYBIND11
   void Hist1D_fillFromBuffer_2args(sh::Hist1D*h,PyArrayDbl py_vals,PyArrayDbl py_weights) {
     const auto n = py_vals.size();
     if ( py_weights.size() != n ) {
@@ -77,22 +52,6 @@ namespace SimpleHists_pycpp {
     }
     h->fillMany(py_vals.data(),py_weights.data(),n);
   }
-#else
-  void Hist1D_fillFromBuffer_2args(sh::Hist1D*h,py::object py_vals,py::object py_weights) {
-    std::size_t nv;
-    double * v;
-    NumpyUtils::decodeBuffer(py_vals,v,nv);
-    std::size_t nw;
-    double * w;
-    NumpyUtils::decodeBuffer(py_weights,w,nw);
-    if (nw!=nv) {
-      PyErr_SetString(PyExc_ValueError, "Value and weights buffers must have equal length");
-      throw py::error_already_set();
-    }
-    h->fillMany(v,w,nv);
-  }
-#endif
-#ifdef DGCODE_USEPYBIND11
   void Hist2D_fillFromBuffer_2args(sh::Hist2D*h,PyArrayDbl py_valsx,PyArrayDbl py_valsy) {
     const auto n = py_valsx.size();
     if ( py_valsy.size() != n ) {
@@ -101,22 +60,6 @@ namespace SimpleHists_pycpp {
     }
     h->fillMany(py_valsx.data(),py_valsy.data(),n);
   }
-#else
-  void Hist2D_fillFromBuffer_2args(sh::Hist2D*h,py::object py_valsx,py::object py_valsy) {
-    std::size_t nvx;
-    double * vx;
-    NumpyUtils::decodeBuffer(py_valsx,vx,nvx);
-    std::size_t nvy;
-    double * vy;
-    NumpyUtils::decodeBuffer(py_valsy,vy,nvy);
-    if (nvx!=nvy) {
-      PyErr_SetString(PyExc_ValueError, "X and Y value buffers must have equal length");
-      throw py::error_already_set();
-    }
-    h->fillMany(vx,vy,nvx);
-  }
-#endif
-#ifdef DGCODE_USEPYBIND11
   void Hist2D_fillFromBuffer_3args(sh::Hist2D*h,PyArrayDbl py_valsx,PyArrayDbl py_valsy, PyArrayDbl py_weights) {
     const auto n = py_valsx.size();
     if ( py_valsy.size() != n ) {
@@ -129,76 +72,33 @@ namespace SimpleHists_pycpp {
     }
     h->fillMany(py_valsx.data(),py_valsy.data(),py_weights.data(),n);
   }
-#else
-  void Hist2D_fillFromBuffer_3args(sh::Hist2D*h,py::object py_valsx,py::object py_valsy, py::object py_weights) {
-    std::size_t nvx;
-    double * vx;
-    NumpyUtils::decodeBuffer(py_valsx,vx,nvx);
-    std::size_t nvy;
-    double * vy;
-    NumpyUtils::decodeBuffer(py_valsy,vy,nvy);
-    if (nvx!=nvy) {
-      PyErr_SetString(PyExc_ValueError, "X and Y value buffers must have equal length");
-      throw py::error_already_set();
-    }
-    std::size_t nw;
-    double * w;
-    NumpyUtils::decodeBuffer(py_weights,w,nw);
-    if (nvx!=nw) {
-      PyErr_SetString(PyExc_ValueError, "Value and weights buffers must have equal length");
-      throw py::error_already_set();
-    }
-    h->fillMany(vx,vy,w,nvx);
-  }
-#endif
 
   //HistBase::serialise() must return by val in py interface (less efficient than C++ interface obviously - in C++98):
-#ifdef DGCODE_USEPYBIND11
   py::buffer HistBase_serialise(sh::HistBase*h)
-#else
-  py::object HistBase_serialise(sh::HistBase*h)
-#endif
   {
     std::string s;
     h->serialise(s);
-#ifndef DGCODE_USEPYBIND11
-    py::object o( py::handle<>( PyBytes_FromStringAndSize( s.c_str(), s.size() ) ) );
-    return o;
-#else
     py::bytes o = s;
     return o;
-#endif
   }
 
   //needed so we can construct efficient numpy arrays of the bin contents:
   py::object Hist1D_rawContentsAsBuffer(sh::Hist1D*h)
   {
     PyObject* py_buf = PyMemoryView_FromMemory((char*)h->rawContents(), h->getNBins()*sizeof(double), PyBUF_READ);
-#ifndef DGCODE_USEPYBIND11
-    py::object retval = py::object(py::handle<>(py_buf));
-#else
     py::object retval = py::reinterpret_borrow<py::object>(py::handle(py_buf));
-#endif
     return retval;
   }
   py::object Hist1D_rawErrorsSquaredAsBuffer(sh::Hist1D*h)
   {
     PyObject* py_buf = PyMemoryView_FromMemory((char*)h->rawErrorsSquared(), h->getNBins()*sizeof(double), PyBUF_READ);
-#ifndef DGCODE_USEPYBIND11
-    py::object retval = py::object(py::handle<>(py_buf));
-#else
     py::object retval = py::reinterpret_borrow<py::object>(py::handle(py_buf));
-#endif
     return retval;
   }
   py::object Hist2D_rawContentsAsBuffer(sh::Hist2D*h)
   {
     PyObject* py_buf = PyMemoryView_FromMemory((char*)h->rawContents(), h->getNBinsY()*h->getNBinsX()*sizeof(double), PyBUF_READ);
-#ifndef DGCODE_USEPYBIND11
-    py::object retval = py::object(py::handle<>(py_buf));
-#else
     py::object retval = py::reinterpret_borrow<py::object>(py::handle(py_buf));
-#endif
     return retval;
   }
 
@@ -284,27 +184,20 @@ namespace SimpleHists_pycpp {
   }
 
 }
+}
 
 namespace shp = SimpleHists_pycpp;
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
   //Change the module name to avoid type(Hist1D()) giving
   //'SimpleHists._init.Hist1D' but rather give 'SimpleHists.Hist1D':
-#ifndef DGCODE_USEPYBIND11
-  py::scope().attr("__name__") = BOOST_STRINGIZE(PACKAGE_NAME);
-#else
-
 #define simplehist_str(s) #s
 #define simplehist_xstr(s) simplehist_str(s)
-  m.attr("__name__") = simplehist_xstr(PACKAGE_NAME);
-#endif
-#ifdef DGCODE_USEPYBIND11
-  py::class_<sh::HistBase PYBOOSTNONCOPYABLE> thePyHistBaseClass(PYMOD "HistBase" PYBOOSTNOINIT);
+  mod.attr("__name__") = simplehist_xstr(PACKAGE_NAME);
+
+  py::class_<sh::HistBase> thePyHistBaseClass(mod, "HistBase");
   thePyHistBaseClass
-#else
-  py::class_<sh::HistBase PYBOOSTNONCOPYABLE>("HistBase" PYBOOSTNOINIT)
-#endif
     .def("getTitle",&shp::HistBase_getTitle)
     .def("getXLabel",&shp::HistBase_getXLabel)
     .def("getYLabel",&shp::HistBase_getYLabel)
@@ -328,32 +221,20 @@ PYTHON_MODULE
     .def("norm",&sh::HistBase::norm)
     .def("clone",&sh::HistBase::clone,py::return_ptr())
     .def("reset",&sh::HistBase::reset)
-#ifdef DGCODE_USEPYBIND11
-#else
-    // //Define legal combination of the special attributes and methods:
-    // //__getinitargs__, __getstate__, __setstate__, __getstate_manages_dict__, __safe_for_unpickling__, __reduce__
-    // //Providing full pickle support.
-    .def_pickle(shp::HistBase_pickle_suite())
-#endif
     //properties (all lowercase):
-    .PYADDPROPERTY("title", &shp::HistBase_getTitle,&sh::HistBase::setTitle)
-    .PYADDPROPERTY("xlabel", &shp::HistBase_getXLabel, &sh::HistBase::setXLabel)
-    .PYADDPROPERTY("ylabel", &shp::HistBase_getYLabel, &sh::HistBase::setYLabel)
-    .PYADDPROPERTY("comment", &shp::HistBase_getComment, &sh::HistBase::setComment)
-    .PYADDREADONLYPROPERTY("integral",&sh::HistBase::getIntegral)
+    .def_property("title", &shp::HistBase_getTitle,&sh::HistBase::setTitle)
+    .def_property("xlabel", &shp::HistBase_getXLabel, &sh::HistBase::setXLabel)
+    .def_property("ylabel", &shp::HistBase_getYLabel, &sh::HistBase::setYLabel)
+    .def_property("comment", &shp::HistBase_getComment, &sh::HistBase::setComment)
+    .def_property_readonly("integral",&sh::HistBase::getIntegral)
     ;
 
-  PYDEF("histTypeOfData",&sh::histTypeOfData);
-  PYDEF("deserialise",&sh::deserialise,py::return_ptr());
-#ifdef DGCODE_USEPYBIND11
-  PYDEF("deserialiseAndManage",&sh::deserialise,py::return_value_policy::take_ownership);
-#else
-  PYDEF("deserialiseAndManage",&sh::deserialise,py::return_value_policy<py::manage_new_object>());
-#endif
+  mod.def("histTypeOfData",&sh::histTypeOfData);
+  mod.def("deserialise",&sh::deserialise,py::return_ptr());
+  mod.def("deserialiseAndManage",&sh::deserialise,py::return_value_policy::take_ownership);
 
   //Hist1D:
-#ifdef DGCODE_USEPYBIND11
-  py::class_<sh::Hist1D> thePyHist1DClass(m, "Hist1D", thePyHistBaseClass);
+  py::class_<sh::Hist1D> thePyHist1DClass(mod, "Hist1D", thePyHistBaseClass);
   thePyHist1DClass
     .def(py::init<unsigned, double, double>(),py::arg("nbins"),py::arg("xmin"),py::arg("xmax"))
     .def(py::init<const std::string&,unsigned, double, double>(),py::arg("title"),py::arg("nbins"),py::arg("xmin"),py::arg("xmax"))
@@ -373,11 +254,6 @@ PYTHON_MODULE
                         throw std::runtime_error("Invalid state!");
                       return std::make_unique<sh::Hist1D>(serialised_data);
                     }))
-#else
-  py::class_<sh::Hist1D PYBOOSTNONCOPYABLE , py::bases<sh::HistBase> >(PYMOD "Hist1D",py::init<unsigned, double, double>())
-    .def(py::init<const std::string&,unsigned, double, double>())
-    .def(py::init<const std::string&>())
-#endif
     .def("getNBins",&sh::Hist1D::getNBins)
     .def("getBinContent",&sh::Hist1D::getBinContent)
     .def("getBinError",&sh::Hist1D::getBinError)
@@ -411,23 +287,22 @@ PYTHON_MODULE
     .def("getPercentileBin",&shp::Hist1D_getPercentileBin_1arg)
     .def("getBinSum",&sh::Hist1D::getBinSum)
     //readonly properties (all lowercase):
-    .PYADDREADONLYPROPERTY("nbins",&sh::Hist1D::getNBins)
-    .PYADDREADONLYPROPERTY("binwidth",&sh::Hist1D::getBinWidth)
-    .PYADDREADONLYPROPERTY("underflow",&sh::Hist1D::getUnderflow)
-    .PYADDREADONLYPROPERTY("overflow",&sh::Hist1D::getOverflow)
-    .PYADDREADONLYPROPERTY("minfilled",&sh::Hist1D::getMinFilled)
-    .PYADDREADONLYPROPERTY("maxfilled",&sh::Hist1D::getMaxFilled)
-    .PYADDREADONLYPROPERTY("xmin",&sh::Hist1D::getXMin)
-    .PYADDREADONLYPROPERTY("xmax",&sh::Hist1D::getXMax)
-    .PYADDREADONLYPROPERTY("mean",&sh::Hist1D::getMean)
-    .PYADDREADONLYPROPERTY("rms",&sh::Hist1D::getRMS)
-    .PYADDREADONLYPROPERTY("rms2",&sh::Hist1D::getRMSSquared)
-    .PYADDREADONLYPROPERTY("maxcontent",&sh::Hist1D::getMaxContent)
+    .def_property_readonly("nbins",&sh::Hist1D::getNBins)
+    .def_property_readonly("binwidth",&sh::Hist1D::getBinWidth)
+    .def_property_readonly("underflow",&sh::Hist1D::getUnderflow)
+    .def_property_readonly("overflow",&sh::Hist1D::getOverflow)
+    .def_property_readonly("minfilled",&sh::Hist1D::getMinFilled)
+    .def_property_readonly("maxfilled",&sh::Hist1D::getMaxFilled)
+    .def_property_readonly("xmin",&sh::Hist1D::getXMin)
+    .def_property_readonly("xmax",&sh::Hist1D::getXMax)
+    .def_property_readonly("mean",&sh::Hist1D::getMean)
+    .def_property_readonly("rms",&sh::Hist1D::getRMS)
+    .def_property_readonly("rms2",&sh::Hist1D::getRMSSquared)
+    .def_property_readonly("maxcontent",&sh::Hist1D::getMaxContent)
     ;
 
   //Hist2D:
-#ifdef DGCODE_USEPYBIND11
-  py::class_<sh::Hist2D> thePyHist2DClass(m,"Hist2D",thePyHistBaseClass);
+  py::class_<sh::Hist2D> thePyHist2DClass(mod,"Hist2D",thePyHistBaseClass);
   thePyHist2DClass
     .def(py::init<unsigned, double, double, unsigned, double, double>(),
          py::arg("nbinsx"),py::arg("xmin"),py::arg("xmax"),
@@ -451,11 +326,6 @@ PYTHON_MODULE
                         throw std::runtime_error("Invalid state!");
                       return std::make_unique<sh::Hist2D>(serialised_data);
                     }))
-#else
-  py::class_<sh::Hist2D PYBOOSTNONCOPYABLE , py::bases<sh::HistBase> >(PYMOD "Hist2D",py::init<unsigned, double, double, unsigned, double, double>())
-    .def(py::init<const std::string&,unsigned, double, double,unsigned, double, double>())
-    .def(py::init<const std::string&>())
-#endif
     .def("getNBinsX",&sh::Hist2D::getNBinsX)
     .def("getNBinsY",&sh::Hist2D::getNBinsY)
     .def("getBinContent",&sh::Hist2D::getBinContent)
@@ -495,36 +365,36 @@ PYTHON_MODULE
     .def("_rawfillFromBuffer",&shp::Hist2D_fillFromBuffer_3args)
     .def("_rawContents",&shp::Hist2D_rawContentsAsBuffer)
     //readonly properties (all lowercase):
-    .PYADDREADONLYPROPERTY("binwidthx",&sh::Hist2D::getBinWidthX)
-    .PYADDREADONLYPROPERTY("binwidthy",&sh::Hist2D::getBinWidthY)
-    .PYADDREADONLYPROPERTY("nbinsx",&sh::Hist2D::getNBinsX)
-    .PYADDREADONLYPROPERTY("nbinsy",&sh::Hist2D::getNBinsY)
-    .PYADDREADONLYPROPERTY("underflowx",&sh::Hist2D::getUnderflowX)
-    .PYADDREADONLYPROPERTY("overflowx",&sh::Hist2D::getOverflowX)
-    .PYADDREADONLYPROPERTY("underflowy",&sh::Hist2D::getUnderflowY)
-    .PYADDREADONLYPROPERTY("overflowy",&sh::Hist2D::getOverflowY)
-    .PYADDREADONLYPROPERTY("minfilledx",&sh::Hist2D::getMinFilledX)
-    .PYADDREADONLYPROPERTY("maxfilledx",&sh::Hist2D::getMaxFilledX)
-    .PYADDREADONLYPROPERTY("minfilledy",&sh::Hist2D::getMinFilledY)
-    .PYADDREADONLYPROPERTY("maxfilledy",&sh::Hist2D::getMaxFilledY)
-    .PYADDREADONLYPROPERTY("xmin",&sh::Hist2D::getXMin)
-    .PYADDREADONLYPROPERTY("xmax",&sh::Hist2D::getXMax)
-    .PYADDREADONLYPROPERTY("ymin",&sh::Hist2D::getYMin)
-    .PYADDREADONLYPROPERTY("ymax",&sh::Hist2D::getYMax)
-    .PYADDREADONLYPROPERTY("meanx",&sh::Hist2D::getMeanX)
-    .PYADDREADONLYPROPERTY("rmsx",&sh::Hist2D::getRMSX)
-    .PYADDREADONLYPROPERTY("rms2x",&sh::Hist2D::getRMSSquaredX)
-    .PYADDREADONLYPROPERTY("meany",&sh::Hist2D::getMeanY)
-    .PYADDREADONLYPROPERTY("rmsy",&sh::Hist2D::getRMSY)
-    .PYADDREADONLYPROPERTY("rms2y",&sh::Hist2D::getRMSSquaredY)
-    .PYADDREADONLYPROPERTY("covariance",&sh::Hist2D::getCovariance)
-    .PYADDREADONLYPROPERTY("covxy",&sh::Hist2D::getCovariance)
-    .PYADDREADONLYPROPERTY("correlation",&sh::Hist2D::getCorrelation)
-    .PYADDREADONLYPROPERTY("corxy",&sh::Hist2D::getCorrelation)
+    .def_property_readonly("binwidthx",&sh::Hist2D::getBinWidthX)
+    .def_property_readonly("binwidthy",&sh::Hist2D::getBinWidthY)
+    .def_property_readonly("nbinsx",&sh::Hist2D::getNBinsX)
+    .def_property_readonly("nbinsy",&sh::Hist2D::getNBinsY)
+    .def_property_readonly("underflowx",&sh::Hist2D::getUnderflowX)
+    .def_property_readonly("overflowx",&sh::Hist2D::getOverflowX)
+    .def_property_readonly("underflowy",&sh::Hist2D::getUnderflowY)
+    .def_property_readonly("overflowy",&sh::Hist2D::getOverflowY)
+    .def_property_readonly("minfilledx",&sh::Hist2D::getMinFilledX)
+    .def_property_readonly("maxfilledx",&sh::Hist2D::getMaxFilledX)
+    .def_property_readonly("minfilledy",&sh::Hist2D::getMinFilledY)
+    .def_property_readonly("maxfilledy",&sh::Hist2D::getMaxFilledY)
+    .def_property_readonly("xmin",&sh::Hist2D::getXMin)
+    .def_property_readonly("xmax",&sh::Hist2D::getXMax)
+    .def_property_readonly("ymin",&sh::Hist2D::getYMin)
+    .def_property_readonly("ymax",&sh::Hist2D::getYMax)
+    .def_property_readonly("meanx",&sh::Hist2D::getMeanX)
+    .def_property_readonly("rmsx",&sh::Hist2D::getRMSX)
+    .def_property_readonly("rms2x",&sh::Hist2D::getRMSSquaredX)
+    .def_property_readonly("meany",&sh::Hist2D::getMeanY)
+    .def_property_readonly("rmsy",&sh::Hist2D::getRMSY)
+    .def_property_readonly("rms2y",&sh::Hist2D::getRMSSquaredY)
+    .def_property_readonly("covariance",&sh::Hist2D::getCovariance)
+    .def_property_readonly("covxy",&sh::Hist2D::getCovariance)
+    .def_property_readonly("correlation",&sh::Hist2D::getCorrelation)
+    .def_property_readonly("corxy",&sh::Hist2D::getCorrelation)
     ;
 
   //HistCounts::Counter:
-  py::class_<sh::HistCounts::Counter>(PYMOD "Counter" PYBOOSTNOINIT)
+  py::class_<sh::HistCounts::Counter>(mod, "Counter")
     .def("getValue",&sh::HistCounts::Counter::getValue)
     .def("__call__",&sh::HistCounts::Counter::getValue)
     .def("getError",&sh::HistCounts::Counter::getError)
@@ -537,17 +407,16 @@ PYTHON_MODULE
     .def(py::self += float())
     .def(py::self += py::self)
     //readonly properties (all lowercase):
-    .PYADDREADONLYPROPERTY("value",&sh::HistCounts::Counter::getValue)
-    .PYADDREADONLYPROPERTY("error",&sh::HistCounts::Counter::getError)
-    .PYADDREADONLYPROPERTY("errorsquared",&sh::HistCounts::Counter::getErrorSquared)
-    .PYADDREADONLYPROPERTY("label",&shp::Counter_getLabel)
-    .PYADDPROPERTY("displaylabel",&shp::Counter_getDisplayLabel,&sh::HistCounts::Counter::setDisplayLabel)
-    .PYADDPROPERTY("comment",&shp::Counter_getComment,&sh::HistCounts::Counter::setComment)
+    .def_property_readonly("value",&sh::HistCounts::Counter::getValue)
+    .def_property_readonly("error",&sh::HistCounts::Counter::getError)
+    .def_property_readonly("errorsquared",&sh::HistCounts::Counter::getErrorSquared)
+    .def_property_readonly("label",&shp::Counter_getLabel)
+    .def_property("displaylabel",&shp::Counter_getDisplayLabel,&sh::HistCounts::Counter::setDisplayLabel)
+    .def_property("comment",&shp::Counter_getComment,&sh::HistCounts::Counter::setComment)
     ;
 
   //HistCounts:
-#ifdef DGCODE_USEPYBIND11
-  py::class_<sh::HistCounts> thePyHistCountsClass(m, "HistCounts",thePyHistBaseClass);
+  py::class_<sh::HistCounts> thePyHistCountsClass(mod, "HistCounts",thePyHistBaseClass);
   thePyHistCountsClass
     .def(py::init<>())
     .def(py::init([]( py::str arg) { auto h = std::make_unique<sh::HistCounts>(); h->setTitle( py::cast<std::string>(arg) ); return h; }), py::arg("title") )
@@ -567,10 +436,6 @@ PYTHON_MODULE
                         throw std::runtime_error("Invalid state!");
                       return std::make_unique<sh::HistCounts>(serialised_data);
                     }))
-#else
-  py::class_<sh::HistCounts PYBOOSTNONCOPYABLE , py::bases<sh::HistBase> >(PYMOD "HistCounts",py::init<>())
-    .def(py::init<const std::string&>())
-#endif
     .def("addCounter",&sh::HistCounts::addCounter)
     .def("addCounter",&shp::HistCounts_addCounter_1arg)
     .def("getMaxContent",&sh::HistCounts::getMaxContent)
@@ -582,20 +447,15 @@ PYTHON_MODULE
     .def("hasCounter",&sh::HistCounts::hasCounter)
     .def("nCounters",&sh::HistCounts::nCounters)
     //readonly properties (all lowercase):
-    .PYADDREADONLYPROPERTY("ncounters",&sh::HistCounts::nCounters)
-    .PYADDREADONLYPROPERTY("maxcontent",&sh::HistCounts::getMaxContent)
-    .PYADDREADONLYPROPERTY("counters",&shp::HistCounts_getCounters)
+    .def_property_readonly("ncounters",&sh::HistCounts::nCounters)
+    .def_property_readonly("maxcontent",&sh::HistCounts::getMaxContent)
+    .def_property_readonly("counters",&shp::HistCounts_getCounters)
     ;
 
   //HistCollection:
-#ifdef DGCODE_USEPYBIND11
-  py::class_<sh::HistCollection>(m,"HistCollection")
+  py::class_<sh::HistCollection>(mod,"HistCollection")
     .def(py::init<>())
     .def(py::init<const std::string&>(),py::arg("filename"))
-#else
-  py::class_<sh::HistCollection PYBOOSTNONCOPYABLE>(PYMOD "HistCollection",py::init<>())
-    .def(py::init<const std::string&>())
-#endif
     .def("book1D",&shp::HistCol_book1Dv1,py::return_ptr())
     .def("book1D",&shp::HistCol_book1Dv2,py::return_ptr())
     .def("book2D",&shp::HistCol_book2Dv1,py::return_ptr())
@@ -608,18 +468,14 @@ PYTHON_MODULE
     .def("hist",&shp::HistCol_histconst,py::return_ptr())
     .def("add",&sh::HistCollection::add)
     .def("remove",&sh::HistCollection::remove,py::return_ptr())
-#ifdef DGCODE_USEPYBIND11
     .def("removeAndManage",&sh::HistCollection::remove,py::return_value_policy::take_ownership)
-#else
-    .def("removeAndManage",&sh::HistCollection::remove,py::return_value_policy<py::manage_new_object>())
-#endif
     .def("saveToFile",&sh::HistCollection::saveToFile)
     .def("saveToFile",&shp::HistColl_saveToFile_1arg)
     .def("getKeys",&shp::HistCol_getKeys)
     .def("merge",&shp::HistCol_mergeCol)
     .def("merge",&shp::HistCol_mergeStr)
     .def("isSimilar",&sh::HistCollection::isSimilar)
-    .PYADDREADONLYPROPERTY("keys",&shp::HistCol_getKeys)
+    .def_property_readonly("keys",&shp::HistCol_getKeys)
     ;
 
 }

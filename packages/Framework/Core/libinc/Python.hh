@@ -64,6 +64,7 @@ namespace pyextra {
 //TODO: Revist these here post-migration:
 #define PYTHON_MODULE PYBIND11_MODULE(PYMODNAME, m)
 #define PYTHON_MODULE2 PYBIND11_MODULE(PYMODNAME, themod)
+#define PYTHON_MODULE3 PYBIND11_MODULE(PYMODNAME, mod)
 #define PYDEF m.def
 #define PYMOD m,
 #define PYDEF2 themod.def

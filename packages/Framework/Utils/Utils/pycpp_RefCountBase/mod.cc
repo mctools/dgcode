@@ -11,13 +11,9 @@ namespace {
 }
 
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-#ifdef DGCODE_USEPYBIND11
-  py::class_<Utils::RefCountBase,std::unique_ptr<Utils::RefCountBase, BlankDeleter<Utils::RefCountBase>>>(PYMOD "RefCountBase" PYBOOSTNOINIT)
-#else
-  py::class_<Utils::RefCountBase  PYBOOSTNONCOPYABLE>(PYMOD "RefCountBase" PYBOOSTNOINIT)
-#endif
+  py::class_<Utils::RefCountBase,std::unique_ptr<Utils::RefCountBase, BlankDeleter<Utils::RefCountBase>>>(mod, "RefCountBase")
     .def("refCount",&Utils::RefCountBase::refCount)
     .def("ref",&Utils::RefCountBase::ref)
     .def("unref",&Utils::RefCountBase::unref)

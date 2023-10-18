@@ -10,11 +10,7 @@
 
 namespace SimpleHists_pycpp {
 
-#ifdef DGCODE_USEPYBIND11
   using PyObjReturnType = py::object;
-#else
-  using PyObjReturnType = PyObject*;
-#endif
 
   PyObjReturnType convertToPyROOT(const SimpleHists::HistBase*h, const char* root_name)
   {
@@ -25,13 +21,9 @@ namespace SimpleHists_pycpp {
                              //investigate further, but for now we assume we can
                              //live with a few minor possible leaks.
     //NB: Method was called TPython::ObjectProxy_FromVoidPtr before ROOT 6.22.
-#  ifdef DGCODE_USEPYBIND11
     PyObject * raw_o = TPython::CPPInstance_FromVoidPtr(hr, hr->ClassName(), python_owns);
     auto handle = py::handle( raw_o );
     return handle.cast<py::object>();
-#  else
-    return TPython::CPPInstance_FromVoidPtr(hr, hr->ClassName(), python_owns);
-#  endif
 #else
     (void)h;
     (void)root_name;
@@ -58,13 +50,9 @@ namespace SimpleHists_pycpp {
 
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-#ifdef DGCODE_USEPYBIND11
-  m.doc() =
-#else
-  py::scope().attr("__doc__") =
-#endif
+  mod.doc() =
     "Python module providing the convertToROOT and convertToROOTFile"
     " functions from Convert.hh. It imports ROOT internally, which can"
     " be avoided by using the sister module " dg_stringify(PACKAGE_NAME) ".ConvertFile"
@@ -72,11 +60,11 @@ PYTHON_MODULE
 
   pyextra::pyimport("ROOT");
 
-  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_1D);
-  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_2D);
-  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_Counts);
-  PYDEF("convertToROOT",&SimpleHists_pycpp::convertToROOT_Base);
-  PYDEF("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_hc);
-  PYDEF("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_fn);
+  mod.def("convertToROOT",&SimpleHists_pycpp::convertToROOT_1D);
+  mod.def("convertToROOT",&SimpleHists_pycpp::convertToROOT_2D);
+  mod.def("convertToROOT",&SimpleHists_pycpp::convertToROOT_Counts);
+  mod.def("convertToROOT",&SimpleHists_pycpp::convertToROOT_Base);
+  mod.def("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_hc);
+  mod.def("convertToROOTFile",&SimpleHists_pycpp::convertToROOTFile_fn);
 }
 

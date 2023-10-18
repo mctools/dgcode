@@ -1,11 +1,7 @@
 #include "G4Interfaces/PhysicsListPyExport.hh"
 #include "G4PhysicsLists/PhysicsListEmpty.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-#if defined(DGCODE_USEPYBIND11)
-  PhysicsListPyExport::exportPhysList<PhysicsListEmpty>(m);
-#else
-  PhysicsListPyExport::exportPhysList<PhysicsListEmpty>();
-#endif
+  PhysicsListPyExport::exportPhysList<PhysicsListEmpty>(mod);
 }

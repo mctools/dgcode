@@ -16,19 +16,12 @@ namespace G4OSG {
     py::ssize_t n = py::len(input);
     for(py::ssize_t i=0;i<n;++i) {
       py::object elem = input[i];
-#ifdef DGCODE_USEPYBIND11
       uint64_t evt;
       try {
         evt = elem.cast<uint64_t>();
       } catch ( py::cast_error& ) {
         throw std::runtime_error("Could not decode element in list as integer");
       }
-#else
-      auto try_evt = py::extract<uint64_t>(elem);
-      if ( !try_evt.check() )
-        throw std::runtime_error("Could not decode element in list as integer");
-      uint64_t evt = try_evt();
-#endif
       o.insert(evt);
     }
   }
@@ -63,11 +56,11 @@ namespace G4OSG {
 
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  PYDEF("run",&G4OSG::run_viewer);
-  PYDEF("run",&G4OSG::run_viewer_with_griff);
-  PYDEF("run",&G4OSG::run_viewer_with_griff_1arg);
-  PYDEF("run_nogeom",&G4OSG::run_viewer_with_griff_no_geom);
-  PYDEF("run_nogeom",&G4OSG::run_viewer_with_griff_no_geom_1arg);
+  mod.def("run",&G4OSG::run_viewer);
+  mod.def("run",&G4OSG::run_viewer_with_griff);
+  mod.def("run",&G4OSG::run_viewer_with_griff_1arg);
+  mod.def("run_nogeom",&G4OSG::run_viewer_with_griff_no_geom);
+  mod.def("run_nogeom",&G4OSG::run_viewer_with_griff_no_geom_1arg);
 }

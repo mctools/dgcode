@@ -1,14 +1,10 @@
 #include "Core/Python.hh"
 #include "Utils/DummyParamHolder.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
   pyextra::pyimport("Utils.ParametersBase");
-#ifdef DGCODE_USEPYBIND11
-  py::class_<Utils::DummyParamHolder PYBOOSTNONCOPYABLE , Utils::ParametersBase >(PYMOD "DummyParamHolder" PYBOOSTNOINIT)
-#else
-  py::class_<Utils::DummyParamHolder PYBOOSTNONCOPYABLE , py::bases<Utils::ParametersBase> >(PYMOD "DummyParamHolder" PYBOOSTNOINIT)
-#endif
+  py::class_<Utils::DummyParamHolder, Utils::ParametersBase >(mod, "DummyParamHolder")
     .def(py::init<const char*>())
     .def(py::init<>())
     ;

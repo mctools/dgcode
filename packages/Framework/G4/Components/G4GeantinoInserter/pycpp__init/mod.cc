@@ -67,20 +67,14 @@ namespace G4GeantinoInserter {
       throw std::runtime_error("G4GeantinoInserter.install called before G4Launcher object was created");
     //Create our call-back and register it:
     pyextra::pyimport("G4Interfaces");
-#ifdef DGCODE_USEPYBIND11
     auto cb = std::make_shared<PostGenCB>();
     std::shared_ptr<G4Interfaces::PostGenCallBack> cb_base = cb;
     py::object pycb = py::cast(cb_base);//,py::return_value_policy::copy);
-#else
-    auto shptr_cb = std::make_shared<PostGenCB>();//create with this, so shared_from_this works
-    G4Interfaces::PostGenCallBack* cb = static_cast<G4Interfaces::PostGenCallBack*>(shptr_cb.get());
-    py::object pycb(boost::ref(cb));
-#endif
     pylauncher.attr("addPostGenHook")(pycb);
   }
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  PYDEF("install",&G4GeantinoInserter::install);
+  mod.def("install",&G4GeantinoInserter::install);
 }
