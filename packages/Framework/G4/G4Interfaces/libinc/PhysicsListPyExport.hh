@@ -1,6 +1,10 @@
 #ifndef G4Interfaces_PhysicsListPyExport_hh
 #define G4Interfaces_PhysicsListPyExport_hh
 
+#ifndef PYMODNAME
+#  error "Do not include the PhysicsListPyExport.hh header for code outside pycpp_* folders."
+#endif
+
 #include "Core/Python.hh"
 #include <cassert>
 #include "Core/String.hh"

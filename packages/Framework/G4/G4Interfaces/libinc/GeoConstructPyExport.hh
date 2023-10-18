@@ -1,6 +1,10 @@
 #ifndef G4Interfaces_GeoConstructPyExport_hh
 #define G4Interfaces_GeoConstructPyExport_hh
 
+#ifndef PYMODNAME
+#  error "Do not include the GeoConstructPyExport.hh header for code outside pycpp_* folders."
+#endif
+
 #include "Core/Python.hh"
 #include "G4Interfaces/GeoConstructBase.hh"
 #include "G4VPhysicalVolume.hh"

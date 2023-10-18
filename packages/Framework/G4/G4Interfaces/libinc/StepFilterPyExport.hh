@@ -1,6 +1,10 @@
 #ifndef G4Interfaces_StepFilterPyExport_hh
 #define G4Interfaces_StepFilterPyExport_hh
 
+#ifndef PYMODNAME
+#  error "Do not include the StepFilterPyExport.hh header for code outside pycpp_* folders."
+#endif
+
 #include "Core/Python.hh"
 #include "G4Interfaces/StepFilterBase.hh"
 #include "G4Step.hh"

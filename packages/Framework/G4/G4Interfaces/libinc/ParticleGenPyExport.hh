@@ -1,6 +1,10 @@
 #ifndef G4Interfaces_ParticleGenPyExport_hh
 #define G4Interfaces_ParticleGenPyExport_hh
 
+#ifndef PYMODNAME
+#  error "Do not include the ParticleGenPyExport.hh header for code outside pycpp_* folders."
+#endif
+
 #include "Core/Python.hh"
 #include "G4Interfaces/ParticleGenBase.hh"
 #include "G4Event.hh"
