@@ -1,8 +1,14 @@
-function( detect_system_pybind11 resvar_cflags_list resvar_linkflags_list )
+function( detect_system_pybind11
+    resvar_embed_cflags_list
+    resvar_embed_linkflags_list
+    resvar_module_cflags_list
+    resvar_module_linkflags_list
+    resvar_version
+    )
   set( cmd "${PYTHON_EXECUTABLE}" -mpybind11 --cmakedir )
   if ( DG_VERBOSE )
     string( JOIN " " tmp ${cmd} )
-    message("-- Invoking:" ${tmp})
+    message( STATUS "-- Invoking:" ${tmp})
   else()
     list( APPEND cmd ERROR_QUIET )
   endif()
@@ -14,43 +20,56 @@ function( detect_system_pybind11 resvar_cflags_list resvar_linkflags_list )
   if ( NOT "x${cmd_exitcode}" STREQUAL "x0" )
     message( FATAL_ERROR "Could not find pybind11." )
   endif()
-
-  set( findpkgargs pybind11 2.10.4 NO_MODULE NO_DEFAULT_PATH )#TODO: If found but version is too old, and in conda, provide conda/pip command for updating ncrystal version.
   if ( DG_VERBOSE )
-    message("-- Found pybind11_DIR=${pybind11_DIR}")
-    string( JOIN " " tmp ${findpkgargs} )
-    message("-- Trying to invoke find_package( ${tmp} )." )
+    message( STATUS "-- Found pybind11_DIR=${pybind11_DIR}")
   endif()
-  find_package( ${findpkgargs} )
-  if ( NOT pybind11_FOUND )
-    if ( DG_VERBOSE )
-      message("-- The find_package call failed.")
-    endif()
-    message( FATAL_ERROR "-- DGCODE_USECONDABOOSTPYTHON==PYBIND11 but could not find pybind11 package." )
+
+  set( cmd "${PYTHON_EXECUTABLE}" -mpybind11 --version )
+  if ( DG_VERBOSE )
+    string( JOIN " " tmp ${cmd} )
+    message( STATUS "-- Invoking:" ${tmp})
+  else()
+    list( APPEND cmd ERROR_QUIET )
   endif()
-  message("-- Found pybind11 version ${pybind11_VERSION}")
+  execute_process( COMMAND ${cmd}
+    OUTPUT_VARIABLE pybind11_version
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE cmd_exitcode
+    )
+  if ( NOT "x${cmd_exitcode}" STREQUAL "x0" )
+    message( FATAL_ERROR "Could not get version of pybind11." )
+  endif()
+  set( findpkg_args "pybind11;2.10.4;NO_MODULE;NO_DEFAULT_PATH" )
+  set( cmake_args "-DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}" "-Dpybind11_DIR=${pybind11_DIR}" )
 
+  extract_extdep_flags( CXX "${findpkg_args}" "pybind11::module" "${cmake_args}" module_cflags module_linkflags )
+  extract_extdep_flags( CXX "${findpkg_args}" "pybind11::embed" "${cmake_args}" embed_cflags embed_linkflags )
 
-  set( tmp_cflags_list "" )
-  foreach( tmp ${pybind11_INCLUDE_DIRS} )
-    list(APPEND tmp_cflags_list "-isystem${tmp}" )
-  endforeach()
-  foreach( tmp ${pybind11_DEFINITIONS} )
-    list(APPEND tmp_cflags_list "-D${tmp}" )
-  endforeach()
-  set( tmp_linkflags_list "" )
-  foreach( tmp ${pybind11_LIBRARIES} )
-    list(APPEND tmp_linkflags_list "${tmp}" )
-  endforeach()
-  set( ${resvar_cflags_list} "${tmp_cflags_list}" PARENT_SCOPE )
-  set( ${resvar_linkflags_list} "${tmp_linkflags_list}" PARENT_SCOPE )
+  #For some reason the -DUSING_pybind11 define does not get added with the
+  #above. Try to add it manually and hope it works:
+  set( ${resvar_version} "${pybind11_version}" PARENT_SCOPE )
+  set( ${resvar_embed_cflags_list} "${embed_cflags} -DUSING_pybind11" PARENT_SCOPE )
+  set( ${resvar_embed_linkflags_list} "${embed_linkflags}" PARENT_SCOPE )
+  set( ${resvar_module_cflags_list} "${module_cflags} -DUSING_pybind11" PARENT_SCOPE )
+  set( ${resvar_module_linkflags_list} "${module_linkflags}" PARENT_SCOPE )
 endfunction()
 
-detect_system_pybind11( SYSTEM_BOOSTPYTHON_CFLAGS_LIST SYSTEM_BOOSTPYTHON_LINKFLAGS_LIST )
-set( SYSTEM_BOOSTPYTHON_INCDIR "" )
-set( SYSTEM_BOOSTPYTHON_FOUND ON )
+detect_system_pybind11(
+  PYBIND11_EMBED_CFLAGS_LIST
+  PYBIND11_EMBED_LINKFLAGS_LIST
+  PYBIND11_MODULE_CFLAGS_LIST
+  PYBIND11_MODULE_LINKFLAGS_LIST
+  PYBIND11_VERSION
+  )
+
+message( STATUS "-- Found pybind11 version ${pybind11_version}")
+
 if ( DG_VERBOSE )
-  message("-- pybind11 compilation flags: ${SYSTEM_BOOSTPYTHON_CFLAGS_LIST} " )
-  message("-- pybind11 link flags: ${SYSTEM_BOOSTPYTHON_LINKFLAGS_LIST} " )
-  #message("-- pybind11 headers : ${SYSTEM_BOOSTPYTHON_INCDIR} " )
+  message("-- pybind11 compilation flags (embed): ${PYBIND11_EMBED_CFLAGS_LIST} " )
+  message("-- pybind11 link flags (embed): ${PYBIND11_EMBED_LINKFLAGS_LIST} " )
+  message("-- pybind11 compilation flags (module): ${PYBIND11_MODULE_CFLAGS_LIST} " )
+  message("-- pybind11 link flags (module): ${PYBIND11_MODULE_LINKFLAGS_LIST} " )
 endif()
+
+list(APPEND DG_GLOBAL_VERSION_DEPS_CXX "pybind11##${PYBIND11_VERSION}")
+list(APPEND DG_GLOBAL_VERSION_DEPS_C "pybind11##${PYBIND11_VERSION}")

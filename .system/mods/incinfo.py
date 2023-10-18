@@ -1,4 +1,5 @@
 import os
+import pathlib
 from . import utils
 from . import langs
 from . import col
@@ -23,7 +24,7 @@ def ccxx_files_in_dir(d):
     return out
 
 def _printform(pkg,f,for_sortkey=False):
-    f=f.split(path.sep)[-3:]
+    f = pathlib.Path(f).parts[-3:]
     assert f[0]==pkg.name
     if for_sortkey:
         return tuple(f)

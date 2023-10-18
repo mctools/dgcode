@@ -72,13 +72,11 @@ def parse(filename):
     sysvars['general'] = {
         'cmake_version': cmakevars['CMAKE_VERSION'],
         'system': cmakevars['CMAKE_SYSTEM'],
-        'pythonexecutable': cmakevars['PYTHON_EXECUTABLE'],
-        'pythonlibs': cmakevars['PYTHON_LIBRARIES'],
-        'pythonincdirs': cmakevars['PYTHON_INCLUDE_DIRS'],
-        'sysboostpython_use' : cmakevars['SYSBOOSTPYTHON_USE']=='1',
-        'sysboostpython_cflags' : cmakevars.get('SYSBOOSTPYTHON_CFLAGS','notavailable'),
-        'sysboostpython_linkflags' : cmakevars.get('SYSBOOSTPYTHON_LINKFLAGS','notavailable'),
-        'sysboostpython_incdir' : cmakevars.get('SYSBOOSTPYTHON_INCDIR','notavailable')
+        'pybind11_embed_cflags_list' : cmakevars['PYBIND11_EMBED_CFLAGS_LIST'],
+        'pybind11_embed_linkflags_list' : cmakevars['PYBIND11_EMBED_LINKFLAGS_LIST'],
+        'pybind11_module_cflags_list' : cmakevars['PYBIND11_MODULE_CFLAGS_LIST'],
+        'pybind11_module_linkflags_list' : cmakevars['PYBIND11_MODULE_LINKFLAGS_LIST'],
+        'pybind11_version' : cmakevars['PYBIND11_VERSION'],
     }
 
     compiler_supports_rpathlink_flag = cmakevars['CAN_USE_RPATHLINK_FLAG']=='1'
@@ -95,7 +93,6 @@ def parse(filename):
                 cflags = ' '.join([c for c in cflags.split() if not c.startswith('-std=c++')])
             elif lang=='CXX':
                 cflags = ' '.join([c for c in cflags.split() if not (c.startswith('-std=c') and not c.startswith('-std=c++'))])
-                cflags += ' ${DGBOOSTCFLAGS}'
             lvars['cflags'] = cflags
             lvars['ldflags_prepend'] = cmakevars.get('DG_GLOBAL_LINK_FLAGS_PREPENDED','')
             lvars['ldflags'] = ' '.join([cmakevars['CMAKE_%s_LINK_FLAGS'%lang],cmakevars.get('DG_GLOBAL_LINK_FLAGS','')])
@@ -128,7 +125,7 @@ def parse(filename):
     #makefiles):
     non_volatile=set(['cflags','ldflags','ldflags_prepend','compiler_version_long','compiler_version_short','dep_versions'])
     sysvars['volatile'] = dict((lang,dict((k,v) for k,v in info.items() if not k in non_volatile)) for lang,info in sysvars['langs'].items())
-    sysvars['volatile']['sysboostpython'] = dict( (k,v) for k,v in sysvars['general'].items() if k.startswith('sysboostpython') )
+    sysvars['volatile']['sysgeneral'] = dict( (k,v) for k,v in sorted(sysvars['general'].items()) )
 
     sysvars['runtime']={'extra_lib_path':[e for e in cmakevars['DG_EXTRA_LDLIBPATHS'].split(';') if e],
                         'extra_bin_path':[e for e in cmakevars['DG_EXTRA_PATHS'].split(';') if e],

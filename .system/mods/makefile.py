@@ -87,41 +87,16 @@ def write_main(global_targets,enabled_pkgnames):
                     fh.write('LDFLAGS_%s_LIB_%s := %s\n'%(extdep,lang,' '.join([info['rpath_flag_lib']%pipes.quote(e) for e in rpathdirs])))
 
     fh.write('\n')
-
-    use_sysboostpy = env.env['system']['general']['sysboostpython_use']
-    if use_sysboostpy:
-        is_pybind11 = env.env['system']['general']['sysboostpython_incdir'] in ('notavailable','')
-        _c = env.env['system']['general']['sysboostpython_cflags'].strip()
-        if is_pybind11:
-            _c += ' -DDGCODE_USEPYBIND11'
-        else:
-            _ = shlex.quote( str( (dirs.blddir/'sysboostinc').absolute().resolve() ) )
-            _c += ' -DDGCODE_USESYSBOOSTPYTHON -I%s -isystem%s'%(_,_)
-        _l = env.env['system']['general']['sysboostpython_linkflags'].strip()
-    else:
-# DGBUILD-EXPORT-ONLY>>        assert False, "Needs a suitable boost python or pybind11"
-        _c, _l = '',''  # DGBUILD-NO-EXPORT
-        if dirs.sysinc_shippedboost:  # DGBUILD-NO-EXPORT
-            _c = ' -I%s -isystem%s'%(dirs.sysinc_shippedboost,dirs.sysinc_shippedboost)  # DGBUILD-NO-EXPORT
-    fh.write('DGBOOSTCFLAGS := %s\n'%_c)
-    def finalise_boost_ldflags( flags, shlib ):
-        ra = utils.rpath_appender(lang='cxx',shlib=shlib)
-        cxxldflags = env.env['system']['langs']['cxx']['ldflags']
-        res = []
-        for f in ra.apply_to_flags( shlex.split(flags) ):
-            if not f in cxxldflags:
-                res.append( f )
-        return ' '.join( shlex.quote(f) for f in res )
-
-    fh.write('DGBOOSTLDFLAGS_EXE := %s\n'%finalise_boost_ldflags(_l,shlib=False) )
-    fh.write('DGBOOSTLDFLAGS_LIB := %s\n'%finalise_boost_ldflags(_l,shlib=True) )
+    sysgen = env.env['system']['general']
+    fh.write('PYBIND11_EMBED_CFLAGS := %s\n'%(sysgen['pybind11_embed_cflags_list'].replace(';',' ')))
+    fh.write('PYBIND11_EMBED_LDFLAGS := %s\n'%(sysgen['pybind11_embed_linkflags_list'].replace(';',' ')))
+    fh.write('PYBIND11_MODULE_CFLAGS := %s\n'%(sysgen['pybind11_module_cflags_list'].replace(';',' ')))
+    fh.write('PYBIND11_MODULE_LDFLAGS := %s\n'%(sysgen['pybind11_module_linkflags_list'].replace(';',' ')))
+    fh.write('\n')
 
     for lang,info in env.env['system']['langs'].items():
         if info:#info is only available for available languages:
             _c, _l = info['cflags'], info['ldflags']
-            if lang=='cxx':
-                _c += ' ${DGBOOSTCFLAGS}'
-                #_l += ' ${DGBOOSTLDFLAGS}'
             fh.write('CFLAGSLANG_%s := %s\n'%(lang,_c))
             fh.write('LDFLAGSLANG_%s := %s\n'%(lang,_l))
             fh.write('LDFLAGSPREPENDLANG_%s := %s\n'%(lang,info['ldflags_prepend']))

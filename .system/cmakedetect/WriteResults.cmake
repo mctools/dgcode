@@ -12,21 +12,16 @@ file(WRITE ${output_file} "#Dependency information extracted via cmake\n")
 set(oa APPEND ${output_file})
 
 file(${oa} "VAR@${}CMAKE_BUILD_TYPE@${CMAKE_BUILD_TYPE}\n")
+foreach( tmp
+    "PYBIND11_EMBED_CFLAGS_LIST"
+    "PYBIND11_EMBED_LINKFLAGS_LIST"
+    "PYBIND11_MODULE_CFLAGS_LIST"
+    "PYBIND11_MODULE_LINKFLAGS_LIST"
+    "PYBIND11_VERSION"
+    )
+  file(${oa} "VAR@${}${tmp}@${${tmp}}\n")
+endforeach()
 
-file(${oa} "VAR@${}PYTHON_EXECUTABLE@${PYTHON_EXECUTABLE}\n")
-file(${oa} "VAR@${}PYTHON_LIBRARIES@${PYTHON_LIBRARIES}\n")
-file(${oa} "VAR@${}PYTHON_INCLUDE_DIRS@${PYTHON_INCLUDE_DIRS}\n")
-
-if ( SYSTEM_BOOSTPYTHON_FOUND )
-  file(${oa} "VAR@${}SYSBOOSTPYTHON_USE@1\n")
-  string( JOIN " " tmp ${SYSTEM_BOOSTPYTHON_CFLAGS_LIST} )
-  file(${oa} "VAR@${}SYSBOOSTPYTHON_CFLAGS@${tmp}\n")
-  string( JOIN " " tmp ${SYSTEM_BOOSTPYTHON_LINKFLAGS_LIST} )
-  file(${oa} "VAR@${}SYSBOOSTPYTHON_LINKFLAGS@${tmp}\n")
-  file(${oa} "VAR@${}SYSBOOSTPYTHON_INCDIR@${SYSTEM_BOOSTPYTHON_INCDIR}\n")
-else()
-  file(${oa} "VAR@${}SYSBOOSTPYTHON_USE@0\n")
-endif()
 
 file(${oa} "VAR@${}CMAKE_VERSION@${CMAKE_VERSION}\n")
 file(${oa} "VAR@${}CMAKE_SYSTEM@${CMAKE_SYSTEM}\n")

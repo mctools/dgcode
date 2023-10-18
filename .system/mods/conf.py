@@ -18,8 +18,7 @@ lang_extensions = {
 
 package_cfg_file='pkg.info'
 
-autodeps = set(['Core','DGBoost'])# DGBUILD-NO-EXPORT
-# DGBUILD-EXPORT-ONLY>>autodeps = set(['Core'])
+autodeps = set(['Core'])
 projectname='ESS'
 
 def runnable_name(pkg,base_name):

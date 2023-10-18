@@ -24,7 +24,6 @@ cmakedetectdir = pathlib.Path(sysdir) / 'cmakedetect' # DGBUILD-NO-EXPORT
 incdirname='include'
 #libdirname='lib'#fixme: unused, 'lib' is simply hardcoded in a few places.
 
-sysinc_shippedboost = os.path.join(sysdir,'include') # DGBUILD-NO-EXPORT
 envcache = blddir / 'env.cache'
 varcache = blddir / 'vars.cache' #dynamic user settings (for pkg filters and cmake flags)
 systimestamp_cache=blddir / 'systimestamp.cache'

@@ -18,6 +18,7 @@ has_realpath = os.path.exists('/usr/bin/realpath')
 
 class TargetBinaryObject(target_base.Target):
     def __init__(self,pkg,subdir,bn,e,lang,shlib,cflags,possible_privincs):
+        is_py_mod = subdir.startswith('pycpp_')#todo better way?
         langinfo=env.env['system']['langs'][lang]
         self.pkglevel=False#needed by the corresponding TargetBinary object
         self.pkgname=pkg.name
@@ -40,6 +41,12 @@ class TargetBinaryObject(target_base.Target):
         for extdep in pkg.extdeps():
             extra_flags+=['${CFLAGS_%s_%s}'%(('CXX' if lang=='cxx' else 'C'),extdep)]
             self.deps+=['${EXT}/%s'%extdep]
+
+        if is_py_mod:
+            assert shlib
+            extra_flags.append( '${PYBIND11_MODULE_CFLAGS}' )
+        else:
+            extra_flags.append( '${PYBIND11_EMBED_CFLAGS}' )
 
         if pkg.extraflags_comp:
             extra_flags+=pkg.extraflags_comp
@@ -85,6 +92,7 @@ class TargetBinaryObject(target_base.Target):
 class TargetBinary(target_base.Target):
 
     def __init__(self,pkg,subdir,lang,shlib,object_targets,instsubdir,namefct,descrfct=None,checkfct=None):
+        is_py_mod = subdir.startswith('pycpp_')#todo better way?
         db.db['pkg2parts'][pkg.name].add(subdir)
         langinfo=env.env['system']['langs'][lang]
         self.pkgname=pkg.name
@@ -98,6 +106,7 @@ class TargetBinary(target_base.Target):
                 error.error(checkerrmsg)
 
         if subdir.startswith('app_'):
+            assert not shlib
             pkg.register_runnable(filename)
             db.db['pkg2runnables'].setdefault(pkg.name,set()).add(filename)
 
@@ -127,7 +136,12 @@ class TargetBinary(target_base.Target):
                 extra_flags += [ rpath_pattern.replace('-rpath','-rpath-link')%str(p) ]
         append_to_rpath( extra_flags, join('${INST}','lib') )
         append_to_rpath( extra_flags, join('${INST}','lib','links') )
-        extra_flags.append( '${DGBOOSTLDFLAGS_LIB}' if shlib else '${DGBOOSTLDFLAGS_EXE}' )
+
+        if is_py_mod:
+            assert shlib
+            extra_flags.append( '${PYBIND11_MODULE_LDFLAGS}' )
+        else:
+            extra_flags.append( '${PYBIND11_EMBED_LDFLAGS}' )
 
         conda_prefix =  envcfg.var.conda_prefix
         if conda_prefix:
@@ -139,9 +153,9 @@ class TargetBinary(target_base.Target):
         d=join('${INST}',instsubdir)
         #contains_message=True
         pattern = 'create_lib' if shlib else 'create_exe'
-        if shlib and '-pie' in extra_flags:
-            #-pie is for position independent executables, not libraries:
-            extra_flags = [e for e in extra_flags if e!='-pie']
+        if shlib and '-fPIE' in extra_flags:
+            #-fPIE is for position independent executables, not libraries:
+            extra_flags = [e for e in extra_flags if e!='-fPIE']
         self.code=['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sCreating %s%s"; fi'%(dcol,descr,dcolend),
                    'mkdir -p %s'%d,
                    langinfo[pattern]%(' '.join(extra_flags),
@@ -181,9 +195,6 @@ def create_tfactory_binary(instsubdir=None,pkglib=False,shlib=False,allowed_lang
         hdrs=[]
         langspresent=set()
         skip_fct = None
-
-        if pkg.name=='DGBoost' and env.env['system']['general']['sysboostpython_use']:
-            skip_fct = lambda basename : basename.startswith('dgboostpython_') # noqa E731
 
         for f in utils.listfiles(dirs.pkg_dir(pkg,subdir),ignore_logs=subdir.startswith('app_')):
             n,e=os.path.splitext(f)
