@@ -159,7 +159,7 @@ def create_cmakeliststxt( args ):
                 dummy_usage_statements += 'if ( DEFINED "%s" )\n'%e
                 dummy_usage_statements += '  set( tmp "${%s}" )\n'%e
                 dummy_usage_statements += 'endif()\n'
-    cmake = """cmake_minimum_required(VERSION 3.24.2...3.26.4)
+    cmake = """cmake_minimum_required(VERSION 3.24.2...3.27.6)
 project( dummy LANGUAGES %s )
 %s
 set_source_files_properties( "${CMAKE_CURRENT_SOURCE_DIR}/dummy_nodep.input"
