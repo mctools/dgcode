@@ -1,8 +1,8 @@
-import os
+import pathlib
 from . import utils
 from . import envcfg
 
-def parse_stdouterr(filename):
+def parse_stdouterr(fh):
     #Errors causes ec!=0 so are noticed by the user. But we want to capture
     #warnings so we can point them out later, and in particular this one:
     #
@@ -13,7 +13,6 @@ def parse_stdouterr(filename):
     #    LALA
     #
     #
-    fh=open(filename)
     n_warnings=0
     unused_var_mode=False
     unused_vars=[]
@@ -22,21 +21,21 @@ def parse_stdouterr(filename):
         if not l:
             continue
         if l.startswith('CMake Warning:'):
-            n_warnings+=1
+            n_warnings += 1
             continue
         if n_warnings and 'Manually-specified variables were not used by the project:' in l:
-            unused_var_mode=True
+            unused_var_mode = True
             continue
         if unused_var_mode:
             if l.startswith('  '):
                 l=l.strip()
                 assert l
-                unused_vars+=[l]
+                if not l in unused_vars:
+                   unused_vars.append( l )
                 continue
             else:
                 assert unused_vars
                 unused_var_mode=False
-    fh.close()
     assert bool(unused_vars)==bool(n_warnings)
     return {'other_warnings':n_warnings-(1 if unused_vars else 0),'unused_vars':unused_vars}
 
@@ -130,8 +129,6 @@ def parse(filename):
     sysvars['runtime']={'extra_lib_path':[e for e in cmakevars['DG_EXTRA_LDLIBPATHS'].split(';') if e],
                         'extra_bin_path':[e for e in cmakevars['DG_EXTRA_PATHS'].split(';') if e],
                         'libs_to_symlink':[e for e in cmakevars['DG_LIBS_TO_SYMLINK'].split(';') if e]}
-    #sysvars['python_precompile'] = cmakevars['PYTHON_EXECUTABLE']+' -c "import py_compile; py_compile.compile(file="%s", doraise=True)"'
-    #sysvars['python_precompile_opt'] = cmakevars['PYTHON_EXECUTABLE']+' -c -O "import py_compile; py_compile.compile(file="%s", doraise=True)"'
 
     autoreconf={}
     autoreconf['bin_list'] = cmakevars['autoreconf_bin_list']
@@ -166,8 +163,10 @@ def extractenv(tmpdir,cmakedir,*,cmakeargs,actually_needed_extdeps,quiet=True,ve
                                                                capture))
     t1 = time.time()
     print("%sEnvironment inspection done (%.2g seconds)"%(prefix,t1-t0))#don't silence this even if quiet==true
-    if ec!=0: return
-    printedinfo = parse_stdouterr(os.path.join(tmpdir,'cmake','cmake_output21_capture.txt'))
+    if ec!=0:
+        return
+    with ( pathlib.Path(tmpdir) / 'cmake' / 'cmake_output21_capture.txt' ).open('rt') as fh:
+        printedinfo = parse_stdouterr(fh)
     writteninfo = parse('%s/cmake/cmakecfg.txt'%tmpdir)
     writteninfo['cmake_printinfo'] = printedinfo
     return writteninfo

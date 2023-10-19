@@ -181,6 +181,13 @@ add_executable(dummy_withdep_app ${CMAKE_CURRENT_SOURCE_DIR}/dummy_withdep.input
 set_target_properties( dummy_withdep_app PROPERTIES LANGUAGE %s )
 set_target_properties( dummy_withdep_app PROPERTIES EXPORT_COMPILE_COMMANDS ON )
 target_link_libraries( dummy_withdep_app %s )
+
+#foreach( tmp ${FAKE_USAGE_VAR_LIST} )
+#  if ( DEFINED "${tmp}" )
+#    set( "${tmp}" "${${tmp}}" )
+#  endif()
+#endforeach()
+
 """%( fpargs,args.language,args.language,args.deptargets )
 
     return cmake

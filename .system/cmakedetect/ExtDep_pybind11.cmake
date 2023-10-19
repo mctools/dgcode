@@ -5,7 +5,7 @@ function( detect_system_pybind11
     resvar_module_linkflags_list
     resvar_version
     )
-  set( cmd "${PYTHON_EXECUTABLE}" -mpybind11 --cmakedir )
+  set( cmd "${Python_EXECUTABLE}" -mpybind11 --cmakedir )
   if ( DG_VERBOSE )
     string( JOIN " " tmp ${cmd} )
     message( STATUS "-- Invoking:" ${tmp})
@@ -24,7 +24,7 @@ function( detect_system_pybind11
     message( STATUS "-- Found pybind11_DIR=${pybind11_DIR}")
   endif()
 
-  set( cmd "${PYTHON_EXECUTABLE}" -mpybind11 --version )
+  set( cmd "${Python_EXECUTABLE}" -mpybind11 --version )
   if ( DG_VERBOSE )
     string( JOIN " " tmp ${cmd} )
     message( STATUS "-- Invoking:" ${tmp})
@@ -40,7 +40,9 @@ function( detect_system_pybind11
     message( FATAL_ERROR "Could not get version of pybind11." )
   endif()
   set( findpkg_args "pybind11;2.10.4;NO_MODULE;NO_DEFAULT_PATH" )
-  set( cmake_args "-DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}" "-Dpybind11_DIR=${pybind11_DIR}" )
+  set( cmake_args "" )
+  list( APPEND cmake_args "-DPython_EXECUTABLE=${Python_EXECUTABLE}" )
+  list( APPEND cmake_args "-Dpybind11_DIR=${pybind11_DIR}" )
 
   extract_extdep_flags( CXX "${findpkg_args}" "pybind11::module" "${cmake_args}" module_cflags module_linkflags )
   extract_extdep_flags( CXX "${findpkg_args}" "pybind11::embed" "${cmake_args}" embed_cflags embed_linkflags )

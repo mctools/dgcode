@@ -4,13 +4,13 @@ set(autoreconf_env_Python "PYTHONPATH;PYTHONHOME;CONDA_PREFIX")
 
 #For consistency, always try to guide the find_package call towards the python3 in the path:
 EXECUTE_PROCESS(COMMAND "which" "python3"
-                OUTPUT_VARIABLE PYTHON_EXECUTABLE
+                OUTPUT_VARIABLE Python_EXECUTABLE
                 RESULT_VARIABLE tmp_ec
                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-if (NOT "x${tmp_ec}" STREQUAL "x0" OR NOT EXISTS "${PYTHON_EXECUTABLE}")
+if (NOT "x${tmp_ec}" STREQUAL "x0" OR NOT EXISTS "${Python_EXECUTABLE}")
   message(FATAL_ERROR "No python3 interpreter in PATH")
 endif()
-file(REAL_PATH "${PYTHON_EXECUTABLE}" tmp_python_exec_in_path )
+file(REAL_PATH "${Python_EXECUTABLE}" tmp_python_exec_in_path )
 
 find_package(Python 3.9 COMPONENTS Interpreter Development REQUIRED)
 
@@ -20,7 +20,7 @@ message("-- Python version: ${PYTHON_VERSION_STRING}")
 if ( NOT Python_INTERPRETER_ID STREQUAL "Python" )
   message(FATAL_ERROR "Python implementation does not appear to be CPython.")
 endif()
-file(REAL_PATH "${PYTHON_EXECUTABLE}" tmp_python_exec_found )
+file(REAL_PATH "${Python_EXECUTABLE}" tmp_python_exec_found )
 if ( NOT "x${tmp_python_exec_found}" STREQUAL "x${tmp_python_exec_in_path}" )
   message(FATAL_ERROR "CMake found a different Python interpreter (${tmp_python_exec_found}) than the python3 one in the path (${tmp_python_exec_in_path}).")
 endif()
