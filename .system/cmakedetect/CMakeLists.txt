@@ -67,3 +67,5 @@ set(DG_GLOBAL_VERSION_DEPS_Fortran "")
 include("Utils.cmake")
 include("Detect.cmake")
 include("WriteResults.cmake")
+#Avoid unused variable warnings for various things set in CMAKE_ARGS:
+fake_usage_cmake_args()
