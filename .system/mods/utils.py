@@ -1,6 +1,7 @@
 import os
 import errno
 import sys
+import pathlib
 
 def err(msg):
     #FIXME: obsolete?
@@ -122,29 +123,28 @@ def listfiles(d,filterfnc=0,error_on_no_match=True,ignore_logs=False):
 def is_executable(fn):
     return os.access(fn,os.X_OK)
 
-import pickle as _pklmod
-from pathlib import Path as _Path
-
 def pkl_load(fn_or_fh):
+    import pickle
     if hasattr(fn_or_fh,'read'):
         #argument is filehandle:
-        return _pklmod.load(fn_or_fh)#filehandle already
+        return pickle.load(fn_or_fh)#filehandle already
     else:
         #argument is filename:
-        with _Path(fn_or_fh).open('rb') as fh:
-            d=_pklmod.load(fh)
+        with pathlib.Path(fn_or_fh).open('rb') as fh:
+            d=pickle.load(fh)
         return d
 
 def pkl_dump(data,fn_or_fh):
+    import pickle
     if hasattr(fn_or_fh,'write'):
         #argument is filehandle:
-        d=_pklmod.dump(data,fn_or_fh)
+        d=pickle.dump(data,fn_or_fh)
         fn_or_fh.flush()
         return d
     else:
         #argument is filename:
-        with _Path(fn_or_fh).open('wb') as fh:
-            d=_pklmod.dump(data,fh)
+        with pathlib.Path(fn_or_fh).open('wb') as fh:
+            d=pickle.dump(data,fh)
         return d
 
 def update_pkl_if_changed(pklcont,filename):
@@ -200,7 +200,6 @@ class rpath_appender:
                     if not _:
                         continue
                 elif not f.startswith('-'):
-                    import pathlib
                     _ = pathlib.Path(f)
                     if _.exists() and not _.is_dir() and _.parent.is_dir():
                         _ = str(_.parent.absolute().resolve())#../bla/libfoo.so -> /some/where/bla
@@ -213,3 +212,18 @@ class rpath_appender:
         for d in found_dirs:
             res += self.apply_to_dir( d )
         return res
+
+def path_is_relative_to( p, pother ):
+    #Path.is_relative_to(..) was introduced in Python 3.9, this function lets us
+    #support python 3.8.
+    assert isinstance( p, pathlib.Path )
+    if hasattr(p,'is_relative_to'):
+        #Python 3.9+:
+        return p.is_relative_to(pother)
+    else:
+        #Python 3.8:
+        try:
+            p.relative_to(pother)
+            return True
+        except ValueError:
+            return False

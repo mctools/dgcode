@@ -6,6 +6,8 @@ import typing
 import re
 from . import error
 
+_OptPath = typing.Union[pathlib.Path, None]# "pathlib.Path | None" needs py3.10+
+
 class SingleCfg:
 
     """Class which contains decoded configuration from a single source (a
@@ -35,7 +37,7 @@ class SingleCfg:
     @classmethod
     def create_from_object_methods( cls, obj,
                                     srcdescr = None,
-                                    default_dir : pathlib.Path | None = None,
+                                    default_dir : _OptPath = None,
                                     ignore_build : bool = False ):
         if hasattr(obj, 'dgbuild_default_dir'):
             p=pathlib.Path( obj.dgbuild_default_dir() ).expanduser()
@@ -143,7 +145,7 @@ class TOMLSchemaDecodeContext(typing.Protocol):
     def src_descr(self) -> str:
         return ''
     @property
-    def default_dir(self) -> pathlib.Path | None:
+    def default_dir(self) -> _OptPath:
         return None
     @property
     def item_name(self) -> str:
@@ -328,7 +330,7 @@ def decode_with_schema_and_apply_result_to_obj( cfg : dict, targetobj : SingleCf
         def src_descr(self) -> str:
             return self.__srcdescr
         @property
-        def default_dir(self) -> pathlib.Path | None:
+        def default_dir(self) -> _OptPath:
             return self.__default_dir
         @property
         def item_name(self) -> str:

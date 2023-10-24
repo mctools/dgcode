@@ -235,7 +235,7 @@ def perform_configuration(cmakeargs=[],
                 #directory with obsolete contents:
                 lt=dirs.pkg_dir(p)
                 if lt.is_dir() and not lt.is_symlink():
-                    assert lt.is_relative_to( conf.build_dir() ) and ( conf.build_dir()/'.dgbuilddir' ).exists()
+                    assert utils.path_is_relative_to( lt, conf.build_dir() ) and ( conf.build_dir()/'.dgbuilddir' ).exists()
                     shutil.rmtree( lt, ignore_errors=True)
                 else:
                     lt.parent.mkdir( parents = True, exist_ok = True )

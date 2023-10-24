@@ -654,7 +654,7 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
             fn=os.path.abspath(os.path.realpath(fn))
             p = pathlib.Path(fn).absolute().resolve()
             dgcode_invoke_dirs = get_dgcode_invoke_dirs()
-            if not any( p.is_relative_to( d ) for d in dgcode_invoke_dirs):
+            if not any( utils.path_is_relative_to(p,d) for d in dgcode_invoke_dirs):
                 #TODO: This currently fails for dynamic packages!
                 parser.error(f"File {p} must be located under one of the following directories:\n%s"%('\n '.join(str(e) for e in dgcode_invoke_dirs)))
             return [fn]#expands to a single file
@@ -732,7 +732,7 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
             if envcfg.var.conda_prefix:
                 pabs = p.absolute().resolve()
                 cp = pathlib.Path(envcfg.var.conda_prefix).absolute().resolve()
-                if cp.is_dir() and pabs.is_relative_to(cp):
+                if cp.is_dir() and utils.path_is_relative_to( pabs, cp ):
                     return os.path.join('${CONDA_PREFIX}',str(pabs.relative_to(cp)))
             return str(p)
         print (prefix+'  Framework directory              : %s'%fixpath(dirs.fmwkdir))
@@ -883,20 +883,21 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
 
     if not opt.quiet:
         if legacy_mode and cfgvars.get('ONLY','')=='Framework::*' and not 'NOT' in cfgvars:
-            from . import col
             print (prefix+"%sNote that only Framework packages were enabled by default:%s"%(col.bldmsg_notallselectwarn,col.end))
             print (prefix)
             print (prefix+"%s  - To enable pkgs for a given project do: dgbuild -p<projectname>%s"%(col.bldmsg_notallselectwarn,col.end))
             print (prefix+"%s  - To enable all pkgs do: dgbuild -a%s"%(col.bldmsg_notallselectwarn,col.end))
             print (prefix)
-        print (prefix+"You are all set to begin using the software!")
-        print (prefix)
-        print (prefix+'To see available applications, type "ess_" and hit the TAB key twice.')
-        print (prefix)
 
-    from .envsetup import calculate_env_setup
-    if not legacy_mode and not prevent_env_setup_msg and calculate_env_setup():
-        print (prefix+'To enable the build environment you must first enable it.\n'
-               'Type the following command (exactly) to do so (undo later by --env-unsetup instead):\n'
-               f'  eval "$({progname} --env-unsetup)"'
-               )
+        from .envsetup import calculate_env_setup
+        if not legacy_mode and not prevent_env_setup_msg and calculate_env_setup():
+            print (f'{prefix}{col.warnenvsetup}Build done. To use the resulting environment you must first enable it!{col.end}\n{prefix}\n'
+                   f'{prefix}{col.warnenvsetup}Type the following command (exactly) to do so (undo later by --env-unsetup instead):{col.end}\n'
+                   f'{prefix}\n'
+                   f'{prefix}    {col.warnenvsetup}eval "$({progname} --env-setup)"{col.end}\n{prefix}'
+                   )
+        else:
+            print (prefix+"Build done. You are all set to begin using the software!")
+            print (prefix)
+            print (prefix+'To see available applications, type "ess_" and hit the TAB key twice.')
+            print (prefix)

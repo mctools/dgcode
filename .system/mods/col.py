@@ -32,6 +32,7 @@ grep_unmatch = magenta
 inc_samepkg = blue
 inc_samedir = lightblue
 inc_dynpkg = lightcyan
+warnenvsetup = lightyellow
 
 if __name__=='__main__':
     for cname in [c for c in dir() if not c[0]=='_' and not c=='end']:

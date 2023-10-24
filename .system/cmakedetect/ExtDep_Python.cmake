@@ -12,7 +12,7 @@ if (NOT "x${tmp_ec}" STREQUAL "x0" OR NOT EXISTS "${Python_EXECUTABLE}")
 endif()
 file(REAL_PATH "${Python_EXECUTABLE}" tmp_python_exec_in_path )
 
-find_package(Python 3.9 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
 
 message("-- Real python executable: ${Python_EXECUTABLE}")
 set(PYTHON_VERSION_STRING "${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}.${Python_VERSION_PATCH}")

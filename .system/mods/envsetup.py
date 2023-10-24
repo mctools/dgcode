@@ -115,8 +115,9 @@ def modify_path_var(varname,*,env_dict, blockpath = None, prepend_entries = None
         res = prepend_entries[:]
     else:
         res = []
+    from .utils import path_is_relative_to
     for e in env_dict.get(varname,'').split(':'):
-        if e and ( blockpath is None or not pathlib.Path(e).is_relative_to( blockpath ) ):
+        if e and ( blockpath is None or not path_is_relative_to( pathlib.Path(e), blockpath ) ):
             res.append(str(e))
     return ':'.join(unique_list(str(e) for e in res))
 
