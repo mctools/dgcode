@@ -21,7 +21,7 @@ function( extract_extdep_flags language find_package_arg_list deptargets_list cm
   endif()
   if ( DG_VERBOSE )
     string( JOIN " " tmp ${cmd} )
-    message("-- About to execute: ${tmp}" )
+    message( STATUS "About to execute: ${tmp}" )
   endif()
   execute_process( COMMAND ${cmd} OUTPUT_VARIABLE tmp COMMAND_ERROR_IS_FATAL ANY )
   string(JSON obj_extra GET "${tmp}" "extra")

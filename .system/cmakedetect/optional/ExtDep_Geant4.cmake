@@ -37,7 +37,7 @@ endif()
 
 if (geant4_config_file)
   set(HAS_Geant4 1)
-  message("-- Base Geant4 setup on ${geant4_config_file}")
+  message( STATUS "Base Geant4 setup on ${geant4_config_file}")
   execute_process(COMMAND "${geant4_config_file}" "--libs" OUTPUT_VARIABLE ExtDep_Geant4_LINK_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(STRIP "${ExtDep_Geant4_LINK_FLAGS}" ExtDep_Geant4_LINK_FLAGS)
   execute_process(COMMAND "${geant4_config_file}" "--cflags" OUTPUT_VARIABLE ExtDep_Geant4_COMPILE_FLAGS_CXX OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -45,7 +45,7 @@ if (geant4_config_file)
   execute_process(COMMAND "${geant4_config_file}" "--has-feature" "gdml" OUTPUT_VARIABLE tmp OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(STRIP "${tmp}" tmp)
   if ( NOT "x${tmp}" STREQUAL "xyes" )
-    message("-- Warning: Geant4 does not have GDML enabled.")
+    message( STATUS "Warning: Geant4 does not have GDML enabled.")
   else()
     #Finally, if G4 was compiled with GDML support we need to explicitly add
     #xercesc as a dependency.
@@ -64,7 +64,7 @@ if (geant4_config_file)
     ####workaround end:
 
     if ( NOT XercesC_FOUND )
-      message("-- Warning: Geant4 has GDML enabled but XercesC could not be detected! Will pretend Geant4-GDML is absent.")
+      message( STATUS "Warning: Geant4 has GDML enabled but XercesC could not be detected! Will pretend Geant4-GDML is absent.")
     else()
       #assuming only one entry in XercesC_INCLUDE_DIRS:
       set(ExtDep_Geant4_COMPILE_FLAGS_CXX "${ExtDep_Geant4_COMPILE_FLAGS_CXX} -I${XercesC_INCLUDE_DIRS} -isystem${XercesC_INCLUDE_DIRS} -DHAS_Geant4_GDML")
@@ -105,7 +105,7 @@ if (geant4_config_file)
       include(CheckLinkerFlag)
       check_linker_flag(CXX -Wl,--allow-shlib-undefined tmp)
       if ( tmp )
-        message("-- Geant4 from conda detected: Adding -Wl,--allow-shlib-undefined to work around missing symbols.")
+        message( STATUS "Geant4 from conda detected: Adding -Wl,--allow-shlib-undefined to work around missing symbols.")
         set(ExtDep_Geant4_LINK_FLAGS "${ExtDep_Geant4_LINK_FLAGS} -Wl,--allow-shlib-undefined")
         #NB: we could in principle also do a try_compile first perhaps and see if
         #this is still needed (and works), but it is complicated to replicate here

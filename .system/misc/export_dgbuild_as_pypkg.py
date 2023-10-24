@@ -53,10 +53,23 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: Unix",
 ]
+dependencies = [
+    #Very light-weight, not a big deal if we happen to install with both conda and pip:
+    'tomli; python_version < "3.11"'
+]
+
+[project.optional-dependencies]
+all = [
+    #Non-trivial dependencies which is most likely already installed in conda
+    #(if we actually make conda-packages, we can move these up to the
+    #non-optional dependencies above):
+   'pybind11 >= 2.10.4',
+    'cmake >= 3.24.2'
+]
 
 [project.urls]
-"Homepage" = "https://github.com/mctools/dgcode"
-"Bug Tracker" = "https://github.com/mctools/dgcode/issues"
+"Homepage" = "https://github.com/mctools/dgbuild"
+"Bug Tracker" = "https://github.com/mctools/dgbuild/issues"
 
 [project.scripts]
 dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main"

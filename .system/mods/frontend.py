@@ -840,10 +840,10 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
         print (prefix+'  %s : %s'%(pkgtxt_en.ljust(32+(len(col_end)+len(col_ok) if n_enabled else 0)),formatlist(pkg_enabled,col_ok)))
         print (prefix+'  %s : %s'%(pkgtxt_dis.ljust(32+(len(col_end)+len(col_bad) if n_disabled else 0)),formatlist(pkg_disabled,col_bad)))
         print (prefix)
-        if cp['unused_vars']:
+        if unused_vars_withvals:
             print (prefix+'%sWARNING%s Unused user cfg variables  : %s'%(col_bad,col_end,formatlist(unused_vars_withvals,None)))
             print (prefix)
-        if cp['other_warnings']:
+        if cp['other_warnings'] or ( len(cp['unused_vars'])>len(unused_vars_withvals)):
             print (prefix+'%sWARNING%s unspecified warnings from CMake encountered during environment inspection!'%(col_bad,col_end))
             print (prefix)
 
