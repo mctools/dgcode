@@ -363,7 +363,8 @@ def perform_configuration(cmakeargs=[],
                                   str( ( pathlib.Path(__file__).resolve().absolute().parent.parent / 'pypath' ).absolute().resolve() ) ) # DGBUILD-NO-EXPORT
                 fh.write(l) # DGBUILD-NO-EXPORT
 
-    dir_names = ('fmwkdir','projdir','pkgsearchpath','blddir','installdir','testdir','envcache')
+# DGBUILD-EXPORT-ONLY>>    dir_names = ('projdir','pkgsearchpath','blddir','installdir','testdir','envcache')
+    dir_names = ('fmwkdir','projdir','pkgsearchpath','blddir','installdir','testdir','envcache')# DGBUILD-NO-EXPORT
     dirdict = dict(((d, getattr(dirs, d)) for d in dir_names))
 
     #Update dynamic python module with information, if needed:

@@ -108,13 +108,14 @@ def extra_pkg_path():
         dirs.extend([AbsPath(p.strip()) for p in extra_pkg_path_env.split(':') if p.strip()]) # DGBUILD-NO-EXPORT
     return dirs # DGBUILD-NO-EXPORT
 
-# DGBUILD-EXPORT-ONLY>>def framework_dir():
-# DGBUILD-EXPORT-ONLY>>    return (AbsPath(__file__).parent / 'data' / 'pkgs' / 'Framework')
+#NEVERUSE # DGBUILD-EXPORT-ONLY>>def framework_dir():
+#NEVERUSE # DGBUILD-EXPORT-ONLY>>    return (AbsPath(__file__).parent / 'data' / 'pkgs' / 'Framework')
 def framework_dir(system_dir): # DGBUILD-NO-EXPORT
     return (AbsPath(system_dir) / '../packages/Framework').resolve() # DGBUILD-NO-EXPORT
 
 # DGBUILD-EXPORT-ONLY>>def pkg_search_path():
-# DGBUILD-EXPORT-ONLY>>    candidates = [framework_dir(), projects_dir()]
+# DGBUILD-EXPORT-ONLY>>    #candidates = [framework_dir(), projects_dir()]
+# DGBUILD-EXPORT-ONLY>>    candidates = [projects_dir()]
 # DGBUILD-EXPORT-ONLY>>    candidates.extend(extra_pkg_path())
 # DGBUILD-EXPORT-ONLY>>    dirs = []
 # DGBUILD-EXPORT-ONLY>>    for d in candidates:

@@ -6,7 +6,7 @@ from . import conf#project specific configuration
 #system dir is one up from the modules dir:
 sysdir = str(pathlib.Path(__file__).resolve().absolute().parent.parent)
 fmwkdir = conf.framework_dir(sysdir)# DGBUILD-NO-EXPORT
-# DGBUILD-EXPORT-ONLY>>fmwkdir = conf.framework_dir()
+#NEVERUSE # DGBUILD-EXPORT-ONLY>>fmwkdir = conf.framework_dir()
 blddir = conf.build_dir()
 makefiledir = blddir / 'makefiles'
 
@@ -69,7 +69,7 @@ for d in [str(x) for x in [blddir, *pkgsearchpath, installdir]]:
 
 # Package directory aliases #keep them lowercase
 pkgdir_aliases = {
-  "framework": fmwkdir,
+  "framework": fmwkdir,# DGBUILD-NO-EXPORT
   "projects": projdir,
   "extra": extrapkgpath
   }

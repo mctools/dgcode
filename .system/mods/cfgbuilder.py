@@ -1,8 +1,8 @@
+import pathlib
 from .singlecfg import SingleCfg
 from . import error
 
 def locate_master_cfg_file():
-    import pathlib
     import os
     p = os.environ.get('DGBUILD_CFG')
     if p:
@@ -29,20 +29,11 @@ def locate_master_cfg_file():
         if f.exists():
             return f
 
-def load_core_cfg():
-    import pathlib
-    class CoreBundleCfg:
-        def dgbuild_srcdescr_override( self ):
-            return 'dgbuildcore bundle (builtin)'
-        def dgbuild_bundle_name( self ):
-            return 'dgbuildcore'
-        def dgbuild_bundle_pkgroot( self ):
-            return ( pathlib.Path(__file__).absolute().parent
-                     / 'data' / 'pkgs' / 'Framework' ).absolute().resolve()
-        def dgbuild_bundle_envpaths( self ):
-            return [ 'PATH:<install>/bin:<install>/scripts',
-                     'PYTHONPATH:<install>/python' ]
-    return SingleCfg.create_from_object_methods(CoreBundleCfg(),ignore_build=True)
+def load_builtin_cfgs():
+    pd = pathlib.Path(__file__).absolute().parent / 'data'
+    cfgs = [ ( pd / 'pkgs-core' / 'dgbuild.cfg' ).absolute().resolve(),
+             ( pd / 'pkgs-core_val' / 'dgbuild.cfg' ).absolute().resolve() ]
+    return [ ( p, SingleCfg.create_from_toml_file(p,ignore_build=True) ) for p in cfgs ]
 
 class CfgBuilder:
 
@@ -55,9 +46,10 @@ class CfgBuilder:
 
     """
 
-    def __init__(self, master_cfg : SingleCfg ):
+    def __init__(self, master_cfg : SingleCfg, master_cfg_file, verbose = True ):#fixme verbose=False
         #Input:
         #Take build settings straight from master_cfg:
+        self.__print_verbose = lambda *a,**kw: print('dgbuild cfgbuilder INFO::',*a,**kw) if verbose else ( lambda *a,**kw: None )
         self.__build_mode = master_cfg.build_mode
         self.__build_njobs = master_cfg.build_njobs
         self.__build_cachedir = master_cfg.build_cachedir
@@ -67,12 +59,24 @@ class CfgBuilder:
         #Build up everything else recursively, starting from the master_cfg:
         self.__pkg_path = []#result 1
         self.__env_paths = {}#result 2
-        self.__cfg_search_path_already_considered = set()
+        self.__used_cfg_files = set()#make sure we don't consider the same cfg-file twice
+        self.__used_cfg_files.add( master_cfg_file )
         self.__available_unused_cfgs = []#only needed during build up
-        self.__available_unused_cfgs.append( load_core_cfg() )#dgbuildcore bundle always available
         self.__cfg_names_used = set()
         self.__cfg_names_missing = set([ master_cfg.project_name ])
         self.__use_cfg( master_cfg, is_top_level = True )
+
+        for cfg_file, cfg in load_builtin_cfgs():
+            #core/core-val bundles always available directly from core
+            #installation, but we only add them if they were not added already
+            #via a search_path entry (to facilitate development of core pkgs
+            #directly from a git clone):
+            if cfg.project_name in self.__cfg_names_missing:
+                #self.__print_verbose(f'Using built-in cfg: {cfg_file}')
+                assert cfg_file not in self.__used_cfg_files
+                self.__used_cfg_files.add( cfg_file )
+                self.__use_cfg( cfg )
+
         if self.__cfg_names_missing:
             #Only consider python plugins if there is anything we did not find
             #already in the directly requested search paths (that way a dev
@@ -84,7 +88,6 @@ class CfgBuilder:
             _s = 's' if len(self.__cfg_names_missing)>2 else ''
             error.error('Could not find dependent project%s: "%s"'%(_s,_p))
         self.__pkg_path = tuple( self.__pkg_path )
-        #self.__env_paths = tuple( self.__env_paths )
         del self.__available_unused_cfgs
 
     @property
@@ -116,9 +119,8 @@ class CfgBuilder:
         return self.__env_paths
 
     def __use_cfg( self, cfg : SingleCfg, is_top_level = False ):
-        if not cfg.project_name in self.__cfg_names_missing:
-            #We do not actually need this cfg!
-            return
+        assert cfg.project_name in self.__cfg_names_missing
+        self.__print_verbose(f'Using {"master-" if is_top_level else ""}cfg from {cfg._cfg_file}')
         self.__cfg_names_missing.remove( cfg.project_name )
         self.__cfg_names_used.add( cfg.project_name )
         #Add dependencies and cfgs available in search paths:
@@ -128,10 +130,11 @@ class CfgBuilder:
         for sp in cfg.depend_search_path:
             if not sp.exists():
                 error.error
-            if sp in self.__cfg_search_path_already_considered:
-                continue
             assert sp.is_file()
-            self.__cfg_search_path_already_considered.add( sp )
+            sp = sp.absolute()
+            if sp in self.__used_cfg_files:
+                continue
+            self.__used_cfg_files.add( sp )
             depcfg = SingleCfg.create_from_toml_file(
                 sp,
                 ignore_build = not is_top_level
@@ -164,29 +167,42 @@ class CfgBuilder:
                 self.__use_cfg( ucfg )
 
     def __consider_python_plugins( self ):
-        #First, find all available python plugins:
+        #First, find all possible python packages with plugins:
+        own_pkg_name = pathlib.Path(__file__).parent.name
         import importlib
         import pkgutil
         possible_pyplugins = set(
             name
             for finder, name, ispkg
             in pkgutil.iter_modules()
-            if ( name.startswith('ess_dgbuild_') or name.startswith('dgbuild_') )
+            if ( name != own_pkg_name
+                 and ( name.startswith('ess_dgbuild_')
+                       or name.startswith('dgbuild_') ) )
         )
 
         #Load their cfgs:
         for name in sorted(possible_pyplugins):
+            modname=f'{name}.dgbuild_bundle_list'
+            self.__print_verbose(f'Trying python plugin module {modname}')
             try:
-                mod = importlib.import_module(f'{name}.dgbuild_bundle_info')
+                mod = importlib.import_module(modname)
             except ModuleNotFoundError:
+                self.__print_verbose(f' -> skipping due to ModuleNotFoundError')
                 continue
-            if not SingleCfg.is_plugin_object( mod ):
+            if not hasattr( mod, 'dgbuild_bundle_list' ):
+                self.__print_verbose(f' -> skipping due to missing dgbuild_bundle_list function')
                 continue
             srcdescr = 'Python module %s'%name
-            cfg = SingleCfg.create_from_object_methods( mod,
-                                                        srcdescr = srcdescr,
-                                                        ignore_build = True )
-            self.__available_unused_cfgs.append( cfg )
+            for cfg_file in mod.dgbuild_bundle_list():
+                if not cfg_file.is_absolute() or not cfg_file.is_file():
+                    error.error(f'Non-absolute or non-existing cfg file path returned from {srcdescr}')
+                cfg_file = cfg_file.absolute().resolve()
+                if cfg_file in self.__used_cfg_files:
+                    self.__print_verbose(f' -> skipping provided file already used: {cfg_file}')
+                    continue#Already used
+                self.__used_cfg_files.add( cfg_file )
+                cfg = SingleCfg.create_from_toml_file( cfg_file, ignore_build = True )
+                self.__available_unused_cfgs.append( cfg )
 
         #Use cfgs we found as appropriate:
         self.__search_available_cfgs()

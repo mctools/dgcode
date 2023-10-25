@@ -9,8 +9,12 @@ import stat
 def parse():
     #FIXME: Proper argparse?
     import sys
+    _srcdir_val = pathlib.Path.home() / 'work' / 'dgcode_val'
+    assert _srcdir_val.exists()
+
     class Args:
         srcdir = pathlib.Path(__file__).parent.parent.absolute().resolve()
+        srcdir_val = _srcdir_val.absolute().resolve()
         targetdir = srcdir / 'exported_pypkg'
         force = '--force' in sys.argv[1:]
     return Args()
@@ -21,12 +25,19 @@ def create_metadata_files( tgtdir ):
     #    ( tgtdir / 'setup.py' ).write_text('dummy')
     ( tgtdir / 'MANIFEST.in' ).write_text("""
 recursive-include src/ess_dgbuild_internals/data/cmake *.cmake *.txt *.py
-recursive-include src/ess_dgbuild_internals/data/pkgs/Framework LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
-recursive-include src/ess_dgbuild_internals/data/pkgs/Framework/**/data *
-recursive-include src/ess_dgbuild_internals/data/pkgs/Framework/**/scripts *
+recursive-include src/ess_dgbuild_internals/data/pkgs-core LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/ess_dgbuild_internals/data/pkgs-core/**/data *
+recursive-include src/ess_dgbuild_internals/data/pkgs-core/**/scripts *
+recursive-include src/ess_dgbuild_internals/data/pkgs-core_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/ess_dgbuild_internals/data/pkgs-core_val/**/data *
+recursive-include src/ess_dgbuild_internals/data/pkgs-core_val/**/scripts *
 recursive-include src/ess_dgbuild_g4framework/data/pkgs LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
 recursive-include src/ess_dgbuild_g4framework/data/pkgs/**/data *
 recursive-include src/ess_dgbuild_g4framework/data/pkgs/**/scripts *
+recursive-include src/ess_dgbuild_g4framework/data/pkgs_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/ess_dgbuild_g4framework/data/pkgs_val/**/data *
+recursive-include src/ess_dgbuild_g4framework/data/pkgs_val/**/scripts *
+recursive-include src dgbuild.cfg
 
 global-exclude *~* *\#* .*
 global-exclude *.pyc *.pyo */__pycache__/* */.ruff_cache/*
@@ -36,12 +47,16 @@ global-exclude vgcore.* .DS_Store .vscode *.reflogupdate*.orig
 
     ( tgtdir / 'pyproject.toml' ).write_text("""
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0","setuptools-git-versioning"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
 
 [project]
 name = "ess_dgbuild"
-version = "0.0.1"
+dynamic = ["version"] # Version based on git tag...
+#... not static: version = "0.0.1"
 authors = [
   { name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" },
 ]
@@ -110,17 +125,12 @@ def create_pymodfiles( srcdir, tgtdir, ignorefct = None ):
 def create_pymodfiles_g4( tgtdir ):
     tgtdir.mkdir( parents = True )
     ( tgtdir / '__init__.py' ).write_text('')
-    ( tgtdir / 'dgbuild_bundle_info.py' ).write_text(
+    ( tgtdir / 'dgbuild_bundle_list.py' ).write_text(
 """
-import pathlib
-def dgbuild_bundle_name():
-    return 'g4framework'
-
-def dgbuild_bundle_pkgroot():
-    return ( pathlib.Path(__file__).parent / 'data' / 'pkgs' ).absolute().resolve()
-
-def dgbuild_bundle_envpaths():
-    return [ 'NCRYSTAL_DATA_PATH:<install>/data' ]
+def dgbuild_bundle_list():
+    import pathlib
+    datadir = ( pathlib.Path(__file__).absolute().parent / 'data' ).absolute().resolve()
+    return [ datadir / 'pkgs' / 'dgbuild.cfg', datadir / 'pkgs_val' / 'dgbuild.cfg' ]
 """
     )
 
@@ -174,6 +184,9 @@ def create_frameworkpkgs( srcdir, tgtdir, pkgfilter ):
         newpkgdir = tgtdir / pkgreldir
         print('Transferring files from: %s'%(pkgreldir))
         for f in sorted(get_pkg_files(pkgdir)):
+            if '~' in str(f) or '#' in str(f) or '.reflogupdate.' in f.name:
+                print('WARNING: Ignoring file:',f)
+                continue
             f_reltopkg = f.relative_to(pkgdir)
             print ('    -> ',f)
             tgtfile = tgtdir / pkgreldir / f_reltopkg
@@ -182,11 +195,15 @@ def create_frameworkpkgs( srcdir, tgtdir, pkgfilter ):
             if text_data is not None:
                 tgtfile.write_text( text_data )
             else:
-                assert tgtfile.parent.name == 'data'
                 print('WARNING: Transferring binary data file:',f)
+                assert ( tgtfile.parent.name == 'data'
+                         or ( tgtfile.parent.parent.name in ('MCPLTests','MCPLZLibTests')
+                              and tgtfile.name in ('testtool_sysgz.log','testtool_nogz.log','testtool.log'))
+                         or ( tgtfile.parent.parent.name=='MCPLPyTests' and tgtfile.name=='testpyd.log')
+                        )
                 tgtfile.write_bytes( f.read_bytes() )
 
-            if tgtfile.parent.name=='scripts' and len(f_reltopkg.parts)==2:
+            if tgtfile.parent.name=='scripts' and len(f_reltopkg.parts)==2 and not tgtfile.name.endswith('.log'):
                 chmod_x( tgtfile )
 
 def main():
@@ -203,17 +220,76 @@ def main():
     destdir_data = destdir_mods / 'data'
     destdir_datag4 = destdir_modsg4 / 'data'
     destdir_cmake = destdir_data / 'cmake'
-    destdir_pkgs = destdir_data / 'pkgs/Framework'
+    destdir_pkgs_core = destdir_data / 'pkgs-core'
+    destdir_pkgs_coreval = destdir_data / 'pkgs-core_val'
     destdir_pkgsg4 = destdir_datag4 / 'pkgs'
+    destdir_pkgsg4_val = destdir_datag4 / 'pkgs_val'
     create_pymodfiles( opt.srcdir / 'mods' , destdir_mods,
                        ignorefct = ( lambda fname : fname in ['create_setup_file.py'] ),
                       )
     create_pymodfiles_g4( destdir_modsg4 )
     create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
-    create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs,
+    #create_dgbuild_cfg_file( destdir_data, 'core' )
+    #create_dgbuild_cfg_file( destdir_datag4, 'g4framework' )
+
+    create_frameworkpkgs( opt.srcdir_val, destdir_pkgs_coreval,
+                          pkgfilter = (lambda pkgname : pkgname=='CoreTests') )
+    create_frameworkpkgs( opt.srcdir_val, destdir_pkgsg4_val,
+                          pkgfilter = (lambda pkgname : pkgname!='CoreTests') )
+
+    create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs_core,
                           pkgfilter = (lambda pkgname : pkgname=='Core') )
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgsg4,
                           pkgfilter = (lambda pkgname : pkgname not in ('Core','DGBoost','NCrystalBuiltin') ) )
+
+#dgbuild.cfg files:
+    ( destdir_pkgs_core / 'dgbuild.cfg' ).write_text(
+f"""[project]
+  name = "core"
+  env_paths = [ "PATH:<install>/bin:<install>/scripts",
+                "PYTHONPATH:<install>/python" ]
+[depend]
+  search_path = [ "../{destdir_pkgs_coreval.name}" ]
+""" )
+    ( destdir_pkgs_coreval / 'dgbuild.cfg' ).write_text(
+f"""[project]
+  name = "core_val"
+[depend]
+  search_path = [ "../{destdir_pkgs_core.name}" ]
+""" )
+
+    ( destdir_pkgsg4 / 'dgbuild.cfg' ).write_text(
+f"""[project]
+  name = "g4framework"
+  env_paths = [ "NCRYSTAL_DATA_PATH:<install>/data" ]
+[depend]
+  search_path= [ "../{destdir_pkgsg4_val.name}" ]
+""" )
+    ( destdir_pkgsg4_val / 'dgbuild.cfg' ).write_text(
+f"""[project]
+  name = "g4framework_val"
+[depend]
+  projects= [ "core_val", "g4framework" ]
+  search_path= [ "../{destdir_pkgsg4.name}" ]
+""" )
+
+    ( opt.targetdir / 'dgbuild_redirect.cfg' ).write_text(
+f"""# Special dgbuild cfg file which allows one to use the pkgs in the contained
+# bundles directly from a git clone of the repository rather than after
+# installing as a python package, and simply by adding the root directory of the
+# git clone to the depend.search_path list in a given dgbuild.cfg file. This
+# exists to facilitate development work, and is not as such intended for
+# end-users.
+
+[special]
+  redirect_search_path = [
+  "./src/ess_dgbuild_internals/data/{destdir_pkgs_core.name}",
+  "./src/ess_dgbuild_internals/data/{destdir_pkgs_coreval.name}",
+  "./src/ess_dgbuild_g4framework/data/{destdir_pkgsg4.name}",
+  "./src/ess_dgbuild_g4framework/data/{destdir_pkgsg4_val.name}"
+  ]
+""" )
+
 
 if __name__ == '__main__':
     main()

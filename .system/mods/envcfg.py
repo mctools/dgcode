@@ -55,7 +55,7 @@ def _newcfg():
     assert master_cfg_file.is_file()
 
     master_cfg = SingleCfg.create_from_toml_file( master_cfg_file )
-    cfg = CfgBuilder( master_cfg )
+    cfg = CfgBuilder( master_cfg, master_cfg_file )
     pkgfilterobj = PkgFilter( cfg.build_pkg_filter )
 
     class EnvCfg:

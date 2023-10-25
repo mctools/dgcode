@@ -46,13 +46,14 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
     def get_dgcode_invoke_dirs():
         #FIXME: This is nonsensical now, we can only be in the projdir (and envcfg will complain if there are issues)!
         from . import dirs
-        return [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]
+# DGBUILD-EXPORT-ONLY>>        return [dirs.projdir, *dirs.extrapkgpath]
+        return [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]# DGBUILD-NO-EXPORT
 
     if legacy_mode and not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in get_dgcode_invoke_dirs()]):
         from . import dirs
         from . import utils
         utils.err(['This instance of %s is associated with'%progname,'',
-                   '      Framework directory : %s'%dirs.fmwkdir.parent.parent,
+                   '      Framework directory : %s'%dirs.fmwkdir.parent.parent,# DGBUILD-NO-EXPORT
                    '      Projects directory  : %s'%dirs.projdir,
                  *['      Extra package path  : %s'%str(d) for d in dirs.extrapkgpath[0:1]],
                  *['                            %s'%str(d) for d in dirs.extrapkgpath[1:]],'',
@@ -735,7 +736,7 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
                 if cp.is_dir() and utils.path_is_relative_to( pabs, cp ):
                     return os.path.join('${CONDA_PREFIX}',str(pabs.relative_to(cp)))
             return str(p)
-        print (prefix+'  Framework directory              : %s'%fixpath(dirs.fmwkdir))
+        print (prefix+'  Framework directory              : %s'%fixpath(dirs.fmwkdir))# DGBUILD-NO-EXPORT
         print (prefix+'  Projects directory               : %s'%fixpath(dirs.projdir))
         print (prefix+'  Installation directory           : %s'%fixpath(dirs.installdir))
         print (prefix+'  Build directory                  : %s'%fixpath(dirs.blddir))
