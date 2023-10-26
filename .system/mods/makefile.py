@@ -97,7 +97,8 @@ def write_main(global_targets,enabled_pkgnames):
     for lang,info in env.env['system']['langs'].items():
         if info:#info is only available for available languages:
             _c, _l = info['cflags'], info['ldflags']
-            fh.write('CFLAGSLANG_%s := %s\n'%(lang,_c))
+            fh.write('CFLAGSLANG_SHLIB_%s := %s\n'%(lang,_c))
+            fh.write('CFLAGSLANG_EXE_%s := %s\n'%(lang,_c))
             fh.write('LDFLAGSLANG_%s := %s\n'%(lang,_l))
             fh.write('LDFLAGSPREPENDLANG_%s := %s\n'%(lang,info['ldflags_prepend']))
 

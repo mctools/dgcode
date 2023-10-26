@@ -52,13 +52,15 @@ class TargetBinaryObject(target_base.Target):
             extra_flags+=pkg.extraflags_comp
 
         #contains_message=True
+        obj_create_key = 'create_obj_for_shlib' if shlib else 'create_obj_for_exe'
+
         self.code=['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sBuilding %s/%s/%s%s"; fi'%(col.bldcol('objectfile'),
                                                                                         pkg.name,
                                                                                         subdir,
                                                                                         os.path.basename(self.name),
                                                                                         col.bldend),
                    'mkdir -p %s'%d,
-                   langinfo['create_obj']%(' '.join(extra_flags),'`realpath %s`'%sf if has_realpath else sf,self.name)]
+                   langinfo[obj_create_key]%(' '.join(extra_flags),'`realpath %s`'%sf if has_realpath else sf,self.name)]
 
         priv,pub = includes.find_includes(dirs.pkg_dir(pkg,subdir,fn),pkg)
 
