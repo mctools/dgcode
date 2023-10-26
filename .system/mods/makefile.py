@@ -94,9 +94,16 @@ def write_main(global_targets,enabled_pkgnames):
     fh.write('PYBIND11_MODULE_LDFLAGS := %s\n'%(sysgen['pybind11_module_linkflags_list'].replace(';',' ')))
     fh.write('\n')
 
+    block_cflags_for_exe = []
+    block_cflags_for_shlib = ['-pie','-fPIE']
+    def remove_flags(orig,blocked_flags):
+        return ' '.join(e for e in shlex.split() if not e in blocked_flags)
+
     for lang,info in env.env['system']['langs'].items():
         if info:#info is only available for available languages:
             _c, _l = info['cflags'], info['ldflags']
+            _c_exe = remove_flags( _c, block_cflags_for_exe )
+            _c_shlib = remove_flags( _c, block_cflags_for_shlib )
             fh.write('CFLAGSLANG_SHLIB_%s := %s\n'%(lang,_c))
             fh.write('CFLAGSLANG_EXE_%s := %s\n'%(lang,_c))
             fh.write('LDFLAGSLANG_%s := %s\n'%(lang,_l))
