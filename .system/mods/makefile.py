@@ -104,8 +104,8 @@ def write_main(global_targets,enabled_pkgnames):
             _c, _l = info['cflags'], info['ldflags']
             _c_exe = remove_flags( _c, block_cflags_for_exe )
             _c_shlib = remove_flags( _c, block_cflags_for_shlib )
-            fh.write('CFLAGSLANG_SHLIB_%s := %s\n'%(lang,_c))
-            fh.write('CFLAGSLANG_EXE_%s := %s\n'%(lang,_c))
+            fh.write('CFLAGSLANG_SHLIB_%s := %s\n'%(lang,_c_shlib))
+            fh.write('CFLAGSLANG_EXE_%s := %s\n'%(lang,_c_exe))
             fh.write('LDFLAGSLANG_%s := %s\n'%(lang,_l))
             fh.write('LDFLAGSPREPENDLANG_%s := %s\n'%(lang,info['ldflags_prepend']))
 
