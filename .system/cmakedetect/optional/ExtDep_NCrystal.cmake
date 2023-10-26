@@ -1,7 +1,8 @@
 set(HAS_NCrystal 0)
 
 set(autoreconf_bin_NCrystal "ncrystal-config;nctool")
-set(autoreconf_env_NCrystal "NCRYSTALDIR;DGCODE_USESYSNCRYSTAL")
+# DGBUILD-EXPORT-ONLY>>set(autoreconf_env_NCrystal "NCRYSTALDIR")
+set(autoreconf_env_NCrystal "NCRYSTALDIR;DGCODE_USESYSNCRYSTAL")# DGBUILD-NO-EXPORT
 
 function(
     detect_system_ncrystal
