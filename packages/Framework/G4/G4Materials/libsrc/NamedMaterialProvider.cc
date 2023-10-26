@@ -8,8 +8,17 @@
 #include "G4Materials/ShieldingMaterials.hh"
 #include "G4NCrystalRel/G4NCrystal.hh"
 #include "NCrystalRel/NCrystal.hh"
-#include "NCrystalRel/internal_NCCfgTypes.hh"
-#include "NCrystalRel/internal_NCMath.hh"
+#ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
+#  include "NCrystal/internal/NCMath.hh" // DGBUILD-NO-EXPORT
+#  include "NCrystal/internal/NCCfgTypes.hh" // DGBUILD-NO-EXPORT
+namespace NC = NCrystal; // DGBUILD-NO-EXPORT
+#else // DGBUILD-NO-EXPORT
+#  include "NCrystalBuiltin/internal_NCMath.hh" // DGBUILD-NO-EXPORT
+#  include "NCrystalBuiltin/internal_NCCfgTypes.hh" // DGBUILD-NO-EXPORT
+namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
+#endif // DGBUILD-NO-EXPORT
+// DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCCfgTypes.hh"
+// DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCMath.hh"
 #include "IdealGasBuilder/IdealGasBuilder.hh"
 #include "G4Units/Units.hh"
 #include "G4Units/Constants.hh"
@@ -22,7 +31,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace NC = NCrystalRel;
+// DGBUILD-EXPORT-ONLY>>namespace NC = NCrystal;
 namespace G4NC = G4NCrystalRel;
 
 namespace NamedMaterialProvider {
