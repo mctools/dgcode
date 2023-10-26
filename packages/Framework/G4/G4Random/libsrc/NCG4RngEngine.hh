@@ -13,7 +13,7 @@ namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 #endif // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCRandUtils.hh"
-// DGBUILD-EXPORT-ONLY>>namespace NC = NCrystal; // DGBUILD-NO-EXPORT
+// DGBUILD-EXPORT-ONLY>>namespace NC = NCrystal;
 
 class NCG4RngEngine final : public CLHEP::HepRandomEngine  {
 public:

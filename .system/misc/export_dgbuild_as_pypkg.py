@@ -105,6 +105,8 @@ def extract_file_content( f ):
             continue
         if l.startswith('# DGBUILD-EXPORT-ONLY>>'):
             l = l[len('# DGBUILD-EXPORT-ONLY>>'):]
+        if l.startswith('// DGBUILD-EXPORT-ONLY>>'):
+            l = l[len('// DGBUILD-EXPORT-ONLY>>'):]
         res += '%s\n'%l
     return res
 
@@ -240,7 +242,11 @@ def main():
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs_core,
                           pkgfilter = (lambda pkgname : pkgname=='Core') )
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgsg4,
-                          pkgfilter = (lambda pkgname : pkgname not in ('Core','DGBoost','NCrystalBuiltin') ) )
+                          pkgfilter = (lambda pkgname : pkgname not in ('Core',
+                                                                        'DGBoost',
+                                                                        'NCrystalBuiltin',
+                                                                        #'NCrystalRel', <--TODO
+                                                                        ) ) )
 
 #dgbuild.cfg files:
     ( destdir_pkgs_core / 'dgbuild.cfg' ).write_text(

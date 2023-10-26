@@ -13,6 +13,7 @@
 /install/
 /.bld/
 /.system/depfix/bld/
+/.system/exported_pypkg/
 *.orig
 
 #Extra protection against adding in build output created by custom user commands:

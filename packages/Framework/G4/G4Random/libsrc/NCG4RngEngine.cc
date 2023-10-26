@@ -2,13 +2,10 @@
 
 #ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
 #  include "NCrystal/internal/NCString.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 #else // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/internal_NCString.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 #endif // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCString.hh"
-// DGBUILD-EXPORT-ONLY>>namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 
 
 NCG4RngEngine::~NCG4RngEngine() = default;
