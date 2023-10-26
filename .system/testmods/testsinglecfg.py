@@ -48,10 +48,7 @@ def main( verbose = True ):
   pkg_root = "./blapkgs"
 """
     SingleCfg.create_from_object_methods( FakeModule4() )
-
     return
-
-
 
 if __name__ == '__main__':
     main()

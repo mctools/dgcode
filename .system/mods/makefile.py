@@ -97,7 +97,7 @@ def write_main(global_targets,enabled_pkgnames):
     block_cflags_for_exe = []
     block_cflags_for_shlib = ['-pie','-fPIE']
     def remove_flags(orig,blocked_flags):
-        return ' '.join(e for e in shlex.split() if not e in blocked_flags)
+        return ' '.join(e for e in shlex.split(orig) if not e in blocked_flags)
 
     for lang,info in env.env['system']['langs'].items():
         if info:#info is only available for available languages:
