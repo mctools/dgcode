@@ -900,5 +900,5 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
         else:
             print (prefix+"Build done. You are all set to begin using the software!")
             print (prefix)
-            print (prefix+'To see available applications, type "ess_" and hit the TAB key twice.')
+            print (f'{prefix} To see available applications, type "{conf.projectname_lc}_" and hit the TAB key twice.')
             print (prefix)

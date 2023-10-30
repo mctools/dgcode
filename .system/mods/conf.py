@@ -20,10 +20,11 @@ package_cfg_file='pkg.info'
 
 autodeps = set(['Core'])
 projectname='ESS'
+projectname_lc = projectname.lower()
 
 def runnable_name(pkg,base_name):
     #create global runnable name for a runnable in a package:
-    return ('ess_%s_%s'%(pkg.name,base_name)).lower()
+    return ('%s_%s_%s'%(projectname_lc,pkg.name,base_name)).lower()
 
 def runnable_is_test(runnable_name):
     return runnable_name.split('_',2)[2].startswith('test')
@@ -63,7 +64,7 @@ def uninstall_package(pkgname):
     if not ( instdir / '.dginstalldir' ).exists():
         return
 
-    #FIXME: ess_foo_bar_blah might be script Blah from package Foo_Bar or script
+    #FIXME: <pn>_foo_bar_blah might be script Blah from package Foo_Bar or script
     #Bar_Blah from package Foo. We should check that the symlinks goes to the
     #correct package! (or better yet, dgbuild should produce pickle file in
     #install or bld with all package dependencies and provided scripts, apps,
@@ -73,11 +74,11 @@ def uninstall_package(pkgname):
 
     parts = [ f'data/{pkgname}',
               f'lib/*PKG__{pkgname}.*',
-              f'tests/testref/ess_{pkgname.lower()}_*.log',
+              f'tests/testref/{projectname_lc}_{pkgname.lower()}_*.log',
               f'include/{pkgname}',
               f'python/{pkgname}',
-              f'scripts/ess_{pkgname.lower()}_*',
-              f'bin/ess_{pkgname.lower()}_*' ]
+              f'scripts/{projectname_lc}_{pkgname.lower()}_*',
+              f'bin/{projectname_lc}_{pkgname.lower()}_*' ]
     import shutil
     for p in parts:
         for f in instdir.glob(p):
@@ -230,9 +231,9 @@ def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
         elif d=='libsrc':
             rm_pattern(i/'lib','*PKG__%s.*'%pkgname)
         elif d.startswith('app_'):
-            rm_tree( i / 'bin' / 'ess_%s_%s'%(pkgname.lower(),d[4:].lower()) )
+            rm_tree( i / 'bin' / '%s_%s_%s'%(projectname_lc,pkgname.lower(),d[4:].lower()) )
         elif d=='symlink__scripts':
-            rm_pattern( i/'scripts','ess_%s_*'%pkgname.lower())#FIXME: clashes (see fixme above)
+            rm_pattern( i/'scripts','%s_%s_*'%(projectname_lc,pkgname.lower()))#FIXME: clashes (see fixme above)
             (pkgcache/'symlinks'/'scripts.pkl').touch()
             rm_file(pkgcache/'symlinks'/'scripts.pkl.old')
         elif d=='symlink__data':
@@ -242,7 +243,7 @@ def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
         #don't do this for testref_links, since all packages always have this target:
         #elif d=='testref_links':
         #    NB: Syntax not updated for pathlib and fcts above!:
-        #    utils.rm_f(os.path.join(i,'tests/testref/ess_%s_*.log'%(pkgname.lower())))
+        #    utils.rm_f(os.path.join(i,'tests/testref/%s_%s_*.log'%(projectname_lc,pkgname.lower())))
         #    utils.touch(os.path.join(pkgcache,'testref/testref.pkl'))
         #    utils.rm_f(os.path.join(pkgcache,'testref/testref.pkl.old'))
         elif d.startswith('autopyinit'):

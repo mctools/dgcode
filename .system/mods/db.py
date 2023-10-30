@@ -6,8 +6,8 @@ db = { 'pkg2timestamp' : {},#to detect when files changed
        'pkg2inc' : {},#keep track of provided public headers (populate at target __init__ stage)
        'pkg2parts' : {},#keep track of targets to the point where we can cleanup the install area when user removes files or dirs
        'pkg2reldir' : {},#keep track of pkg locations
-       'pkg2runnables' : {},#Keep track of runnables (with cmdname, e.g. ess_bla_lala)
-       'pkg2reflogs' : {},#Keep track of reference logs (e.g. ess_bla_lala.log)
+       'pkg2runnables' : {},#Keep track of runnables (with cmdname, e.g. <pn>_bla_lala)
+       'pkg2reflogs' : {},#Keep track of reference logs (e.g. <pn>_bla_lala.log)
        'pkg2directextdeps' : {},#list of extdep's directly used by package.
    }
 
