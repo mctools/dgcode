@@ -327,10 +327,10 @@ void G4Launcher::Launcher::Imp::preinit_vis(Launcher * launcher)
   launcher->cmd("/vis/scene/add/trajectories");
   launcher->cmd("/vis/scene/add/hits");
   launcher->cmd("/vis/scene/endOfEventAction accumulate 0");
-  const char * datadir_c = getenv("ESS_DATA_DIR");
+  const char * datadir_c = getenv("SBLD_DATA_DIR");
   std::string datadir(datadir_c?datadir_c:"");
   if (datadir.empty()) {
-    print("WARNING: $ESS_DATA_DIR environment variable not set or is empty!");
+    print("WARNING: $SBLD_DATA_DIR environment variable not set or is empty!");
     launcher->cmd("/control/macroPath .");
   } else {
     std::string tmp2;

@@ -6,5 +6,5 @@ if [ $? != 0 ]; then
 fi
 shift 1
 export PYTHONMALLOC=malloc
-valgrind --tool=memcheck --track-origins=yes --malloc-fill=0x80 --free-fill=0x7f --suppressions=$ESS_DATA_DIR/DevTools/valgrind_suppressions.txt --trace-children=yes $prog "$@"
+valgrind --tool=memcheck --track-origins=yes --malloc-fill=0x80 --free-fill=0x7f --suppressions=$SBLD_DATA_DIR/DevTools/valgrind_suppressions.txt --trace-children=yes $prog "$@"
 

@@ -98,7 +98,7 @@ class ExportMgr:
                 return np(f)
             if path.count('/')==1:
                 #Perhaps a data file?
-                f=os.path.join(os.getenv('ESS_DATA_DIR'),path)
+                f=os.path.join(os.getenv('SBLD_DATA_DIR'),path)
                 if os.path.exists(f):
                     return np(f)
             if path.count('/') in (1,2):

@@ -7,4 +7,4 @@ fi
 shift 1
 export PYTHONMALLOC=malloc
 valgrind --tool=helgrind --trace-children=yes $prog "$@"
-# --suppressions=$ESS_DATA_DIR/DevTools/valgrind_suppressions.txt
+# --suppressions=$SBLD_DATA_DIR/DevTools/valgrind_suppressions.txt

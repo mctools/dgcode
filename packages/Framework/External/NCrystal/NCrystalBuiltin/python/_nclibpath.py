@@ -1,7 +1,7 @@
 #dgcode-aware version
 import os
 import pathlib
-_=pathlib.Path(os.environ['ESS_LIB_DIR'])
+_=pathlib.Path(os.environ['SBLD_LIB_DIR'])
 assert _.is_dir()
 _=list(_.glob('libPKG__NCrystalBuiltin.*'))
 assert len(_)==1

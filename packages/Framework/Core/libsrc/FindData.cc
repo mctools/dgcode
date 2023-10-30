@@ -6,7 +6,7 @@
 
 std::string Core::findData(const char* pkg,const char* filename)
 {
-  std::string s=getenv("ESS_DATA_DIR");
+  std::string s=getenv("SBLD_DATA_DIR");
   s+="/";
   s+=pkg;
   s+="/";

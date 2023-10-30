@@ -12,7 +12,7 @@ def _get_custom():
     import pathlib
     import sysconfig
     import os
-    pymoddir = pathlib.Path( os.environ['ESS_INSTALL_PREFIX'] ) / 'python'
+    pymoddir = pathlib.Path( os.environ['SBLD_INSTALL_PREFIX'] ) / 'python'
     assert pymoddir.is_dir()
     pyext_suffix = sysconfig.get_config_var('EXT_SUFFIX')
     for mod in pymoddir.glob('*/g4physlist_*%s'%pyext_suffix):

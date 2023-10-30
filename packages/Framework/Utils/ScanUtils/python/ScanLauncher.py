@@ -160,7 +160,7 @@ class ScanLauncher:
                 print('WARNING: The feature preventing future developments from interfering with running jobs is in maintenance,'
                    +'\n         therefore you are not supposed to alter the application while the scan script is running!')
                 print("SKIPPED: Invoking dgbuild and installing to %s"%instdir)
-                instdir=os.environ.get('ESS_INSTALL_PREFIX', None) 
+                instdir=os.environ.get('SBLD_INSTALL_PREFIX', None)
                 setupsh=os.path.join(instdir,'setup.sh')
                 if not ec==0:
                     print("ERROR: Build or installation failed")
@@ -225,4 +225,3 @@ class ScanLauncher:
                 seedpar = []
             #put seed first, so any specified seed will take precedence
             yield label,[self._app_name]+self._global_pars+seedpar+jobpars+self._global_postpars
-

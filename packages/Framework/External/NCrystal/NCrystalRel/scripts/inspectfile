@@ -2,7 +2,7 @@
 import pathlib as _pathlib
 def _find_ncrystal_builtin_nctool():
     import os
-    _ = os.environ.get('ESS_INSTALL_PREFIX')
+    _ = os.environ.get('SBLD_INSTALL_PREFIX')
     assert _ is not None
     _ = _pathlib.Path(_) / 'scripts'
     assert _.is_dir()

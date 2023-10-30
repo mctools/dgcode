@@ -20,7 +20,7 @@ def usage(ec):
     print()
     print('If a NAME is provided, it will become the job name in the queue system')
     print()
-    print('If a SETUPSH is provided, it will be used rather than $ESS_INSTALL_PREFIX/setup.sh')
+    print('If a SETUPSH is provided, it will be used rather than $SBLD_INSTALL_PREFIX/setup.sh')
     print()
     print('QUEUE must be one of: %s'%' '.join(queues))
     print()
@@ -65,7 +65,7 @@ setupsh=None
 if args[0].startswith('--setupsh='):
     setupsh=args.pop(0)[10:]
 if not setupsh:
-    setupsh = os.path.join(os.getenv('ESS_INSTALL_PREFIX'),'setup.sh')
+    setupsh = os.path.join(os.getenv('SBLD_INSTALL_PREFIX'),'setup.sh')
 if not os.path.exists(setupsh):
     print("ERROR: %s not found"%setupsh)
     usage(1)

@@ -434,7 +434,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     //better to enable dynamic "NamedMaterial factories" and have such a factory
     //in the NCrystalDev repo!!!).
     {
-      const char * essinstdir = getenv("ESS_INSTALL_PREFIX");
+      const char * essinstdir = getenv("SBLD_INSTALL_PREFIX");
       if ( !essinstdir || !Core::file_exists(std::string(essinstdir)+"/python/NCrystalPreview/__init__.py") ) {
         throw std::runtime_error("ERROR: In order to use \"NCrystalDev\" materials the NCrystalPreview package\n"
                                  "must be enabled. This is intended solely for code in the ncrystaldev repo, most\n"

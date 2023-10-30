@@ -469,7 +469,7 @@ void NCD::enableStandardSearchPath( bool doEnable )
     for ( auto& e : split2(hardwired,0,':') )
       addEntry( e );
 #endif
-    //FIXME: Do not do this anymore, since we can't do it for conda-ncrystal: addEntry(std::getenv("ESS_DATA_DIR"));//Make sure <pkgname>/filename works in dgcode <NO-NC-EXPORT>
+    //FIXME: Do not do this anymore, since we can't do it for conda-ncrystal: addEntry(std::getenv("SBLD_DATA_DIR"));//Make sure <pkgname>/filename works in dgcode <NO-NC-EXPORT>
     FactImpl::registerFactory( std::make_unique<TDFact_DirList>( std::move(dirs), factNameStdSearchPath, Priority{default_priority_stdpath} ) );
   }
 }

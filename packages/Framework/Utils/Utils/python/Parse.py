@@ -11,8 +11,8 @@ def decode_inputfile(fn, require_ext=None, rel_path = False ):
     parts = fn.split('/')
     if len(parts)==2 and parts[0] and parts[1]:
         #could be PKGNAME/FILENAME specification
-        import Core.FindData
-        tfn = Core.FindData(*parts)
+        import Core.FindData3
+        tfn = Core.FindData3(*parts)
         if tfn and op.exists(tfn):
             return _fix(tfn)
     return False,'does not exists'

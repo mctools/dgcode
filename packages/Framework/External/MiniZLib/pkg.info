@@ -41,7 +41,7 @@ Check compilation!
 
 However, this still leaves many symbols to fix, investigate with:
 
-nm -p $ESS_LIB_DIR/libPKG__MiniZLib.so|grep -v minizlib_|grep -v U|grep -v '\.'
+nm -p $SBLD_LIB_DIR/libPKG__MiniZLib.so|grep -v minizlib_|grep -v U|grep -v '\.'
 
 Anything between frame init and frame end should be fixed. For 1.2.8 we had to
 add extra defines to zconf.h (check the /* extras added by TK */ section)!

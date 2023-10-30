@@ -17,7 +17,7 @@ class _themodule:
                     return ret
             ret = pkg
         else:
-            ret = self._os.path.join(self._os.environ['ESS_DATA_DIR'],pkg,filename)
+            ret = self._os.path.join(self._os.environ['SBLD_DATA_DIR'],pkg,filename)
         return ret if self._os.path.exists(ret) else ""
     def __call__(self,pkg,filename=None):
         return self.findData(pkg,filename)

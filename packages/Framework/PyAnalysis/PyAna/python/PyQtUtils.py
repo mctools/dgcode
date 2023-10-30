@@ -56,8 +56,8 @@ class MyGuiAppBase:
         #self.__qmainwindow.setMouseTracking(True) ?
 
         if uicfile and not pathlib.Path(uicfile).exists():
-            import Core.FindData
-            fn=Core.FindData(uicfile)
+            import Core.FindData3
+            fn=Core.FindData3(uicfile)
             if not fn:
                 raise ValueError(f'Could not find file {uicfile}')
             uicfile=fn
