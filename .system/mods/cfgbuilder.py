@@ -4,41 +4,41 @@ from . import error
 
 def locate_master_cfg_file():
     import os
-    p = os.environ.get('DGBUILD_CFG')
+    p = os.environ.get('SIMPLEBUILD_CFG')
     if p:
         p = pathlib.Path(p).expanduser()
         if not p.exists():
-            error.error('DGBUILD_CFG was set to a non-existing directory or file')
+            error.error('SIMPLEBUILD_CFG was set to a non-existing directory or file')
         if p.is_dir():
-            p = p / 'dgbuild.cfg'
+            p = p / 'simplebuild.cfg'
             if not p.exists():
-                error.error('DGBUILD_CFG was set to a directory'
-                            ' with no dgbuild.cfg file in it')
+                error.error('SIMPLEBUILD_CFG was set to a directory'
+                            ' with no simplebuild.cfg file in it')
         else:
             if not p.exists():
-                error.error('DGBUILD_CFG was set to non-existing file')
+                error.error('SIMPLEBUILD_CFG was set to non-existing file')
         if not p.is_absolute():
-            error.error('DGBUILD_CFG must be set to an absolute path')
+            error.error('SIMPLEBUILD_CFG must be set to an absolute path')
         return p
     p = pathlib.Path('.').absolute()#NB: NOT .resolve() on purpose!
-    f = p / 'dgbuild.cfg'
+    f = p / 'simplebuild.cfg'
     if f.exists():
         return f
     for p in sorted(p.parents,reverse=True):
-        f = p / 'dgbuild.cfg'
+        f = p / 'simplebuild.cfg'
         if f.exists():
             return f
 
 def load_builtin_cfgs():
     pd = pathlib.Path(__file__).absolute().parent / 'data'
-    cfgs = [ ( pd / 'pkgs-core' / 'dgbuild.cfg' ).absolute().resolve(),
-             ( pd / 'pkgs-core_val' / 'dgbuild.cfg' ).absolute().resolve() ]
+    cfgs = [ ( pd / 'pkgs-core' / 'simplebuild.cfg' ).absolute().resolve(),
+             ( pd / 'pkgs-core_val' / 'simplebuild.cfg' ).absolute().resolve() ]
     return [ ( p, SingleCfg.create_from_toml_file(p,ignore_build=True) ) for p in cfgs ]
 
 class CfgBuilder:
 
-    """Class which, based on an initial "master" dgbuild.cfg, can locate and
-    extract other dgbuild cfg's, and provide a combined configuration object.
+    """Class which, based on an initial "master" simplebuild.cfg, can locate and
+    extract other simplebuild cfg's, and provide a combined configuration object.
 
     The "build" section (build mode, ncpu, pkgfilter, etc.) is taken straight
     from the master config, while the other sections are based on a combination
@@ -125,7 +125,7 @@ class CfgBuilder:
         self.__cfg_names_used.add( cfg.project_name )
         #Add dependencies and cfgs available in search paths:
         for cfgname in cfg.depend_projects:
-            if not cfgname in self.__cfg_names_used:
+            if cfgname not in self.__cfg_names_used:
                 self.__cfg_names_missing.add( cfgname )
         for sp in cfg.depend_search_path:
             if not sp.exists():
@@ -142,10 +142,10 @@ class CfgBuilder:
             self.__available_unused_cfgs.append( depcfg )
 
         #Add actual pkg-dirs and env-path requests from cfg:
-        if not cfg.project_pkg_root in self.__pkg_path:
+        if cfg.project_pkg_root not in self.__pkg_path:
             self.__pkg_path.append( cfg.project_pkg_root )
         for pathvar,contents in cfg.project_env_paths.items():
-            if not pathvar in self.__env_paths:
+            if pathvar not in self.__env_paths:
                 self.__env_paths[pathvar] = set()
             self.__env_paths[pathvar].update( contents )
 
@@ -175,25 +175,23 @@ class CfgBuilder:
             name
             for finder, name, ispkg
             in pkgutil.iter_modules()
-            if ( name != own_pkg_name
-                 and ( name.startswith('ess_dgbuild_')
-                       or name.startswith('dgbuild_') ) )
+            if ( name != own_pkg_name and name.startswith('simplebuild-') )
         )
 
         #Load their cfgs:
         for name in sorted(possible_pyplugins):
-            modname=f'{name}.dgbuild_bundle_list'
+            modname=f'{name}.simplebuild_bundle_list'
             self.__print_verbose(f'Trying python plugin module {modname}')
             try:
                 mod = importlib.import_module(modname)
             except ModuleNotFoundError:
-                self.__print_verbose(f' -> skipping due to ModuleNotFoundError')
+                self.__print_verbose(' -> skipping due to ModuleNotFoundError')
                 continue
-            if not hasattr( mod, 'dgbuild_bundle_list' ):
-                self.__print_verbose(f' -> skipping due to missing dgbuild_bundle_list function')
+            if not hasattr( mod, 'simplebuild_bundle_list' ):
+                self.__print_verbose(' -> skipping due to missing simplebuild_bundle_list function')
                 continue
             srcdescr = 'Python module %s'%name
-            for cfg_file in mod.dgbuild_bundle_list():
+            for cfg_file in mod.simplebuild_bundle_list():
                 if not cfg_file.is_absolute() or not cfg_file.is_file():
                     error.error(f'Non-absolute or non-existing cfg file path returned from {srcdescr}')
                 cfg_file = cfg_file.absolute().resolve()

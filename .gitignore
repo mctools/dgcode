@@ -26,6 +26,7 @@
 *.exe
 *.gch
 *.out
+dgbuild_cache/
 __pycache__/
 *.egg-info/
 

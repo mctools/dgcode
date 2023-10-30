@@ -9,6 +9,9 @@ from . import db
 join = os.path.join
 basename=os.path.basename
 
+pypkgname = __name__.split('.')[0]
+assert pypkgname != '__main__'
+
 class TargetRefLogs(target_base.Target):
     def __init__(self,pkg,applogs,scriptlogs):
         #No need for this, since each package will always have this part:
@@ -34,7 +37,7 @@ class TargetRefLogs(target_base.Target):
         self.pkgname=pkg.name
         self.deps=[mpf]
         self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sUpdating symlinks %s/testlogs%s"; fi'%(col.bldcol('symlink'),pkg.name,col.bldend),
-                     'python3 -mess_dgbuild_internals.instsl2 %s ${VERBOSE}'%(mpf)]
+                     'python3 -m%s.instsl2 %s ${VERBOSE}'%(pypkgname,mpf)]
 
 def tfactory_reflogs(pkg,dirtypes):
     #Must complain about any .log file in app_* which is not test.log

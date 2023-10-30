@@ -7,6 +7,9 @@ from . import utils
 from . import target_base
 join=os.path.join
 
+pypkgname = __name__.split('.')[0]
+assert pypkgname != '__main__'
+
 class TargetSymlinks(target_base.Target):
     def __init__(self,pkg,linktype,srcdir,destdir,files,chmodx,renamefct=None,runnables=False):
         db.db['pkg2parts'][pkg.name].add('symlink__%s'%linktype)
@@ -24,7 +27,7 @@ class TargetSymlinks(target_base.Target):
         self.deps=[mpf]
         self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "  %sUpdating symlinks %s/%s%s"; fi'%(col.bldcol('symlink'),
                                                                                                 pkg.name,linktype,col.bldend),
-                     'python3 -mess_dgbuild_internals.instsl %s ${VERBOSE}'%(mpf)]
+                     'python3 -m%s.instsl %s ${VERBOSE}'%(pypkgname,mpf)]
 
         pklcont=[]
         for f in self.files:

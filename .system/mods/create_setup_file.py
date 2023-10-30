@@ -39,6 +39,11 @@ if [ "x${<pn>_INSTALL_PREFIX}" != "x${ESS_DGBUILD_TMP_THIS_DIR}" ]; then
   export <pn>_LIB_DIR="${ESS_DGBUILD_TMP_THIS_DIR}/lib"
   export <pn>_DATA_DIR="${ESS_DGBUILD_TMP_THIS_DIR}/data"
   export <pn>_TESTREF_DIR="${ESS_DGBUILD_TMP_THIS_DIR}/tests/testref"
+  export SBLD_INSTALL_PREFIX="${ESS_DGBUILD_TMP_THIS_DIR}"
+  export SBLD_INCLUDE_DIR="${ESS_DGBUILD_TMP_THIS_DIR}/include"
+  export SBLD_LIB_DIR="${ESS_DGBUILD_TMP_THIS_DIR}/lib"
+  export SBLD_DATA_DIR="${ESS_DGBUILD_TMP_THIS_DIR}/data"
+  export SBLD_TESTREF_DIR="${ESS_DGBUILD_TMP_THIS_DIR}/tests/testref"
 
   ###############################################################################################################
   # Modify global path variables for our executables, scripts, libraries, python modules, etc. to be available:
@@ -93,6 +98,11 @@ if [ "x${<pn>_INSTALL_PREFIX}" == "x${ESS_DGBUILD_TMP_THIS_DIR}" ]; then
     unset <pn>_LIB_DIR
     unset <pn>_DATA_DIR
     unset <pn>_TESTREF_DIR
+    unset SBLD_INSTALL_PREFIX
+    unset SBLD_INCLUDE_DIR
+    unset SBLD_LIB_DIR
+    unset SBLD_DATA_DIR
+    unset SBLD_TESTREF_DIR
 
 fi
 

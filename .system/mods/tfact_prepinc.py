@@ -6,6 +6,9 @@ from . import col
 from . import db
 join=os.path.join
 
+pypkgname = __name__.split('.')[0]
+assert pypkgname != '__main__'
+
 class TargetPrepInc(target_base.Target):
 
     def __init__(self,pkg,has_compiled_target,has_libinc):
@@ -18,7 +21,7 @@ class TargetPrepInc(target_base.Target):
         self._pklfile = join(self._cachedir,'prepinc.pkl')
         mpf=dirs.makefile_blddir(self._pklfile)
         self.deps=[mpf]
-        self.code = ['python3 -mess_dgbuild_internals.instsl2 %s ${VERBOSE}'%(mpf)]
+        self.code = ['python3 -m%s.instsl2 %s ${VERBOSE}'%(pypkgname,mpf)]
         utils.mkdir_p(self._cachedir)
         self._neededlinks=set()
         if self._has_libinc:

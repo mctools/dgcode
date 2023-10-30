@@ -7,18 +7,20 @@
 #include "G4Materials/CommonMaterials.hh"
 #include "G4Materials/ShieldingMaterials.hh"
 #include "G4NCrystalRel/G4NCrystal.hh"
-#include "NCrystalRel/NCrystal.hh"
 #ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
 #  include "NCrystal/internal/NCMath.hh" // DGBUILD-NO-EXPORT
 #  include "NCrystal/internal/NCCfgTypes.hh" // DGBUILD-NO-EXPORT
+#  include "NCrystal/NCFactImpl.hh" // DGBUILD-NO-EXPORT
 namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 #else // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/internal_NCMath.hh" // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/internal_NCCfgTypes.hh" // DGBUILD-NO-EXPORT
+#  include "NCrystalBuiltin/NCFactImpl.hh" // DGBUILD-NO-EXPORT
 namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 #endif // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCCfgTypes.hh"
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCMath.hh"
+// DGBUILD-EXPORT-ONLY>>#include "NCrystal/NCFactImpl.hh"
 #include "IdealGasBuilder/IdealGasBuilder.hh"
 #include "G4Units/Units.hh"
 #include "G4Units/Constants.hh"

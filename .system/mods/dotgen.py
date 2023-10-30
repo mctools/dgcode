@@ -26,7 +26,7 @@ def dotgen(pkgloader,outfile,enabled_only=True):
         if enabled_only and not p.enabled:
             continue
         for pdname in p.direct_deps_pkgnames:
-            if not pdname in autodeps:
+            if pdname not in autodeps:
                 fh.write('    "node_%s" -> "node_%s"%s\n'%(p.name,pdname,'' if p.enabled else ' [ color="gray" ]'))
     fh.write("}\n")
     fh.close()

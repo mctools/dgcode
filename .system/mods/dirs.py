@@ -64,7 +64,7 @@ def makefile_pkg_dir(pkg,*subpaths):
 
 #sanity:
 for d in [str(x) for x in [blddir, *pkgsearchpath, installdir]]:
-    assert not ' ' in d, 'Spaces not allowed in directory names. Illegal path is: "%s"'%d
+    assert ' ' not in d, 'Spaces not allowed in directory names. Illegal path is: "%s"'%d
     assert len(d)>3,f"suspiciously short path name: {d}"
 
 # Package directory aliases #keep them lowercase

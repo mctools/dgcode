@@ -1,10 +1,18 @@
 #include "G4Materials/G4NCUtils.hh"
-#include "NCrystalRel/NCrystal.hh"
 #include "G4NCrystalRel/G4NCMatHelper.hh"
 #include "G4NCrystalRel/G4NCManager.hh"
-
-namespace NC=NCrystalRel;
 namespace G4NC=G4NCrystalRel;
+#ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
+#  include "NCrystal/NCrystal.hh" // DGBUILD-NO-EXPORT
+namespace NC=NCrystal;
+#else // DGBUILD-NO-EXPORT
+#  include "NCrystalBuiltin/NCrystal.hh" // DGBUILD-NO-EXPORT
+namespace NC=NCrystalRel;
+#endif // DGBUILD-NO-EXPORT
+
+// DGBUILD-EXPORT-ONLY>>#include "NCrystal/NCrystal.hh"
+// DGBUILD-EXPORT-ONLY>>namespace NC=NCrystal;
+
 
 G4Material * NCG4Utils::createPCAlloy( const std::string& name, const AlloyList& nccfgs_and_weights, double density )
 {

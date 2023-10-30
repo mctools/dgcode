@@ -50,7 +50,7 @@ def _newcfg():
 
     if not master_cfg_file or not master_cfg_file.is_file():
         from . import error
-        error.error('In order to continue, please step into a directory tree with a dgbuild.cfg file at its root.')
+        error.error('In order to continue, please step into a directory tree with a simplebuild.cfg file at its root.')
 
     assert master_cfg_file.is_file()
 

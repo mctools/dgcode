@@ -1,7 +1,6 @@
 __all__ = ['SingleCfg']
 
 import pathlib
-import types
 import typing
 import re
 from . import error
@@ -35,18 +34,18 @@ def decode_list_of_search_paths( ctx : TOMLSchemaDecodeContext, item ):
         if not p.exists():
             error.error(f'Non-existing path "{p}" in list entry #{i+1} in item {ctx.item_name} in {ctx.src_descr}')
         if p.is_file():
-            p_redirect = p if p.name=='dgbuild_redirect.cfg' else None
+            p_redirect = p if p.name=='simplebuild_redirect.cfg' else None
             p_std = p if p_redirect is None else None
         if p.is_dir():
             #Unless the filename is specified directly, add the default name:
-            p_std = ( p / 'dgbuild.cfg' )
-            p_redirect = ( p / 'dgbuild_redirect.cfg' )
+            p_std = ( p / 'simplebuild.cfg' )
+            p_redirect = ( p / 'simplebuild_redirect.cfg' )
             p_std = None if not p_std.exists() else p_std
             p_redirect = None if not p_redirect.exists() else p_redirect
         if p_std is None and p_redirect is None:
             error.error(f'Missing file "{p}" in list entry #{i+1} in item {ctx.item_name} in {ctx.src_descr}')
         if p_std is not None and p_redirect is not None:
-            error.error('Both dgbuild.cfg and dgbuild_redirect.cfg file exists in search_path directory'
+            error.error('Both simplebuild.cfg and simplebuild_redirect.cfg file exists in search_path directory'
                         f' "{p}" in list entry #{i+1} in item {ctx.item_name} in {ctx.src_descr} (specify'
                         ' the full path to one of the files to specify which one you are interested in using.')
         if p_std is not None:
@@ -96,7 +95,7 @@ class RedirectionCfg:
 class SingleCfg:
 
     """Class which contains decoded configuration from a single source (a
-    dgbuild.cfg file, a python module, etc.)."""
+    simplebuild.cfg file, a python module, etc.)."""
 
     @classmethod
     def create_from_toml_file( cls, path : pathlib.Path, ignore_build : bool = False ):
@@ -297,12 +296,12 @@ def decode_with_schema_and_apply_result_to_obj( cfg : dict, targetobj : SingleCf
         schemadata = schema.get(section)
         #forward compatibility: ignore unknown sections and keys
         if not schemadata:
-            error.warn(f'Ignoring unknown dgbuild.cfg section "{section}" of {ctx.src_descr}.')
+            error.warn(f'Ignoring unknown simplebuild.cfg section "{section}" of {ctx.src_descr}.')
             continue
         for k,v in sectiondata.items():
             _ = schemadata.get(k)
             if _ is None:
-                error.warn(f'Ignoring unknown dgbuild.cfg entry name "{k}" in section "{section}" of {ctx.src_descr}.')
+                error.warn(f'Ignoring unknown simplebuild.cfg entry name "{k}" in section "{section}" of {ctx.src_descr}.')
                 continue
             decodefct, defval = _
             ctx.set_item_name(f'{section}.{k}')

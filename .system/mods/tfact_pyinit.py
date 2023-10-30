@@ -6,6 +6,9 @@ from . import col
 import os.path
 join = os.path.join
 
+pypkgname = __name__.split('.')[0]
+assert pypkgname != '__main__'
+
 def _ensure_create_pyinit(pkg,compinit):
     d  = dirs.pkg_cache_dir(pkg,'pyinit')
     fn = join(d,('__init__ci.py' if compinit else '__init__.py'))
@@ -31,7 +34,7 @@ class TargetPyInit(target_base.Target):
         self.pkgname=pkg.name
         self.deps=[mpf]
         self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "%s  Generating %s/__init__.py%s"; fi'%(col.bldcol('pymod'),pkg.name,col.bldend),
-                     'python3 -mess_dgbuild_internals.instsl2 %s ${VERBOSE}'%(mpf)]
+                     'python3 -m%s.instsl2 %s ${VERBOSE}'%(pypkgname,mpf)]
 
 _python_patterns = set(['pycp', 'pyth'])#todo: to conf
 def tfactory_pyinit(pkg,dirtypes):

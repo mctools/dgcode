@@ -16,28 +16,24 @@ def parse():
         srcdir = pathlib.Path(__file__).parent.parent.absolute().resolve()
         srcdir_val = _srcdir_val.absolute().resolve()
         targetdir = srcdir / 'exported_pypkg'
+        targetdir_core = targetdir / 'core_pkg'
+        targetdir_dgcode = targetdir / 'dgcode_pkg'
         force = '--force' in sys.argv[1:]
     return Args()
 
-def create_metadata_files( tgtdir ):
-    ( tgtdir / 'LICENSE' ).write_text('https://www.apache.org/licenses/LICENSE-2.0')#FIXME: Actual file!
-    ( tgtdir / 'README.md' ).write_text('Build system for the ESS-detector group coding framework.')
-    #    ( tgtdir / 'setup.py' ).write_text('dummy')
+def create_metadata_files_core( tgtdir ):
+    ( tgtdir / 'LICENSE' ).write_text('https://www.apache.org/licenses/LICENSE-2.0')
+    descr='Simple build system multi-user and multi-project development focused on C++/Python projects.'
+    ( tgtdir / 'README.md' ).write_text(descr)
     ( tgtdir / 'MANIFEST.in' ).write_text("""
-recursive-include src/ess_dgbuild_internals/data/cmake *.cmake *.txt *.py
-recursive-include src/ess_dgbuild_internals/data/pkgs-core LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
-recursive-include src/ess_dgbuild_internals/data/pkgs-core/**/data *
-recursive-include src/ess_dgbuild_internals/data/pkgs-core/**/scripts *
-recursive-include src/ess_dgbuild_internals/data/pkgs-core_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
-recursive-include src/ess_dgbuild_internals/data/pkgs-core_val/**/data *
-recursive-include src/ess_dgbuild_internals/data/pkgs-core_val/**/scripts *
-recursive-include src/ess_dgbuild_g4framework/data/pkgs LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
-recursive-include src/ess_dgbuild_g4framework/data/pkgs/**/data *
-recursive-include src/ess_dgbuild_g4framework/data/pkgs/**/scripts *
-recursive-include src/ess_dgbuild_g4framework/data/pkgs_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
-recursive-include src/ess_dgbuild_g4framework/data/pkgs_val/**/data *
-recursive-include src/ess_dgbuild_g4framework/data/pkgs_val/**/scripts *
-recursive-include src dgbuild.cfg
+recursive-include src/simplebuild/data/cmake *.cmake *.txt *.py
+recursive-include src/simplebuild/data/pkgs-core LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/simplebuild/data/pkgs-core/**/data *
+recursive-include src/simplebuild/data/pkgs-core/**/scripts *
+recursive-include src/simplebuild/data/pkgs-core_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/simplebuild/data/pkgs-core_val/**/data *
+recursive-include src/simplebuild/data/pkgs-core_val/**/scripts *
+recursive-include src simplebuild.cfg
 
 global-exclude *~* *\#* .*
 global-exclude *.pyc *.pyo */__pycache__/* */.ruff_cache/*
@@ -45,7 +41,7 @@ global-exclude *.gch *.exe *.so *.dylib *.o *.a
 global-exclude vgcore.* .DS_Store .vscode *.reflogupdate*.orig
 """)
 
-    ( tgtdir / 'pyproject.toml' ).write_text("""
+    ( tgtdir / 'pyproject.toml' ).write_text(f"""
 [build-system]
 requires = ["setuptools>=61.0","setuptools-git-versioning"]
 build-backend = "setuptools.build_meta"
@@ -54,13 +50,13 @@ build-backend = "setuptools.build_meta"
 enabled = true
 
 [project]
-name = "ess_dgbuild"
+name = "simplebuild"
 dynamic = ["version"] # Version based on git tag...
 #... not static: version = "0.0.1"
 authors = [
-  { name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" },
+  {{ name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" }},
 ]
-description = "Build system for the ESS-detector group coding framework"
+description = "{descr}"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -83,15 +79,66 @@ all = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/mctools/dgbuild"
-"Bug Tracker" = "https://github.com/mctools/dgbuild/issues"
+"Homepage" = "https://github.com/mctools/simplebuild"
+"Bug Tracker" = "https://github.com/mctools/simplebuild/issues"
 
 [project.scripts]
-dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:main"
-unwrapped_dgbuild2 = "ess_dgbuild_internals._cli_dgbuild:unwrapped_main"
-dgtests2 = "ess_dgbuild_internals._cli_dgtests:main"
-dgenv2 = "ess_dgbuild_internals._cli_dgbuild:dgenv_main"
-dgrun2 = "ess_dgbuild_internals._cli_dgbuild:dgrun_main"
+simplebuild2 = "simplebuild._cli_dgbuild:main"
+unwrapped_simplebuild2 = "simplebuild._cli_dgbuild:unwrapped_main"
+sbtests2 = "simplebuild._cli_dgtests:main"
+sbenv2 = "simplebuild._cli_dgbuild:dgenv_main"
+sbrun2 = "simplebuild._cli_dgbuild:dgrun_main"
+""")
+
+def create_metadata_files_dgcode( tgtdir ):
+    ( tgtdir / 'LICENSE' ).write_text('https://www.apache.org/licenses/LICENSE-2.0')#FIXME: Actual file!
+    ( tgtdir / 'README.md' ).write_text('Build system for the ESS-detector group coding framework.')
+    #    ( tgtdir / 'setup.py' ).write_text('dummy')
+    ( tgtdir / 'MANIFEST.in' ).write_text("""
+recursive-include src/simplebuild-dgcode/data/pkgs LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/simplebuild-dgcode/data/pkgs/**/data *
+recursive-include src/simplebuild-dgcode/data/pkgs/**/scripts *
+recursive-include src/simplebuild-dgcode/data/pkgs_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/simplebuild-dgcode/data/pkgs_val/**/data *
+recursive-include src/simplebuild-dgcode/data/pkgs_val/**/scripts *
+recursive-include src simplebuild.cfg
+
+global-exclude *~* *\#* .*
+global-exclude *.pyc *.pyo */__pycache__/* */.ruff_cache/*
+global-exclude *.gch *.exe *.so *.dylib *.o *.a
+global-exclude vgcore.* .DS_Store .vscode *.reflogupdate*.orig
+""")
+
+    ( tgtdir / 'pyproject.toml' ).write_text("""
+[build-system]
+requires = ["setuptools>=61.0","setuptools-git-versioning"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[project]
+name = "simplebuild-dgcode"
+dynamic = ["version"] # Version based on git tag...
+#... not static: version = "0.0.1"
+authors = [
+  { name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" },
+]
+description = "The Geant4-based coding framework originating in the ESS Detector Group, provided as a simplebuild bundle of packages."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: Unix",
+]
+dependencies = [
+    'simplebuild'
+]
+
+[project.urls]
+"Homepage" = "https://github.com/mctools/dgcode"
+"Bug Tracker" = "https://github.com/mctools/dgcode/issues"
 """)
 
 def extract_file_content( f ):
@@ -124,15 +171,15 @@ def create_pymodfiles( srcdir, tgtdir, ignorefct = None ):
             continue
         ( tgtdir / f.name ).write_text( extract_file_content(f) )
 
-def create_pymodfiles_g4( tgtdir ):
+def create_pymodfiles_dgcode( tgtdir ):
     tgtdir.mkdir( parents = True )
     ( tgtdir / '__init__.py' ).write_text('')
-    ( tgtdir / 'dgbuild_bundle_list.py' ).write_text(
+    ( tgtdir / 'simplebuild_bundle_list.py' ).write_text(
 """
-def dgbuild_bundle_list():
+def simplebuild_bundle_list():
     import pathlib
     datadir = ( pathlib.Path(__file__).absolute().parent / 'data' ).absolute().resolve()
-    return [ datadir / 'pkgs' / 'dgbuild.cfg', datadir / 'pkgs_val' / 'dgbuild.cfg' ]
+    return [ datadir / 'pkgs' / 'simplebuild.cfg', datadir / 'pkgs_val' / 'simplebuild.cfg' ]
 """
     )
 
@@ -216,40 +263,41 @@ def main():
         shutil.rmtree( opt.targetdir )
     print('Extracting to %s'%opt.targetdir)
     opt.targetdir.mkdir( parents=True )
-    create_metadata_files( opt.targetdir )
-    destdir_mods = opt.targetdir / 'src' / 'ess_dgbuild_internals'
-    destdir_modsg4 = opt.targetdir / 'src' / 'ess_dgbuild_g4framework'
+    opt.targetdir_core.mkdir( parents=True )
+    opt.targetdir_dgcode.mkdir( parents=True )
+    create_metadata_files_core( opt.targetdir_core )
+    create_metadata_files_dgcode( opt.targetdir_dgcode )
+    destdir_mods = opt.targetdir_core / 'src' / 'simplebuild'
+    destdir_mods_dgcode = opt.targetdir_dgcode / 'src' / 'simplebuild-dgcode'
     destdir_data = destdir_mods / 'data'
-    destdir_datag4 = destdir_modsg4 / 'data'
+    destdir_data_dgcode = destdir_mods_dgcode / 'data'
     destdir_cmake = destdir_data / 'cmake'
     destdir_pkgs_core = destdir_data / 'pkgs-core'
     destdir_pkgs_coreval = destdir_data / 'pkgs-core_val'
-    destdir_pkgsg4 = destdir_datag4 / 'pkgs'
-    destdir_pkgsg4_val = destdir_datag4 / 'pkgs_val'
+    destdir_pkgs_dgcode = destdir_data_dgcode / 'pkgs'
+    destdir_pkgs_dgcode_val = destdir_data_dgcode / 'pkgs_val'
     create_pymodfiles( opt.srcdir / 'mods' , destdir_mods,
                        ignorefct = ( lambda fname : fname in ['create_setup_file.py'] ),
                       )
-    create_pymodfiles_g4( destdir_modsg4 )
+    create_pymodfiles_dgcode( destdir_mods_dgcode )
     create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
-    #create_dgbuild_cfg_file( destdir_data, 'core' )
-    #create_dgbuild_cfg_file( destdir_datag4, 'g4framework' )
 
     create_frameworkpkgs( opt.srcdir_val, destdir_pkgs_coreval,
                           pkgfilter = (lambda pkgname : pkgname=='CoreTests') )
-    create_frameworkpkgs( opt.srcdir_val, destdir_pkgsg4_val,
+    create_frameworkpkgs( opt.srcdir_val, destdir_pkgs_dgcode_val,
                           pkgfilter = (lambda pkgname : pkgname!='CoreTests') )
 
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs_core,
                           pkgfilter = (lambda pkgname : pkgname=='Core') )
-    create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgsg4,
+    create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs_dgcode,
                           pkgfilter = (lambda pkgname : pkgname not in ('Core',
                                                                         'DGBoost',
                                                                         'NCrystalBuiltin',
                                                                         #'NCrystalRel', <--TODO
                                                                         ) ) )
 
-#dgbuild.cfg files:
-    ( destdir_pkgs_core / 'dgbuild.cfg' ).write_text(
+#simplebuild.cfg files:
+    ( destdir_pkgs_core / 'simplebuild.cfg' ).write_text(
 f"""[project]
   name = "core"
   env_paths = [ "PATH:<install>/bin:<install>/scripts",
@@ -257,42 +305,55 @@ f"""[project]
 [depend]
   search_path = [ "../{destdir_pkgs_coreval.name}" ]
 """ )
-    ( destdir_pkgs_coreval / 'dgbuild.cfg' ).write_text(
+    ( destdir_pkgs_coreval / 'simplebuild.cfg' ).write_text(
 f"""[project]
   name = "core_val"
 [depend]
   search_path = [ "../{destdir_pkgs_core.name}" ]
 """ )
 
-    ( destdir_pkgsg4 / 'dgbuild.cfg' ).write_text(
+    ( destdir_pkgs_dgcode / 'simplebuild.cfg' ).write_text(
 f"""[project]
-  name = "g4framework"
+  name = "dgcode"
   env_paths = [ "NCRYSTAL_DATA_PATH:<install>/data" ]
 [depend]
-  search_path= [ "../{destdir_pkgsg4_val.name}" ]
+  search_path= [ "../{destdir_pkgs_dgcode_val.name}" ]
 """ )
-    ( destdir_pkgsg4_val / 'dgbuild.cfg' ).write_text(
+    ( destdir_pkgs_dgcode_val / 'simplebuild.cfg' ).write_text(
 f"""[project]
-  name = "g4framework_val"
+  name = "dgcode_val"
 [depend]
-  projects= [ "core_val", "g4framework" ]
-  search_path= [ "../{destdir_pkgsg4.name}" ]
+  projects= [ "core_val", "dgcode" ]
+  search_path= [ "../{destdir_pkgs_dgcode.name}" ]
 """ )
 
-    ( opt.targetdir / 'dgbuild_redirect.cfg' ).write_text(
-f"""# Special dgbuild cfg file which allows one to use the pkgs in the contained
+    ( opt.targetdir_core / 'simplebuild_redirect.cfg' ).write_text(
+f"""# Special simplebuild cfg file which allows one to use the pkgs in the contained
 # bundles directly from a git clone of the repository rather than after
 # installing as a python package, and simply by adding the root directory of the
-# git clone to the depend.search_path list in a given dgbuild.cfg file. This
+# git clone to the depend.search_path list in a given simplebuild.cfg file. This
 # exists to facilitate development work, and is not as such intended for
 # end-users.
 
 [special]
   redirect_search_path = [
-  "./src/ess_dgbuild_internals/data/{destdir_pkgs_core.name}",
-  "./src/ess_dgbuild_internals/data/{destdir_pkgs_coreval.name}",
-  "./src/ess_dgbuild_g4framework/data/{destdir_pkgsg4.name}",
-  "./src/ess_dgbuild_g4framework/data/{destdir_pkgsg4_val.name}"
+  "./src/simplebuild/data/{destdir_pkgs_core.name}",
+  "./src/simplebuild/data/{destdir_pkgs_coreval.name}",
+  ]
+""" )
+
+    ( opt.targetdir_dgcode / 'simplebuild_redirect.cfg' ).write_text(
+f"""# Special simplebuild cfg file which allows one to use the pkgs in the contained
+# bundles directly from a git clone of the repository rather than after
+# installing as a python package, and simply by adding the root directory of the
+# git clone to the depend.search_path list in a given simplebuild.cfg file. This
+# exists to facilitate development work, and is not as such intended for
+# end-users.
+
+[special]
+  redirect_search_path = [
+  "./src/simplebuild-dgcode/data/{destdir_pkgs_dgcode.name}",
+  "./src/simplebuild-dgcode/data/{destdir_pkgs_dgcode_val.name}"
   ]
 """ )
 

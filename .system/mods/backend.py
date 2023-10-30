@@ -111,7 +111,7 @@ def perform_configuration(cmakeargs=[],
             error.error('Failure during cmake configuration')
         assert '_cmakeargs' not in envdict
         envdict['_cmakeargs']=cmakeargs
-        assert not '_actually_needed_extdeps' in envdict
+        assert '_actually_needed_extdeps' not in envdict
         envdict['_actually_needed_extdeps'] = actually_needed_extdeps
         assert '_autoreconf_environment' not in envdict
         envdict['_autoreconf_environment']=current_reconf_environment(envdict)

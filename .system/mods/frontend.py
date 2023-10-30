@@ -138,7 +138,7 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
         if not legacy_mode:
             group_query.add_option('--cfginfo',
                                    action='store_true', dest='cfginfo', default=False,
-                                   help='Print overall configuration information (based on the dgbuild.cfg file) and exit.')
+                                   help='Print overall configuration information (based on the simplebuild.cfg file) and exit.')
 
 
         group_query.add_option("--pkginfo",
@@ -535,7 +535,7 @@ def dgbuild_main( argv = None, prevent_env_setup_msg = False ):
         exclude_filter = 'NOTLEGACYMODE'
         if 'ONLY' in cfgvars or 'NOT' in cfgvars:
             error.error('Do not use old-school -p/-a/ONLY=/NOT= mode for filtering packages.'
-                        ' Instead add a [build] pkg_filter = ["filter",...] entry in your main dgbuild.cfg.')
+                        ' Instead add a [build] pkg_filter = ["filter",...] entry in your main simplebuild.cfg.')
         cmakeargs = []#fixme
 
 

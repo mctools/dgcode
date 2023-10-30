@@ -40,7 +40,10 @@ def calculate_env_unsetup( oldenv = None ):
         oldenv = os.environ
     env_dict = env_with_previous_pathvar_changes_undone( oldenv )
     for e in ['ESS_INSTALL_PREFIX','ESS_DATA_DIR','ESS_LIB_DIR',
-              'ESS_TESTREF_DIR','ESS_INCLUDE_DIR','DGBUILD_CURRENT_ENV']:
+              'ESS_TESTREF_DIR','ESS_INCLUDE_DIR','DGBUILD_CURRENT_ENV',
+              'SBLD_INSTALL_PREFIX','SBLD_DATA_DIR','SBLD_LIB_DIR',
+              'SBLD_TESTREF_DIR','SBLD_INCLUDE_DIR'
+              ]:
         if e in env_dict or e in oldenv:
             env_dict[e] = None
     return env_dict
@@ -81,6 +84,11 @@ def calculate_env_setup( oldenv = None ):
     env_dict['ESS_LIB_DIR']         = str(instdir/'lib')
     env_dict['ESS_TESTREF_DIR']     = str(instdir/'tests'/'testref')
     env_dict['ESS_INCLUDE_DIR']     = str(instdir/'include')
+    env_dict['SBLD_INSTALL_PREFIX']  = str(instdir)
+    env_dict['SBLD_DATA_DIR']        = str(instdir/'data')
+    env_dict['SBLD_LIB_DIR']         = str(instdir/'lib')
+    env_dict['SBLD_TESTREF_DIR']     = str(instdir/'tests'/'testref')
+    env_dict['SBLD_INCLUDE_DIR']     = str(instdir/'include')
     return env_dict
 
 def env_with_previous_pathvar_changes_undone( oldenv ):

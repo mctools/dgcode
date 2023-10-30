@@ -2,7 +2,12 @@
 #define G4Materials_NCG4Utils_hh
 
 class G4Material;
-#include "NCrystalRel/NCMatCfg.hh"
+#ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
+#  include "NCrystal/NCMatCfg.hh" // DGBUILD-NO-EXPORT
+#else // DGBUILD-NO-EXPORT
+#  include "NCrystalBuiltin/NCMatCfg.hh" // DGBUILD-NO-EXPORT
+#endif // DGBUILD-NO-EXPORT
+// DGBUILD-EXPORT-ONLY>>#include "NCrystal/NCMatCfg.hh"
 #include <vector>
 
 namespace NCG4Utils {
@@ -12,7 +17,12 @@ namespace NCG4Utils {
   //*NOT* employ any caching behind the scenes. It is the callers responsibility
   //that the provided material name is unique for each call.
   typedef std::vector<std::pair<std::string,double> > AlloyList;
-  typedef std::vector<std::pair<NCrystalRel::MatCfg,double> > AlloyListMatCfg;
+#ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
+  typedef std::vector<std::pair<NCrystal::MatCfg,double> > AlloyListMatCfg; // DGBUILD-NO-EXPORT
+#else // DGBUILD-NO-EXPORT
+  typedef std::vector<std::pair<NCrystalRel::MatCfg,double> > AlloyListMatCfg; // DGBUILD-NO-EXPORT
+#endif // DGBUILD-NO-EXPORT
+// DGBUILD-EXPORT-ONLY>>  typedef std::vector<std::pair<NCrystal::MatCfg,double> > AlloyListMatCfg;
   G4Material * createPCAlloy( const std::string& name, const AlloyList& nccfgs_and_weights, double density = 0 );
   G4Material * createPCAlloy( const std::string& name, const AlloyListMatCfg& nccfgs_and_weights, double density = 0 );
 
