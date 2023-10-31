@@ -5,5 +5,5 @@ import os
 p = str( ( pathlib.Path(__file__).parent.parent / 'pypath' ).absolute().resolve() )
 sys.path.insert(0, p )
 os.environ['PYTHONPATH']='%s:%s'%(p,os.environ.get('PYTHONPATH',''))
-import ess_dgbuild_internals._cli_dgbuild as cli
+import ess_dgbuild_internals._cli as cli
 cli.main( prevent_env_setup_msg = True )
