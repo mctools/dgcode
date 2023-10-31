@@ -49,20 +49,7 @@ if (geant4_config_file)
   else()
     #Finally, if G4 was compiled with GDML support we need to explicitly add
     #xercesc as a dependency.
-
-    ####workaround begin:
-    #Not all our platforms (not even Fedora 21!) has FindXercesC.cmake
-    #installed, so we use the one found in Geant4 10.1.p04 (TODO: get rid of
-    #this shipping FindXercesC.cmake when possible one day and just do
-    #find_package(XercesC)):
-    include("extras/FindXercesC.cmake")
-    if (XERCESC_LIBRARY AND XERCESC_INCLUDE_DIR)
-      set(XercesC_FOUND 1)
-      set(XercesC_LIBRARIES ${XERCESC_LIBRARY})
-      set(XercesC_INCLUDE_DIRS ${XERCESC_INCLUDE_DIR})
-    endif()
-    ####workaround end:
-
+    find_package(XercesC)
     if ( NOT XercesC_FOUND )
       message( STATUS "Warning: Geant4 has GDML enabled but XercesC could not be detected! Will pretend Geant4-GDML is absent.")
     else()
