@@ -46,10 +46,13 @@ class CfgBuilder:
 
     """
 
-    def __init__(self, master_cfg : SingleCfg, master_cfg_file, verbose = True ):#fixme verbose=False
+    def __init__(self, master_cfg : SingleCfg, master_cfg_file, quiet = False ):
         #Input:
         #Take build settings straight from master_cfg:
-        self.__print_verbose = lambda *a,**kw: print('dgbuild cfgbuilder INFO::',*a,**kw) if verbose else ( lambda *a,**kw: None )
+        from . import conf
+        print_prefix = f'{conf.print_prefix} cfgbuilder INFO::'
+        self.__print = ( ( lambda *a,**kw: print(print_prefix,*a,**kw) )
+                         if not quiet else ( lambda *a,**kw: None ) )
         self.__build_mode = master_cfg.build_mode
         self.__build_njobs = master_cfg.build_njobs
         self.__build_cachedir = master_cfg.build_cachedir
@@ -72,7 +75,7 @@ class CfgBuilder:
             #via a search_path entry (to facilitate development of core pkgs
             #directly from a git clone):
             if cfg.project_name in self.__cfg_names_missing:
-                #self.__print_verbose(f'Using built-in cfg: {cfg_file}')
+                #self.__print(f'Using built-in cfg: {cfg_file}')
                 assert cfg_file not in self.__used_cfg_files
                 self.__used_cfg_files.add( cfg_file )
                 self.__use_cfg( cfg )
@@ -120,7 +123,7 @@ class CfgBuilder:
 
     def __use_cfg( self, cfg : SingleCfg, is_top_level = False ):
         assert cfg.project_name in self.__cfg_names_missing
-        self.__print_verbose(f'Using {"master-" if is_top_level else ""}cfg from {cfg._cfg_file}')
+        self.__print(f'Using {"master-" if is_top_level else ""}cfg from {cfg._cfg_file}')
         self.__cfg_names_missing.remove( cfg.project_name )
         self.__cfg_names_used.add( cfg.project_name )
         #Add dependencies and cfgs available in search paths:
@@ -181,14 +184,14 @@ class CfgBuilder:
         #Load their cfgs:
         for name in sorted(possible_pyplugins):
             modname=f'{name}.simplebuild_bundle_list'
-            self.__print_verbose(f'Trying python plugin module {modname}')
+            self.__print(f'Trying python plugin module {modname}')
             try:
                 mod = importlib.import_module(modname)
             except ModuleNotFoundError:
-                self.__print_verbose(' -> skipping due to ModuleNotFoundError')
+                self.__print(' -> skipping due to ModuleNotFoundError')
                 continue
             if not hasattr( mod, 'simplebuild_bundle_list' ):
-                self.__print_verbose(' -> skipping due to missing simplebuild_bundle_list function')
+                self.__print(' -> skipping due to missing simplebuild_bundle_list function')
                 continue
             srcdescr = 'Python module %s'%name
             for cfg_file in mod.simplebuild_bundle_list():
@@ -196,7 +199,7 @@ class CfgBuilder:
                     error.error(f'Non-absolute or non-existing cfg file path returned from {srcdescr}')
                 cfg_file = cfg_file.absolute().resolve()
                 if cfg_file in self.__used_cfg_files:
-                    self.__print_verbose(f' -> skipping provided file already used: {cfg_file}')
+                    self.__print(f' -> skipping provided file already used: {cfg_file}')
                     continue#Already used
                 self.__used_cfg_files.add( cfg_file )
                 cfg = SingleCfg.create_from_toml_file( cfg_file, ignore_build = True )

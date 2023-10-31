@@ -43,17 +43,19 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
                     yield join(d,f)
     tests=set()
     testinfo = {}
-    #Load pkg list from the generated dgbuild.cfg module, for complete
-    #consistency between "dgbuild -t" and "dgtests" commands:
+    #Load pkg list from the generated simplebuild.cfg module, for complete
+    #consistency between "simplebuild -t" and "sbtests" commands (TODO obsolete
+    #requirement?):
     if pkgloader:
         #Called from frontend.py
         pkginfo = dict((p.name,p.info_as_dict()) for p in pkgloader.pkgs)
     else:
-        #called from CLI dgtests:
+        #called from CLI sbtests:
+        #FIXME: supported?
         sys.path.insert(0,str(dirs.installdir/'python'))
-        import dgbuild.cfg as dgbuild_cfg#FIXME: Could/should we brute-force load via importlib, so avoid poluting the module space here?
+        import simplebuild.cfg as simplebuild_cfg#FIXME: Could/should we brute-force load via importlib, so avoid poluting the module space here?
         sys.path.pop(0)
-        pkginfo = dgbuild_cfg.pkgs
+        pkginfo = simplebuild_cfg.pkgs
 
     if filters:
         _ = []
@@ -214,7 +216,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
             elif not nfo['logdiffok']:
                 test.set_reflog_failure(nfo['logdifffile'])
             testxmlwriter.add_test(test)
-        outfile = pathlib.Path(testdir) / 'dgtest_results_junitformat.xml'
+        outfile = pathlib.Path(testdir) / 'simplebuild_test_results_junitformat.xml'
         with outfile.open('wt') as f:
             for line in testxmlwriter.generate_xml():
                 f.write('%s\n'%line)

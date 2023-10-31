@@ -240,7 +240,7 @@ def _generate_toml_schema():
                                   ),
                  build     = dict( mode = ( lambda a,b : decode_str_enum(a,b,('debug','release')), 'release' ),
                                    njobs = (decode_nonneg_int, 0),
-                                   cachedir = (decode_dir, './dgbuild_cache'),
+                                   cachedir = (decode_dir, './simplebuild_cache'),
                                    pkg_filter = (decode_is_list_of_nonempty_str,[]),
                                    #^^^
                                    #Starting with all packages available,

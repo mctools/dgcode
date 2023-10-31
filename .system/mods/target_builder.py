@@ -78,11 +78,11 @@ class TargetGlobalSysModules(target_base.Target):
         self.pkgname = None
         self.deps = []
         self.code = ['@if [ ${VERBOSE} -ge 0 ]; then echo "%sInstalling global system modules%s"; fi'%(col.bldcol('global'),col.bldend),
-                     'mkdir -p ${INST}/python/dgbuild',
-                     'touch ${INST}/python/dgbuild/__init__.py'
+                     'mkdir -p ${INST}/python/simplebuild',
+                     'touch ${INST}/python/simplebuild/__init__.py'
                      ]
         self.deps += [ '${BLD}/cfg.py' ]
-        self.code += ['cp -f ${BLD}/cfg.py ${INST}/python/dgbuild/cfg.py']#TODO: Add more info in cfg.py.
+        self.code += ['cp -f ${BLD}/cfg.py ${INST}/python/simplebuild/cfg.py']#TODO: Add more info in cfg.py.
 
 class TargetGlobalScripts(target_base.Target): # DGBUILD-NO-EXPORT
     isglobal=True # DGBUILD-NO-EXPORT

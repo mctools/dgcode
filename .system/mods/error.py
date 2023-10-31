@@ -6,7 +6,7 @@
 # error.error('some error message')
 
 
-# IMPORTANT: This module should NOT import other dgbuild modules (in particular
+# IMPORTANT: This module should NOT import other simplebuild modules (in particular
 # not anything triggering envcfg etc.)
 
 import warnings
@@ -14,10 +14,10 @@ import warnings
 class Error(Exception):
     pass
 
-class DGBuildUserWarning( UserWarning ):
-    """UserWarning's emitted from dgbuild"""
+class SimpleBuildUserWarning( UserWarning ):
+    """UserWarning's emitted from simplebuild"""
     def __init__(self,*args,**kwargs):
-        super(DGBuildUserWarning, self).__init__(*args,**kwargs)
+        super(SimpleBuildUserWarning, self).__init__(*args,**kwargs)
 
 default_error_type = SystemExit
 
@@ -47,13 +47,13 @@ def print_traceback(exc,prefix=''):
 
 _orig_showwarning = warnings.showwarning
 def _custom_warning_fmt(msg,cat,*args,**kwargs):
-    if issubclass(cat,DGBuildUserWarning):
-        print('dgbuild WARNING: %s'%msg)
+    if issubclass(cat,SimpleBuildUserWarning):
+        print('simplebuild WARNING: %s'%msg)
     else:
         _orig_showwarning(msg,cat,*args,**kwargs)
 
-def fmt_dgbuild_warnings():
+def fmt_simplebuild_warnings():
     warnings.showwarning = _custom_warning_fmt
 
 def warn(msg):
-    warnings.warn( DGBuildUserWarning( str(msg) ), stacklevel = 2 )
+    warnings.warn( SimpleBuildUserWarning( str(msg) ), stacklevel = 2 )

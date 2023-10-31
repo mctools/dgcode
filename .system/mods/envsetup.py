@@ -39,10 +39,10 @@ def calculate_env_unsetup( oldenv = None ):
         import os
         oldenv = os.environ
     env_dict = env_with_previous_pathvar_changes_undone( oldenv )
-    for e in ['ESS_INSTALL_PREFIX','ESS_DATA_DIR','ESS_LIB_DIR',
-              'ESS_TESTREF_DIR','ESS_INCLUDE_DIR','DGBUILD_CURRENT_ENV',
-              'SBLD_INSTALL_PREFIX','SBLD_DATA_DIR','SBLD_LIB_DIR',
-              'SBLD_TESTREF_DIR','SBLD_INCLUDE_DIR'
+    for e in [ 'SBLD_INSTALL_PREFIX','SBLD_DATA_DIR','SBLD_LIB_DIR',
+               'SBLD_TESTREF_DIR','SBLD_INCLUDE_DIR',
+               'ESS_INSTALL_PREFIX','ESS_DATA_DIR','ESS_LIB_DIR', # DGBUILD-NO-EXPORT
+               'ESS_TESTREF_DIR','ESS_INCLUDE_DIR','SIMPLEBUILD_CURRENT_ENV', # DGBUILD-NO-EXPORT
               ]:
         if e in env_dict or e in oldenv:
             env_dict[e] = None
@@ -78,12 +78,12 @@ def calculate_env_setup( oldenv = None ):
 
 
     #Set relevant non-path vars:
-    env_dict['DGBUILD_CURRENT_ENV'] = ':'.join(str(e) for e in fpcontent)
-    env_dict['ESS_INSTALL_PREFIX']  = str(instdir)
-    env_dict['ESS_DATA_DIR']        = str(instdir/'data')
-    env_dict['ESS_LIB_DIR']         = str(instdir/'lib')
-    env_dict['ESS_TESTREF_DIR']     = str(instdir/'tests'/'testref')
-    env_dict['ESS_INCLUDE_DIR']     = str(instdir/'include')
+    env_dict['SIMPLEBUILD_CURRENT_ENV'] = ':'.join(str(e) for e in fpcontent)
+    env_dict['ESS_INSTALL_PREFIX']  = str(instdir)# DGBUILD-NO-EXPORT
+    env_dict['ESS_DATA_DIR']        = str(instdir/'data')# DGBUILD-NO-EXPORT
+    env_dict['ESS_LIB_DIR']         = str(instdir/'lib')# DGBUILD-NO-EXPORT
+    env_dict['ESS_TESTREF_DIR']     = str(instdir/'tests'/'testref')# DGBUILD-NO-EXPORT
+    env_dict['ESS_INCLUDE_DIR']     = str(instdir/'include')# DGBUILD-NO-EXPORT
     env_dict['SBLD_INSTALL_PREFIX']  = str(instdir)
     env_dict['SBLD_DATA_DIR']        = str(instdir/'data')
     env_dict['SBLD_LIB_DIR']         = str(instdir/'lib')
@@ -94,7 +94,7 @@ def calculate_env_setup( oldenv = None ):
 def env_with_previous_pathvar_changes_undone( oldenv ):
     assert oldenv is not None
     env = {}
-    oldfp = oldenv.get('DGBUILD_CURRENT_ENV')
+    oldfp = oldenv.get('SIMPLEBUILD_CURRENT_ENV')
     if oldfp:
         import pathlib
         _ = oldfp.split(':')

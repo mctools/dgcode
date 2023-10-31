@@ -6,7 +6,7 @@ from . import error
 join=os.path.join
 
 ignore_dirs=set(['install'])
-forbidden_names = set([s for s in ignore_dirs]+['dgbuild'])#forbid dgbuild, to avoid conflict with "dgbuild" python module
+forbidden_names = set([s for s in ignore_dirs]+['simplebuildbuild'])#forbid simplebuild, to avoid conflict with "simplebuild" python module
 
 import re
 _nameval_pattern='^[a-zA-Z][a-zA-Z0-9_]{2,24}$'
@@ -105,10 +105,10 @@ def check_dir_case_insensitive_duplication(dircontent, path):
           seen.add(d)
 
 def _find_pkg_dirs_under_basedir(dirname):
-    #Ignore dgbuild's own cache dirs:
-    if os.path.exists(os.path.join(dirname,'.dginstalldir')):
+    #Ignore simplebuild's own cache dirs:
+    if os.path.exists(os.path.join(dirname,'.sbinstalldir')):
         return []
-    if os.path.exists(os.path.join(dirname,'.dgbuilddir')):
+    if os.path.exists(os.path.join(dirname,'.sbbuilddir')):
         return []
     if os.path.exists(os.path.join(dirname,conf.package_cfg_file)):
         #dir is itself a pkg dir

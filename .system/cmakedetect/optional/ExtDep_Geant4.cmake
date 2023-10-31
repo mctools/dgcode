@@ -96,7 +96,7 @@ if (geant4_config_file)
         set(ExtDep_Geant4_LINK_FLAGS "${ExtDep_Geant4_LINK_FLAGS} -Wl,--allow-shlib-undefined")
         #NB: we could in principle also do a try_compile first perhaps and see if
         #this is still needed (and works), but it is complicated to replicate here
-        #the exact compilation command that dgbuild will create later, since some
+        #the exact compilation command that simplebuild will create later, since some
         #flags might be added elsewhere.
       endif()
     endif()

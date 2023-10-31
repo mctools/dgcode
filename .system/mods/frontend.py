@@ -21,10 +21,13 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
     #Always inspect cfg and set up appropriate warnings/error printouts:
     from . import error
-    error.fmt_dgbuild_warnings()
+    from . import conf
+
+    error.fmt_simplebuild_warnings()
 
     progname=os.path.basename(argv[0])
-    prefix=progname+': '
+    prefix = conf.print_prefix
+    print = conf.print
 
     from optparse import OptionParser,OptionGroup#FIXME: deprecated, use argparse instead!
 
@@ -38,26 +41,28 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
     legacy_mode = True# DGBUILD-NO-EXPORT
 # DGBUILD-EXPORT-ONLY>>    legacy_mode = False
 
+    def get_simplebuild_pkg_dirs():
+        from . import dirs
+        return [dirs.projdir, *dirs.extrapkgpath]
+
     if legacy_mode:
         from . import dirs # noqa: F811
         rel_blddir=os.path.relpath(dirs.blddir)
         rel_instdir=os.path.relpath(dirs.installdir)
 
-    def get_dgcode_invoke_dirs():
-        #FIXME: This is nonsensical now, we can only be in the projdir (and envcfg will complain if there are issues)!
-        from . import dirs
-# DGBUILD-EXPORT-ONLY>>        return [dirs.projdir, *dirs.extrapkgpath]
+    def get_simplebuild_invoke_dirs():# DGBUILD-NO-EXPORT
+        from . import dirs# DGBUILD-NO-EXPORT
         return [dirs.fmwkdir.parent.parent, dirs.projdir, *dirs.extrapkgpath]# DGBUILD-NO-EXPORT
-
-    if legacy_mode and not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in get_dgcode_invoke_dirs()]):
-        from . import dirs
-        from . import utils
-        utils.err(['This instance of %s is associated with'%progname,'',
+    # DGBUILD-NO-EXPORT
+    if not any([os.path.realpath(os.getcwd()).startswith(str(d)) for d in get_simplebuild_invoke_dirs()]):# DGBUILD-NO-EXPORT
+        from . import dirs# DGBUILD-NO-EXPORT
+        from . import utils# DGBUILD-NO-EXPORT
+        utils.err(['This instance of %s is associated with'%progname,'',# DGBUILD-NO-EXPORT
                    '      Framework directory : %s'%dirs.fmwkdir.parent.parent,# DGBUILD-NO-EXPORT
-                   '      Projects directory  : %s'%dirs.projdir,
-                 *['      Extra package path  : %s'%str(d) for d in dirs.extrapkgpath[0:1]],
-                 *['                            %s'%str(d) for d in dirs.extrapkgpath[1:]],'',
-                   'and must only be invoked in those directories or their subdirs.'])
+                   '      Projects directory  : %s'%dirs.projdir,# DGBUILD-NO-EXPORT
+                 *['      Extra package path  : %s'%str(d) for d in dirs.extrapkgpath[0:1]],# DGBUILD-NO-EXPORT
+                 *['                            %s'%str(d) for d in dirs.extrapkgpath[1:]],'',# DGBUILD-NO-EXPORT
+                   'and must only be invoked in those directories or their subdirs.'])# DGBUILD-NO-EXPORT
 
     if legacy_mode:
         from . import envcfg
@@ -293,14 +298,14 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         if query_mode_withpathzoom_n > 0:
             for a in args_unused:
                 qp=os.path.abspath(os.path.realpath(a))
-                dgcode_invoke_dirs = get_dgcode_invoke_dirs()
-                if not any([qp.startswith(str(d)) for d in dgcode_invoke_dirs]):
-                    parser.error("grep/find/replace/... can only work on directories below %s"%dgcode_invoke_dirs) #TODO ' '.join(dgcode_invoke_dirs) might look nicer
+                simplebuild_pkg_dirs = get_simplebuild_pkg_dirs()
+                if not any([qp.startswith(str(d)) for d in simplebuild_pkg_dirs]):
+                    parser.error("grep/find/replace/... can only work on directories below %s"%simplebuild_pkg_dirs) #TODO ' '.join(simplebuild_pkg_dirs) might look nicer
                 gps=[d for d in glob.glob(qp) if os.path.isdir(d)]
                 if not gps:
                     parser.error("no directory matches for '%s'"%a)
                 for d in sorted(gps):
-                  opt._querypaths+=['%s/'%os.path.relpath(d,str(codedir)) for codedir in dgcode_invoke_dirs if d.startswith(str(codedir))]
+                  opt._querypaths+=['%s/'%os.path.relpath(d,str(codedir)) for codedir in simplebuild_pkg_dirs if d.startswith(str(codedir))]
             args_unused=[]
 
         if args_unused:
@@ -319,6 +324,8 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         return parser,opt,new_cfgvars
 
     parser,opt,new_cfgvars=parse_args()
+    if opt.quiet:
+        conf.make_quiet()
 
 # DGBUILD-EXPORT-ONLY>>    if opt.env_setup:
     if False: #DGBUILD-NO-EXPORT
@@ -334,7 +341,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
     if opt.cfginfo:
         assert not legacy_mode
-        print("FIXME: This is not yet implemented!")
+        print("FIXME: cfginfo mode is not yet implemented!")
         raise SystemExit
 
     #setup lockfile:
@@ -364,11 +371,11 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
     if opt.clean:
         if dirs.blddir.is_dir() or dirs.installdir.is_dir():
             if not opt.quiet:
-                print (prefix+"Removing temporary cache directories and forgetting stored CMake args. Exiting.")
+                print("Removing temporary cache directories and forgetting stored CMake args. Exiting.")
             conf.safe_remove_install_and_build_dir()
         else:
             if not opt.quiet:
-                print (prefix+"Nothing to clean. Exiting.")
+                print("Nothing to clean. Exiting.")
         sys.exit(0)
     try:
         old_cfgvars = utils.pkl_load(dirs.varcache)
@@ -379,10 +386,10 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         if old_cfgvars:
             os.remove(dirs.varcache)
             if not opt.quiet:
-                print ("%sCleared %i configuration variable%s."%(prefix,len(old_cfgvars),'' if len(old_cfgvars)==1 else 's'))
+                print("Cleared %i configuration variable%s."%(len(old_cfgvars),'' if len(old_cfgvars)==1 else 's'))
         else:
             if not opt.quiet:
-                print (prefix+"No configuration variables set, nothing to clear.")
+                print("No configuration variables set, nothing to clear.")
         sys.exit(0)
 
     #combine old and new config vars:
@@ -442,35 +449,35 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
     if opt.show:
         if cfgvars:
             if not opt.quiet:
-                print ('%sCurrently the following configuration variables are set:'%prefix)
+                print('Currently the following configuration variables are set:')
             if not opt.quiet:
-                print (prefix)
+                print()
             #print the values even when quiet:
             for k,v in sorted(cfgvars.items()):
-                print ('%s    %s=%s'%(prefix,k,shlex.quote(v)))
+                print('    %s=%s'%(k,shlex.quote(v)))
         else:
             if not opt.quiet:
-                print ('%sCurrently no configuration variables are set.'%prefix)
+                print('Currently no configuration variables are set.')
         if not opt.quiet:
-            print (prefix)
-            print ('%sTo modify this you can (note this is mostly for expert users!):'%prefix)
-            print (prefix)
-            print ('%s  - set variable by supplying VAR=VAL arguments to %s'%(prefix,progname))
-            print ('%s  - unset a variable by setting it to nothing (VAR=)'%(prefix))
-            print ('%s  - unset all variables by running %s with --forget (but note that'%(prefix,progname))
-            print ('%s    the ONLY variable is special and defaults to "%s")'%(prefix,pkg_selection_default))
-            print (prefix)
-            print ('%sThese are the variables with special support in %s'%(prefix,progname))
-            print (prefix)
-            print ('%s  - DG_EXTRA_CFLAGS  : Extra compilation flags to be passed to the compiler'%prefix)
-            print ('%s                       Example: DG_EXTRA_CFLAGS=-Wshadow'%prefix)
-            print ('%s  - DG_EXTRA_LDFLAGS : Extra link flags to be passed to the linker'%prefix)
-            print ('%s  - DG_RELAX         : Set to 1 to temporarily ignore compiler warnings'%prefix)
-            print ('%s  - ONLY             : Enable only certain packages.'%prefix)
-            print ('%s                       Example: ONLY="Framework::*,BasicExamples"'%prefix)
-            print ('%s  - NOT              : Disable certain packages.'%prefix)
-            print ('%s  - Geant4=0, ROOT=0, etc.. : Force a given external dependency to be'%prefix)
-            print ('%s                              considered as absent, even if present.'%prefix)
+            print()
+            print('To modify this you can (note this is mostly for expert users!):')
+            print()
+            print('  - set variable by supplying VAR=VAL arguments to %s'%progname)
+            print('  - unset a variable by setting it to nothing (VAR=)')
+            print('  - unset all variables by running %s with --forget (but note that'%progname)
+            print('    the ONLY variable is special and defaults to "%s")'%(pkg_selection_default))
+            print()
+            print('These are the variables with special support in %s'%progname)
+            print()
+            print('  - DG_EXTRA_CFLAGS  : Extra compilation flags to be passed to the compiler')
+            print('                       Example: DG_EXTRA_CFLAGS=-Wshadow')
+            print('  - DG_EXTRA_LDFLAGS : Extra link flags to be passed to the linker')
+            print('  - DG_RELAX         : Set to 1 to temporarily ignore compiler warnings')
+            print('  - ONLY             : Enable only certain packages.')
+            print('                       Example: ONLY="Framework::*,BasicExamples"')
+            print('  - NOT              : Disable certain packages.')
+            print('  - Geant4=0, ROOT=0, etc.. : Force a given external dependency to be')
+            print('                              considered as absent, even if present.')
         sys.exit(0)
 
     def create_filter(pattern):
@@ -495,7 +502,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
             else:
               return [os.path.join(pkgdir,subdirPattern)]
           else:
-            print(prefix+"Error: Can't find directory alias for %s in %s"%(part.split('::')[0],part))
+            print("Error: Can't find directory alias for %s in %s"%(part.split('::')[0],part))
             sys.exit(1)
 
         # Separate patterns, and expand directory aliases
@@ -574,7 +581,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
     if err_txt:
         pr="\n\nERROR during configuration:\n\n  %s\n\nAborting."%(err_txt.replace('\n','\n  '))
-        print (pr.replace('\n','\n%s'%prefix))
+        print(pr.replace('\n','\n%s'%prefix))
         #make all packages need reconfig upon next run:
         from . import db
         db.db['pkg2timestamp']={}
@@ -600,12 +607,12 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
     if opt.grep:
         qp=query_pkgs()
-        print ("Grepping %i packages for pattern %s\n"%(len(qp),opt.grep))
+        print("Grepping %i packages for pattern %s\n"%(len(qp),opt.grep))
         n=0
         from . import grep
         for pkg in qp:
             n+=grep.grep(pkg,opt.grep,countonly=opt.grepc)
-        print ("\nFound %i matches"%n)
+        print("\nFound %i matches"%n)
         sys.exit(0)
 
     if opt.replace:
@@ -615,23 +622,23 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         search_pat,replace_pat = replace.decode_pattern(opt.replace)
         if not search_pat:
             parser.error("Bad syntax in replacement pattern: %s"%p)
-        print ("\nReplacing all \"%s\" with \"%s\""%(search_pat,replace_pat))
+        print("\nReplacing all \"%s\" with \"%s\""%(search_pat,replace_pat))
         n = 0
         for pkg in qp:
             if not pkg.isdynamicpkg:#TODO: Can we somehow support dynamic packages?
                 n+=replace.replace(pkg,search_pat,replace_pat)
-        print ("\nPerformed %i replacements"%n)
+        print("\nPerformed %i replacements"%n)
         sys.exit(0)
 
     if opt.find:
         qp=query_pkgs()
         p=opt.find
         from . import find#fnmatch!!
-        print ("\nFinding all files and paths matching \"%s\"\n"%(p))
+        print("\nFinding all files and paths matching \"%s\"\n"%(p))
         n = 0
         for pkg in qp:
             n+=find.find(pkg,p)
-        print ("\nFound %i matches"%n)
+        print("\nFound %i matches"%n)
         sys.exit(0)
 
     if opt.incinfo:
@@ -654,10 +661,10 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
                 parser.error("Not a file: %s"%fn)
             fn=os.path.abspath(os.path.realpath(fn))
             p = pathlib.Path(fn).absolute().resolve()
-            dgcode_invoke_dirs = get_dgcode_invoke_dirs()
-            if not any( utils.path_is_relative_to(p,d) for d in dgcode_invoke_dirs):
+            simplebuild_pkg_dirs = get_simplebuild_pkg_dirs()
+            if not any( utils.path_is_relative_to(p,d) for d in simplebuild_pkg_dirs):
                 #TODO: This currently fails for dynamic packages!
-                parser.error(f"File {p} must be located under one of the following directories:\n%s"%('\n '.join(str(e) for e in dgcode_invoke_dirs)))
+                parser.error(f"File {p} must be located under one of the following directories:\n%s"%('\n '.join(str(e) for e in simplebuild_pkg_dirs)))
             return [fn]#expands to a single file
         from . import incinfo
         fnsraw = opt.incinfo.split(',') if ',' in opt.incinfo else [opt.incinfo]
@@ -685,21 +692,21 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         from . import dotgen
         dotgen.dotgen(pkgloader,dotfile,enabled_only=opt.pkggraph_activeonly)
         if not opt.quiet:
-            print ('%sPackage dependencies in graphviz DOT format has been generated in %s'%(prefix,dotfile))
+            print('%sPackage dependencies in graphviz DOT format has been generated in %s'%(prefix,dotfile))
         ec=utils.system('dot -V > /dev/null 2>&1')
         if ec:
             if not opt.quiet:
-                print (prefix+'Warning: command "dot" not found or ran into problems.')
-                print (prefix+'Please install graphviz to enable graphical dependency displays')
+                print('Warning: command "dot" not found or ran into problems.')
+                print('Please install graphviz to enable graphical dependency displays')
             sys.exit(1)
         ec=utils.system('unflatten -l3 -c7 %s|dot -Tpng -o%s/pkggraph.png'%(dotfile,dirs.blddir))
         if ec or not isfile('%s/pkggraph.png'%dirs.blddir):
             if not opt.quiet:
-                print (prefix+'Error: Problems with dot command while transforming pkggraph.dot to pkggraph.png')
+                print('Error: Problems with dot command while transforming pkggraph.dot to pkggraph.png')
             sys.exit(1)
         else:
             if not opt.quiet:
-                print (prefix+'Package dependencies in PNG format has been generated in %s/pkggraph.png'%dirs.blddir)
+                print('Package dependencies in PNG format has been generated in %s/pkggraph.png'%dirs.blddir)
         sys.exit(0)
 
 
@@ -715,20 +722,20 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
     elif opt.quiet: extramakeopts=' VERBOSE=-1'
     else: extramakeopts=''
     if not opt.quiet:
-        print (prefix+"Configuration completed => Launching build with %i parallel processes"%opt.njobs)
+        print("Configuration completed => Launching build with %i parallel processes"%opt.njobs)
 
     assert dirs.makefiledir.is_dir()
     ec=utils.system("cd %s && make --warn-undefined-variables -f Makefile -j%i%s"%(dirs.makefiledir,opt.njobs,extramakeopts))
     if ec!=0:
         if not opt.quiet:
-            print ("ERROR: Build problems encountered")
+            print("ERROR: Build problems encountered")
         sys.exit(1 if ec > 128 else ec)
 
     if not opt.quiet:
-        print (prefix)
-        print ('%sSuccessfully built and installed all enabled packages!'%prefix)
-        print (prefix)
-        print ('%sSummary:'%prefix)
+        print()
+        print('%sSuccessfully built and installed all enabled packages!'%prefix)
+        print()
+        print('%sSummary:'%prefix)
         def fixpath( p ):
             if envcfg.var.conda_prefix:
                 pabs = p.absolute().resolve()
@@ -736,10 +743,10 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
                 if cp.is_dir() and utils.path_is_relative_to( pabs, cp ):
                     return os.path.join('${CONDA_PREFIX}',str(pabs.relative_to(cp)))
             return str(p)
-        print (prefix+'  Framework directory              : %s'%fixpath(dirs.fmwkdir))# DGBUILD-NO-EXPORT
-        print (prefix+'  Projects directory               : %s'%fixpath(dirs.projdir))
-        print (prefix+'  Installation directory           : %s'%fixpath(dirs.installdir))
-        print (prefix+'  Build directory                  : %s'%fixpath(dirs.blddir))
+        print('  Framework directory              : %s'%fixpath(dirs.fmwkdir))# DGBUILD-NO-EXPORT
+        print('  Projects directory               : %s'%fixpath(dirs.projdir))
+        print('  Installation directory           : %s'%fixpath(dirs.installdir))
+        print('  Build directory                  : %s'%fixpath(dirs.blddir))
 
         from . import col
         col_ok = col.ok
@@ -782,7 +789,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
                 descr='%s built, %s skipped'%(nbuilt, nskipped)
             return "%s (%s)"%(p, descr)
 
-        print (prefix+'  Package search path              : %s'%formatlist([pkg_info_str(info) for info in pkg_src_info],None))
+        print('  Package search path              : %s'%formatlist([pkg_info_str(info) for info in pkg_src_info],None))
 
         nmax = 20
         pkg_enabled = sorted([p.name for p in pkgloader.pkgs if p.enabled])
@@ -813,7 +820,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
             else:
                 assert not info['dep_versions']#If allowed, we would need to print them somewhere
 
-        print (prefix+'  System                           : %s'%env.env['system']['general']['system'])
+        print('  System                           : %s'%env.env['system']['general']['system'])
         cp=env.env['cmake_printinfo']
         unused_vars = set(cp['unused_vars'])
         unused_vars_withvals=[]
@@ -825,11 +832,11 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
             else:
                 ucvlist+=['%s=%s'%(k,shlex.quote(v))]
 
-        print (prefix+'  User configuration variables[*]  : %s'%formatlist(ucvlist,None))
-        print (prefix+'  Required dependencies            : %s'%formatlist(['%s[%s]'%(k,v) for k,v in sorted(set(reqdep))],None))
-        print (prefix+'  Optional dependencies present    : %s'%formatlist(['%s[%s]'%(e,env.env['extdeps'][e]['version']) for e in extdeps_avail],
+        print('  User configuration variables[*]  : %s'%formatlist(ucvlist,None))
+        print('  Required dependencies            : %s'%formatlist(['%s[%s]'%(k,v) for k,v in sorted(set(reqdep))],None))
+        print('  Optional dependencies present    : %s'%formatlist(['%s[%s]'%(e,env.env['extdeps'][e]['version']) for e in extdeps_avail],
                                                                            col_ok))
-        print (prefix+'  Optional dependencies missing[*] : %s'%formatlist(extdeps_missing,col_bad))
+        print('  Optional dependencies missing[*] : %s'%formatlist(extdeps_missing,col_bad))
         pkgtxt_en ='%s%i%s package%s built successfully'%(col_ok if n_enabled else '',
                                                           n_enabled,
                                                           col_end if n_enabled else '',
@@ -838,18 +845,18 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
                                                           n_disabled,
                                                           col_end if n_disabled else '',
                                                           '' if n_disabled==1 else 's')
-        print (prefix+'  %s : %s'%(pkgtxt_en.ljust(32+(len(col_end)+len(col_ok) if n_enabled else 0)),formatlist(pkg_enabled,col_ok)))
-        print (prefix+'  %s : %s'%(pkgtxt_dis.ljust(32+(len(col_end)+len(col_bad) if n_disabled else 0)),formatlist(pkg_disabled,col_bad)))
-        print (prefix)
+        print('  %s : %s'%(pkgtxt_en.ljust(32+(len(col_end)+len(col_ok) if n_enabled else 0)),formatlist(pkg_enabled,col_ok)))
+        print('  %s : %s'%(pkgtxt_dis.ljust(32+(len(col_end)+len(col_bad) if n_disabled else 0)),formatlist(pkg_disabled,col_bad)))
+        print()
         if unused_vars_withvals:
-            print (prefix+'%sWARNING%s Unused user cfg variables  : %s'%(col_bad,col_end,formatlist(unused_vars_withvals,None)))
-            print (prefix)
+            print('%sWARNING%s Unused user cfg variables  : %s'%(col_bad,col_end,formatlist(unused_vars_withvals,None)))
+            print()
         if cp['other_warnings'] or ( len(cp['unused_vars'])>len(unused_vars_withvals)):
-            print (prefix+'%sWARNING%s unspecified warnings from CMake encountered during environment inspection!'%(col_bad,col_end))
-            print (prefix)
+            print('%sWARNING%s unspecified warnings from CMake encountered during environment inspection!'%(col_bad,col_end))
+            print()
 
     if opt.runtests:
-        assert (conf.test_dir().parent / '.dgbuilddir').exists()
+        assert (conf.test_dir().parent / '.sbbuilddir').exists()
         import shutil
         shutil.rmtree(conf.test_dir(),ignore_errors=True)
         _testfilter=''
@@ -867,8 +874,8 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
         if ec==0 and (cp['unused_vars'] or cp['other_warnings']):
             #Make sure user sees these warnings:
-            print (prefix+'%sWARNING%s There were warnings (see above)'%(col_bad,col_end))
-            print (prefix)
+            print('%sWARNING%s There were warnings (see above)'%(col_bad,col_end))
+            print()
         if ec:
             sys.exit(ec)
 
@@ -877,28 +884,29 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         if ec: # DGBUILD-NO-EXPORT
             sys.exit(1 if ec > 128 else ec) # DGBUILD-NO-EXPORT
         if not opt.quiet: # DGBUILD-NO-EXPORT
-            print (prefix+'Copied self-contained installation to:') # DGBUILD-NO-EXPORT
-            print (prefix) # DGBUILD-NO-EXPORT
-            print (prefix+'  %s'%opt.install) # DGBUILD-NO-EXPORT
-            print (prefix) # DGBUILD-NO-EXPORT
+            print('Copied self-contained installation to:') # DGBUILD-NO-EXPORT
+            print() # DGBUILD-NO-EXPORT
+            print('  %s'%opt.install) # DGBUILD-NO-EXPORT
+            print() # DGBUILD-NO-EXPORT
 
     if not opt.quiet:
         if legacy_mode and cfgvars.get('ONLY','')=='Framework::*' and not 'NOT' in cfgvars:
-            print (prefix+"%sNote that only Framework packages were enabled by default:%s"%(col.bldmsg_notallselectwarn,col.end))
-            print (prefix)
-            print (prefix+"%s  - To enable pkgs for a given project do: dgbuild -p<projectname>%s"%(col.bldmsg_notallselectwarn,col.end))
-            print (prefix+"%s  - To enable all pkgs do: dgbuild -a%s"%(col.bldmsg_notallselectwarn,col.end))
-            print (prefix)
+            print("%sNote that only Framework packages were enabled by default:%s"%(col.bldmsg_notallselectwarn,col.end))
+            print()
+            print("%s  - To enable pkgs for a given project do: simplebuild -p<projectname>%s"%(col.bldmsg_notallselectwarn,col.end))
+            print("%s  - To enable all pkgs do: simplebuild -a%s"%(col.bldmsg_notallselectwarn,col.end))
+            print()
 
         from .envsetup import calculate_env_setup
         if not legacy_mode and not prevent_env_setup_msg and calculate_env_setup():
-            print (f'{prefix}{col.warnenvsetup}Build done. To use the resulting environment you must first enable it!{col.end}\n{prefix}\n'
-                   f'{prefix}{col.warnenvsetup}Type the following command (exactly) to do so (undo later by --env-unsetup instead):{col.end}\n'
-                   f'{prefix}\n'
-                   f'{prefix}    {col.warnenvsetup}eval "$({progname} --env-setup)"{col.end}\n{prefix}'
-                   )
+            print(f'{prefix}{col.warnenvsetup}Build done. To use the resulting environment you must first enable it!{col.end}')
+            print()
+            print(f'{col.warnenvsetup}Type the following command (exactly) to do so (undo later by --env-unsetup instead):{col.end}')
+            print()
+            print(f'    {col.warnenvsetup}eval "$({progname} --env-setup)"{col.end}')
+            print()
         else:
-            print (prefix+"Build done. You are all set to begin using the software!")
-            print (prefix)
-            print (f'{prefix} To see available applications, type "{conf.runnable_prefix}" and hit the TAB key twice.')
-            print (prefix)
+            print("Build done. You are all set to begin using the software!")
+            print()
+            print(f'To see available applications, type "{conf.runnable_prefix}" and hit the TAB key twice.')
+            print()

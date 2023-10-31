@@ -62,7 +62,7 @@ class TestXMLWriter:
         time_sum = float(sum(t.time_elapsed_seconds() for t in self.__tests))
 
         yield f'<testsuites failures="{nfailures}" errors="0" tests="{ntests}" disabled="0" {_fmt_time_attribute(time_sum)}>'
-        yield f'  <testsuite name="dgbuild-tests" disabled="0" failures="{nfailures}" errors="0" skipped="0" time="{time_sum}" tests="{ntests}">'
+        yield f'  <testsuite name="simplebuild-tests" disabled="0" failures="{nfailures}" errors="0" skipped="0" time="{time_sum}" tests="{ntests}">'
         for t in self.__tests:
             for line in t._generate_xml():
                 yield line

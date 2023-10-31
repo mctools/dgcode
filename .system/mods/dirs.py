@@ -75,21 +75,21 @@ pkgdir_aliases = {
   }
 
 def create_bld_dir():
-    fingerprint = blddir  / '.dgbuilddir'
+    fingerprint = blddir  / '.sbbuilddir'
     if  blddir.exists() and not fingerprint.exists():
         from . import error
         error.error(f'Did not find expected fingerprint file at: {fingerprint}')
     blddir.mkdir(parents=True,exist_ok=True)
     fingerprint.touch()
     assert blddir.is_dir()
-    assert ( blddir  / '.dgbuilddir' ).exists()
+    assert ( blddir  / '.sbbuilddir' ).exists()
 
 def create_install_dir():
-    fingerprint = installdir  / '.dginstalldir'
+    fingerprint = installdir  / '.sbinstalldir'
     if  installdir.exists() and not fingerprint.exists():
         from . import error
         error.error(f'Did not find expected fingerprint file at: {fingerprint}')
     installdir.mkdir(parents=True,exist_ok=True)
     fingerprint.touch()
     assert installdir.is_dir()
-    assert ( installdir  / '.dginstalldir' ).exists()
+    assert ( installdir  / '.sbinstalldir' ).exists()

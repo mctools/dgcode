@@ -85,7 +85,6 @@ all = [
 [project.scripts]
 simplebuild = "simplebuild._cli_dgbuild:main"
 unwrapped_simplebuild = "simplebuild._cli_dgbuild:unwrapped_main"
-sbtests = "simplebuild._cli_dgtests:main"
 sbenv = "simplebuild._cli_dgbuild:sbenv_main"
 sbrun = "simplebuild._cli_dgbuild:sbrun_main"
 """)

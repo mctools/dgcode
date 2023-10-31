@@ -3,7 +3,6 @@
 import os
 import pathlib
 import sysconfig
-from . import envcfg
 
 def AbsPath( p ):
     return pathlib.Path(p).expanduser().resolve().absolute()
@@ -22,6 +21,18 @@ autodeps = set(['Core'])
 projectname='SBLD'
 projectname_lc = projectname.lower()
 runnable_prefix = 'sb_'
+print_prefix_name = 'simplebuild'
+print_prefix = f'{print_prefix_name}: '
+quiet = False#might be overridden by a cal to make_quiet
+_printfcts = [print]
+def print( *args, **kwargs ):
+    _printfcts[0]( print_prefix, *args, **kwargs )
+def print_no_prefix( *args, **kwargs ):
+    _printfcts[0]( *args, **kwargs )
+def make_quiet():
+    if not quiet:
+        quiet = True
+        _printfct[0] = lambda *args, **kwargs : None
 
 def runnable_name(pkg,base_name):
     #create global runnable name for a runnable in a package:
@@ -62,12 +73,12 @@ def uninstall_package(pkgname):
     #assert d and not ' ' in d
 
     instdir = install_dir()
-    if not ( instdir / '.dginstalldir' ).exists():
+    if not ( instdir / '.sbinstalldir' ).exists():
         return
 
     #FIXME: <pn>_foo_bar_blah might be script Blah from package Foo_Bar or script
     #Bar_Blah from package Foo. We should check that the symlinks goes to the
-    #correct package! (or better yet, dgbuild should produce pickle file in
+    #correct package! (or better yet, simplebuild should produce pickle file in
     #install or bld with all package dependencies and provided scripts, apps,
     #etc.). But a quick fix for the scripts (not for the apps) would be for the
     #framework to remove all symlinks to the package in question from the
@@ -91,6 +102,7 @@ def uninstall_package(pkgname):
 #Get paths to all packages (including the framework and user packages)
 
 def projects_dir():
+    from . import envcfg
 # DGBUILD-EXPORT-ONLY>>    return envcfg.var.projects_dir
     proj_dir_env = envcfg.var.projects_dir # DGBUILD-NO-EXPORT
     if not proj_dir_env: # DGBUILD-NO-EXPORT
@@ -103,6 +115,7 @@ def projects_dir():
     return proj_dir # DGBUILD-NO-EXPORT
 
 def extra_pkg_path():
+    from . import envcfg
 # DGBUILD-EXPORT-ONLY>>    return envcfg.var.extra_pkg_path_list
     dirs = [] # DGBUILD-NO-EXPORT
     extra_pkg_path_env = envcfg.var.extra_pkg_path # DGBUILD-NO-EXPORT
@@ -130,11 +143,14 @@ def pkg_search_path(system_dir): # DGBUILD-NO-EXPORT
     return dirs # DGBUILD-NO-EXPORT
 
 # DGBUILD-EXPORT-ONLY>>def build_dir():
+# DGBUILD-EXPORT-ONLY>>    from . import envcfg
 # DGBUILD-EXPORT-ONLY>>    return envcfg.var.build_dir_resolved
 # DGBUILD-EXPORT-ONLY>>def install_dir():
+# DGBUILD-EXPORT-ONLY>>    from . import envcfg
 # DGBUILD-EXPORT-ONLY>>    return envcfg.var.install_dir_resolved
 
 def _determine_resolved_dir( env_var_name, attribute_name ):  # DGBUILD-NO-EXPORT
+    from . import envcfg
     assert hasattr(envcfg.var,attribute_name)  # DGBUILD-NO-EXPORT
     the_dir = getattr(envcfg.var,attribute_name)  # DGBUILD-NO-EXPORT
     if not the_dir:  # DGBUILD-NO-EXPORT
@@ -164,7 +180,7 @@ def test_dir():
 
 def safe_remove_install_and_build_dir():
     import shutil
-    for fingerprintfile in [ build_dir() / '.dgbuilddir', install_dir() / '.dginstalldir' ]:
+    for fingerprintfile in [ build_dir() / '.sbbuilddir', install_dir() / '.sbinstalldir' ]:
         if fingerprintfile.exists():
             shutil.rmtree( fingerprintfile.parent, ignore_errors=True )
 
@@ -212,7 +228,7 @@ def target_factories():
 def deinstall_parts(instdir,pkgname,current_parts,disappeared_parts):
     from . import dirs
     i=instdir
-    if not ( i / '.dginstalldir' ).exists():
+    if not ( i / '.sbinstalldir' ).exists():
         return
     unused=set()
     pydone=False

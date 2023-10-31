@@ -76,18 +76,18 @@ def _newcfg():
         cmake_args =  _query('CMAKE_ARGS')
 
         #These are most likely almost never used by anyone (thus keeping as env vars for now!):
-        color_fix_code = _query('DGCODE_COLOR_FIX')
-        allow_sys_dev =  _query('DGCODE_ALLOWSYSDEV',boolean=True)
+        color_fix_code = _query('SIMPLEBUILD_COLOR_FIX')
+        allow_sys_dev =  _query('SIMPLEBUILD_ALLOWSYSDEV',boolean=True)
 
         # NOTE: backend.py also checks environment variables to check if something
         # changed needing an automatic cmake reconf. We provide a good base list
         # here:
 
         reconf_env_vars = [
-            #All of the above except DGCODE_ALLOWSYSDEV:
-            'PATH','DGCODE_COLOR_FIX','CONDA_PREFIX','CMAKE_ARGS','PYTHONPATH',
+            #All of the above except SIMPLEBUILD_ALLOWSYSDEV:
+            'PATH','SIMPLEBUILD_COLOR_FIX','CONDA_PREFIX','CMAKE_ARGS','PYTHONPATH',
             #Also this one of course:
-            'DGBUILD_CFG',
+            'SIMPLEBUILD_CFG',
         ]
 
         env_paths = cfg.env_paths
