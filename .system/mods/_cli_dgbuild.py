@@ -14,26 +14,26 @@ def main( prevent_env_setup_msg = False ):
 # DGBUILD-EXPORT-ONLY>>            emit_envsetup()
 # DGBUILD-EXPORT-ONLY>>            raise SystemExit
     from . import frontend
-    frontend.dgbuild_main( prevent_env_setup_msg = prevent_env_setup_msg )
+    frontend.simplebuild_main( prevent_env_setup_msg = prevent_env_setup_msg )
 
 def unwrapped_main():
-    #For the unwrapped_dgbuild entry point, presumably only called from a bash
+    #For the unwrapped_simplebuild entry point, presumably only called from a bash
     #function taking care of the --env-setup.
     import sys
-    sys.argv[0] = 'dgbuild2'#FIXME: after migration put to 'dgbuild'!
+    sys.argv[0] = 'simplebuild'
     main( prevent_env_setup_msg = True )
 
-def dgenv_main():
+def sbenv_main():
     import sys
     args = sys.argv[1:]
     if not args:
         print("""Usage:
 
-dgenv <program> [args]
+sbenv <program> [args]
 
-Runs <program> within the dgbuild runtime environment. Note that if you wish to
-make sure the codebase has been built first (with dgbuild) you should use dgrun
-rather than dgenv.
+Runs <program> within the simplebuild runtime environment. Note that if you wish to
+make sure the codebase has been built first (with simplebuild) you should use sbrun
+rather than sbenv.
 """)
         sys.exit(1)
         return
@@ -44,16 +44,16 @@ rather than dgenv.
     cmd = ' '.join(shlex.quote(e) for e in args)
     utils.system(cmd,env=run_env)
 
-def dgrun_main():
+def sbrun_main():
     import sys
     args = sys.argv[1:]
     if not args:
         print("""Usage:
 
-dgrun <program> [args]
+sbrun <program> [args]
 
-Runs dgbuild (quietly) and if it finishes successfully, then proceeds to launch
-<program> within the dgbuild runtime environment.
+Runs simplebuild (quietly) and if it finishes successfully, then proceeds to launch
+<program> within the simplebuild runtime environment.
 """)
         sys.exit(1)
         return
@@ -63,9 +63,9 @@ Runs dgbuild (quietly) and if it finishes successfully, then proceeds to launch
     import shlex
     cmd = ' '.join(shlex.quote(e) for e in args)
     from . import frontend
-    frontend.dgbuild_main( argv = ['dgbuild2',#FIXME: after migration put to 'dgbuild'!
-                                   '--quiet'],
-                           prevent_env_setup_msg = True )
+    frontend.simplebuild_main( argv = ['simplebuild',
+                                       '--quiet'],
+                               prevent_env_setup_msg = True )
     utils.system(cmd,env=run_env)
 
 if __name__=='__main__':

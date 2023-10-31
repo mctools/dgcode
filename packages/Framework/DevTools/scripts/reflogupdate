@@ -44,7 +44,7 @@ if '-h' in args or '--help' in args:
     print('Usage: ')
     print()
     print('%s [-h|--help] [TESTDIR] '%os.path.basename(sys.argv[0])+
-          '[ess_some_testcommand1] [ess_some_testcommand2] [..]')
+          '[sb_some_testcommand1] [sb_some_testcommand2] [..]')
     print()
     sys.exit(0)
 
@@ -57,7 +57,7 @@ else:
 
 if not args:
     args = [ p.split(os.sep)[-2] for p in
-             glob.glob(os.path.join(testbasedir,'ess_*/refdiff.log'))
+             glob.glob(os.path.join(testbasedir,'sb_*/refdiff.log'))
              if os.path.getsize(p) ]
 
 commands=[]

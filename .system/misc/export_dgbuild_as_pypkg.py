@@ -83,11 +83,11 @@ all = [
 "Bug Tracker" = "https://github.com/mctools/simplebuild/issues"
 
 [project.scripts]
-simplebuild2 = "simplebuild._cli_dgbuild:main"
-unwrapped_simplebuild2 = "simplebuild._cli_dgbuild:unwrapped_main"
-sbtests2 = "simplebuild._cli_dgtests:main"
-sbenv2 = "simplebuild._cli_dgbuild:dgenv_main"
-sbrun2 = "simplebuild._cli_dgbuild:dgrun_main"
+simplebuild = "simplebuild._cli_dgbuild:main"
+unwrapped_simplebuild = "simplebuild._cli_dgbuild:unwrapped_main"
+sbtests = "simplebuild._cli_dgtests:main"
+sbenv = "simplebuild._cli_dgbuild:sbenv_main"
+sbrun = "simplebuild._cli_dgbuild:sbrun_main"
 """)
 
 def create_metadata_files_dgcode( tgtdir ):

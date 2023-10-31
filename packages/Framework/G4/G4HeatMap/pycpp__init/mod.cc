@@ -105,7 +105,7 @@ namespace DMWriter {
       e->ensureWrite();
     if (!FrameworkGlobals::isForked()||FrameworkGlobals::isParent()) {
       printf("HeatMapWriter: ==> All requested heatmap files were created successfully.\n");
-      printf("HeatMapWriter: ==> Browse the files immediately with the ess_mesh3d_browse command.\n");
+      printf("HeatMapWriter: ==> Browse the files immediately with the sb_mesh3d_browse command.\n");
       printf("HeatMapWriter: ==> More info is at https://confluence.esss.lu.se/display/DGCODE/G4HeatMap\n");
     }
   }

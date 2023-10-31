@@ -180,7 +180,7 @@ class ScanLauncher:
                     if opt.resubmit and os.path.isdir(rundir):
                         continue
                     print("Submitting job %i/%i (%s) [%g%% done]"%(i+1,njobs,label,(i+1)*100.0/njobs))
-                    ec=Core.System.system(_joinargs(['ess_dmscutils_submit',
+                    ec=Core.System.system(_joinargs(['sb_dmscutils_submit',
                                                      opt.queue.split(':')[1],
                                                      '--email=%s'%quote(opt.email),
                                                      '--comment=%s'%quote(label),

@@ -83,8 +83,8 @@ if not args:
 
 if name==None:
     name=args[0]
-    if name.startswith('ess_'):
-        name=name[4:]
+    if name.startswith('sb_'):
+        name=name[3:]
     if not name:
         name='generic_dgcode'
 

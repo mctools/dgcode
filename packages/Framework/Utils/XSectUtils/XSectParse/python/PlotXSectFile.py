@@ -154,7 +154,7 @@ def xsectfile(mat,physlist,particle='neutron',force=False):
     import os,sys
     fn='xsects_discreteprocs_%s__%s__%s.txt'%(particle,mat,physlist)
     if force or not os.path.exists(fn):
-        ec=system('ess_g4xsectdump_query -m"%s" -p%s  -l"%s" -s -f'%(mat,particle,physlist))
+        ec=system('sb_g4xsectdump_query -m"%s" -p%s  -l"%s" -s -f'%(mat,particle,physlist))
         if ec!=0 or not os.path.exists(fn):
             print("ERROR: Could not generate x-sections for %s / %s / %s"%(mat,particle,physlist))
             sys.exit(0)

@@ -2,7 +2,7 @@ import Core.System as Sys
 import os
 
 def jobid(jobdir):
-    """Get jobid of jobdir for a job submitted with ess_dmscutils_submit. Returns None if unable to determine."""
+    """Get jobid of jobdir for a job submitted with sb_dmscutils_submit. Returns None if unable to determine."""
     if not os.path.isdir(jobdir):
         return None
     if not os.path.exists(os.path.join(jobdir,'state.submit')):

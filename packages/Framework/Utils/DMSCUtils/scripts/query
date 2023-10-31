@@ -5,7 +5,7 @@ from Core.System import system
 def usage(ec):
     print('%s [-h|--help] [-t|--trouble] [JOBDIR1] [[JOBDIR2] ...]'%os.path.basename(sys.argv[0]))
     print()
-    print("Prints information about the slurm jobs (submitted with ess_dmscutils_submit) in the provided job dirs")
+    print("Prints information about the slurm jobs (submitted with sb_dmscutils_submit) in the provided job dirs")
     print()
     print("Options:")
     print("  -h, --help    : Print this usage information.")

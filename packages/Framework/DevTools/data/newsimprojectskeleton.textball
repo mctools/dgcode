@@ -162,7 +162,7 @@ int main(int argc,char**argv) {
     }
   }
 
-  //Save histograms to a file which can be browsed with ess_simplehists_browse:
+  //Save histograms to a file which can be browsed with sb_simplehists_browse:
   hc.saveToFile("skeletonsp",true);
 
   return 0;
@@ -201,7 +201,7 @@ from ScanUtils.ScanLauncher import ScanLauncher,ParameterGroup
 from numpy import linspace
 
 #Global setup for all scan jobs:
-scan = ScanLauncher("ess_skeletonsp_simanachain",autoseed=True)
+scan = ScanLauncher("sb_skeletonsp_simanachain",autoseed=True)
 scan.add_global_parameter("rundir")
 scan.add_global_parameter("--cleanup")
 scan.add_global_parameter("--nevts",100000)
@@ -294,7 +294,7 @@ launcher.go()
 
 #!/usr/bin/env python3
 import G4Utils.chain
-G4Utils.chain.chain('ess_skeletonsp_sim','ess_skeletonsp_ana','REDUCED')
+G4Utils.chain.chain('sb_skeletonsp_sim','sb_skeletonsp_ana','REDUCED')
 
 
 
@@ -307,7 +307,7 @@ G4Utils.chain.chain('ess_skeletonsp_sim','ess_skeletonsp_ana','REDUCED')
 #silently doesn't do anything when the Geant4 framework is not present.
 
 if [ -d $SBLD_INSTALL_PREFIX/include/G4Launcher/ ]; then
-   ess_skeletonsp_sim -t -lESS_Empty && \
-   ess_skeletonsp_simanachain rundir --cleanup -n1 -lESS_Empty
+   sb_skeletonsp_sim -t -lESS_Empty && \
+   sb_skeletonsp_simanachain rundir --cleanup -n1 -lESS_Empty
 fi
 

@@ -6,7 +6,7 @@ def _find_ncrystal_builtin_nctool():
     assert _ is not None
     _ = _pathlib.Path(_) / 'scripts'
     assert _.is_dir()
-    f = ( _ / 'ess_ncrystalbuiltin_tool' ).absolute()
+    f = ( _ / 'sb_ncrystalbuiltin_tool' ).absolute()
     return f if f.exists() else None
 
 _the_actual_tool = _find_ncrystal_builtin_nctool()

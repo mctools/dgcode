@@ -92,7 +92,7 @@ def chain(g4sim_exec_name,griffana_exec_name,griff_mode=None):
             seedpar=G4Utils.hash2seed.hash2seedpar('##'.join(simargs+['chainmult=%i'%i]))
             setup_runscript(os.path.join(rundir,'runsim_part%04i'%i),simargs+[seedpar])
             setup_runscript(os.path.join(rundir,'runana_part%04i'%i),[griffana_exec_name,'../runsim_part%04i/sim*.griff'%i])
-        setup_runscript(os.path.join(rundir,'runana'),['ess_simplehists_merge','-o','merged.shist','../runana_part*/*.shist'])
+        setup_runscript(os.path.join(rundir,'runana'),['sb_simplehists_merge','-o','merged.shist','../runana_part*/*.shist'])
     def run(step):
         ec=system(". %s/run.sh"%pipes.quote(os.path.join(rundir,step)))
         if ec!=0:

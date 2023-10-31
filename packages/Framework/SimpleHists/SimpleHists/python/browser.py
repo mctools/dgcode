@@ -50,7 +50,7 @@ def interactive_browser(filename,indices_and_keys=None,dpi=None):
 
     def launch_entry_view(entry,dpi=None):
         global _sub_procs
-        cmd=['ess_simplehists_browse','-pq',filename,entry.key,f'--dpi={dpi or 0}']
+        cmd=['sb_simplehists_browse','-pq',filename,entry.key,f'--dpi={dpi or 0}']
         os.environ['TK_SILENCE_DEPRECATION']='1'#no need to spam repeatedly
         print("Launching command:",' '.join(cmd))
         p = subprocess.Popen([shlex.quote(e) for e in cmd],shell=False,

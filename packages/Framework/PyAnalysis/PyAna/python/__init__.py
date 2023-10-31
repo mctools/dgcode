@@ -1,5 +1,5 @@
 
-__all__ = ['math','os','sys','pathlib','numpy', 'matplotlib', 'np', 'mpl', 'plt','Core','Units','ColourDashesHelper','lighten_colour','darken_colour','rainbow_colour','dgextras']
+__all__ = ['math','os','sys','pathlib','numpy', 'matplotlib', 'np', 'mpl', 'plt','Units','ColourDashesHelper','lighten_colour','darken_colour','rainbow_colour','dgextras']
 
 #1) Fix matplotlib backend:
 import os
