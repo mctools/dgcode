@@ -10,7 +10,7 @@ function _dgcode_prunepath() {
     export $1="${P:1:99999}"
 }
 
-for tmp in DGCODE_INSTALL_DIR_RESOLVED ESS_INSTALL_PREFIX; do
+for tmp in DGCODE_INSTALL_DIR_RESOLVED ESS_INSTALL_PREFIX SBLD_INSTALL_PREFIX; do
     #Cleanout leftover from previous invocations:
     if [ "x${!tmp}" != x ]; then
         _dgcode_prunepath PYTHONPATH "${!tmp}"

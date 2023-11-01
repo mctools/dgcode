@@ -1,5 +1,5 @@
 set(HAS_Threads 0)
-if (NOT DG_VERBOSE)
+if (NOT SBLD_VERBOSE)
   set(Threads_FIND_QUIETLY ON)
 endif()
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)

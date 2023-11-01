@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24.2...3.27.6)
 
 
-if (DG_QUIET)
+if (SBLD_QUIET)
   #override normal message function and block anything except errors and warnings
   function(message)
     list(GET ARGV 0 MessageType)
@@ -25,10 +25,10 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")#other options are DEBUG, RELEASE, MINSIZEREL, RELWITHDEBINFO
 endif()
 
-#We compile with -pedantic and -Werror unless DG_RELAX is set:
+#We compile with -pedantic and -Werror unless SBLD_RELAX is set:
 set(FLAG_PEDANTIC "")
 set(FLAG_WERROR "")
-if (NOT DG_RELAX)
+if (NOT SBLD_RELAX)
   set(FLAG_PEDANTIC "-pedantic ")
   set(FLAG_WERROR "-Werror ")
 endif()
@@ -43,26 +43,26 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 #NB: Using -std=c++1z rather than -std=c++17 for now, due to clang++ from XCode 9.2 not recognising it yet.
-set(DG_GLOBAL_COMPILE_FLAGS_CXX "${FLAG_PEDANTIC}-std=c++1z -Wextra ${FLAG_WERROR}-Wall -Woverloaded-virtual -Wno-non-virtual-dtor -Wno-long-long -Wwrite-strings -Wpointer-arith -Wno-variadic-macros -Wshadow${FLAGS_PLATFORM_CXX} ${DG_EXTRA_CFLAGS} -DDGCODE_USEPYBIND11")
-set(DG_GLOBAL_COMPILE_FLAGS_C "${FLAG_PEDANTIC}-std=c99 -Wextra${FLAGS_PLATFORM_C} ${FLAG_WERROR}-Wall ${DG_EXTRA_CFLAGS}")
+set(SBLD_GLOBAL_COMPILE_FLAGS_CXX "${FLAG_PEDANTIC}-std=c++1z -Wextra ${FLAG_WERROR}-Wall -Woverloaded-virtual -Wno-non-virtual-dtor -Wno-long-long -Wwrite-strings -Wpointer-arith -Wno-variadic-macros -Wshadow${FLAGS_PLATFORM_CXX} ${SBLD_EXTRA_CFLAGS} -DDGCODE_USEPYBIND11")
+set(SBLD_GLOBAL_COMPILE_FLAGS_C "${FLAG_PEDANTIC}-std=c99 -Wextra${FLAGS_PLATFORM_C} ${FLAG_WERROR}-Wall ${SBLD_EXTRA_CFLAGS}")
 
 
-set(DG_GLOBAL_COMPILE_FLAGS_Fortran "")
-set(DG_GLOBAL_LINK_FLAGS "${DG_EXTRA_LDFLAGS}")
-set(DG_GLOBAL_LINK_FLAGS_PREPENDED "")
+set(SBLD_GLOBAL_COMPILE_FLAGS_Fortran "")
+set(SBLD_GLOBAL_LINK_FLAGS "${SBLD_EXTRA_LDFLAGS}")
+set(SBLD_GLOBAL_LINK_FLAGS_PREPENDED "")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   #Ubuntu has --as-needed by default and GCC, so we overrule this (prepended, before specific libs appear on the link cmd):
-  set(DG_GLOBAL_LINK_FLAGS_PREPENDED "-Wl,--no-as-needed")
+  set(SBLD_GLOBAL_LINK_FLAGS_PREPENDED "-Wl,--no-as-needed")
   #With GCC we can (since v4.6) make sure the compiler stops after after a few
   #errors, which is a bit more friendly for most users:
-  set(DG_GLOBAL_COMPILE_FLAGS_CXX "${DG_GLOBAL_COMPILE_FLAGS_CXX} -fmax-errors=3")
-  set(DG_GLOBAL_COMPILE_FLAGS_C "${DG_GLOBAL_COMPILE_FLAGS_C} -fmax-errors=3")
+  set(SBLD_GLOBAL_COMPILE_FLAGS_CXX "${SBLD_GLOBAL_COMPILE_FLAGS_CXX} -fmax-errors=3")
+  set(SBLD_GLOBAL_COMPILE_FLAGS_C "${SBLD_GLOBAL_COMPILE_FLAGS_C} -fmax-errors=3")
 endif()
 
 #To be filled with versions of global ext deps (Python):
-set(DG_GLOBAL_VERSION_DEPS_CXX "")
-set(DG_GLOBAL_VERSION_DEPS_C "")
-set(DG_GLOBAL_VERSION_DEPS_Fortran "")
+set(SBLD_GLOBAL_VERSION_DEPS_CXX "")
+set(SBLD_GLOBAL_VERSION_DEPS_C "")
+set(SBLD_GLOBAL_VERSION_DEPS_Fortran "")
 
 include("Utils.cmake")
 include("Detect.cmake")

@@ -13,8 +13,8 @@ include("ExtDep_pybind11.cmake")
 cmake_policy(POP)
 
 #Declare include dirs added above as -isystem (and remove /usr/include):
-declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_CXX)
-declare_includes_as_system_headers(DG_GLOBAL_COMPILE_FLAGS_C)
+declare_includes_as_system_headers(SBLD_GLOBAL_COMPILE_FLAGS_CXX)
+declare_includes_as_system_headers(SBLD_GLOBAL_COMPILE_FLAGS_C)
 
 #####################################################################
 ###   Optional dependencies which if absent causes parts of our   ###
@@ -45,18 +45,18 @@ foreach(extdep ${extdep_all})
     set(HAS_${extdep} "pending")
 endforeach()
 
-string(REPLACE ":" ";" DG_ACTUALLY_USED_EXTDEPS "${DG_ACTUALLY_USED_EXTDEPS}")
+string(REPLACE ":" ";" SBLD_ACTUALLY_USED_EXTDEPS "${SBLD_ACTUALLY_USED_EXTDEPS}")
 
-#Make sure the DG_ACTUALLY_USED_EXTDEPS are first in the list, since they might
+#Make sure the SBLD_ACTUALLY_USED_EXTDEPS are first in the list, since they might
 #activate other not directly used extdeps via the EXTDEPS_WAITS_FOR variable
 #(e.g. Garfield might activate ROOT):
-foreach( tmp ${DG_ACTUALLY_USED_EXTDEPS} )
+foreach( tmp ${SBLD_ACTUALLY_USED_EXTDEPS} )
   if ( NOT "${tmp}" IN_LIST extdep_pending )
     message( FATAL_ERROR "Unknown external dependency specified in pkg.info file: \"${tmp}\"" )
   endif()
   list(REMOVE_ITEM extdep_pending ${tmp})
 endforeach()
-list( PREPEND extdep_pending ${DG_ACTUALLY_USED_EXTDEPS} )
+list( PREPEND extdep_pending ${SBLD_ACTUALLY_USED_EXTDEPS} )
 
 while(extdep_pending)
   list(GET extdep_pending 0 extdep)
@@ -66,7 +66,7 @@ while(extdep_pending)
   if ( NOT "x${${extdep}}" STREQUAL "x"  AND NOT "${${extdep}}" )
     set(HAS_${extdep} 0)
     message( STATUS "Skipping since this dependency was explicitly disabled")
-  elseif( NOT "${extdep}" IN_LIST DG_ACTUALLY_USED_EXTDEPS )
+  elseif( NOT "${extdep}" IN_LIST SBLD_ACTUALLY_USED_EXTDEPS )
     set(HAS_${extdep} 0)
     message( STATUS "Skipping since no active packages require this dependency")
   else()
@@ -74,7 +74,7 @@ while(extdep_pending)
     set( EXTDEPS_WAITS_FOR "")
     include(optional/ExtDep_${extdep}.cmake)
     if ( EXTDEPS_WAITS_FOR )
-      list( APPEND DG_ACTUALLY_USED_EXTDEPS ${EXTDEPS_WAITS_FOR} )
+      list( APPEND SBLD_ACTUALLY_USED_EXTDEPS ${EXTDEPS_WAITS_FOR} )
     endif()
     cmake_policy(POP)
   endif()
@@ -114,7 +114,7 @@ while(extdep_pending)
       set(ExtDep_${extdep}_COMPILE_FLAGS "")
       message( STATUS "Checking for ${extdep} installation -- yes")
       message( STATUS "Found ${extdep} version: ${ExtDep_${extdep}_VERSION}")
-      if (DG_VERBOSE)
+      if (SBLD_VERBOSE)
         message( STATUS "${extdep} link flags: ${ExtDep_${extdep}_LINK_FLAGS}")
         message( STATUS "${extdep} compile flags (C++ only): ${ExtDep_${extdep}_COMPILE_FLAGS_CXX}")
         message( STATUS "${extdep} compile flags (C/others): ${ExtDep_${extdep}_COMPILE_FLAGS_C}")

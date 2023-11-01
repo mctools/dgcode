@@ -19,7 +19,7 @@ function( extract_extdep_flags language find_package_arg_list deptargets_list cm
       endif()
     endforeach()
   endif()
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     string( JOIN " " tmp ${cmd} )
     message( STATUS "About to execute: ${tmp}" )
   endif()

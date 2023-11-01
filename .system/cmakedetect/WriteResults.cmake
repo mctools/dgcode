@@ -1,7 +1,7 @@
 #Just before writing, we also decodes all the link flags (here for global
 #variables and further below for each extdep):
-decode_link_options( "${DG_GLOBAL_LINK_FLAGS}" CXX DG_GLOBAL_LINK_FLAGS )
-decode_link_options( "${DG_GLOBAL_LINK_FLAGS_PREPENDED}" CXX DG_GLOBAL_LINK_FLAGS_PREPENDED )
+decode_link_options( "${SBLD_GLOBAL_LINK_FLAGS}" CXX SBLD_GLOBAL_LINK_FLAGS )
+decode_link_options( "${SBLD_GLOBAL_LINK_FLAGS_PREPENDED}" CXX SBLD_GLOBAL_LINK_FLAGS_PREPENDED )
 foreach( lang C CXX Fortran )
   decode_link_options( "${CMAKE_${lang}_EXECLINK_FLAGS}" ${lang} CMAKE_${lang}_EXECLINK_FLAGS )
   decode_link_options( "${CMAKE_${lang}_LINK_FLAGS}" ${lang} CMAKE_${lang}_EXECLINK_FLAGS )
@@ -52,7 +52,7 @@ foreach(lang ${tmplangs})
   string(REPLACE "\n" ";" TMPL "${TMPL}")
   file(${oa} "VAR@${}CMAKE_${lang}_COMPILER_VERSION_SHORT@${CMAKE_${lang}_COMPILER_ID}/${TMPS}\n")
   file(${oa} "VAR@${}CMAKE_${lang}_COMPILER_VERSION_LONG@${TMPL}\n")
-  file(${oa} "VAR@${}DG_GLOBAL_VERSION_DEPS_${lang}@${DG_GLOBAL_VERSION_DEPS_${lang}}\n")
+  file(${oa} "VAR@${}SBLD_GLOBAL_VERSION_DEPS_${lang}@${SBLD_GLOBAL_VERSION_DEPS_${lang}}\n")
 endforeach()
 
 file(${oa} "VAR@${}CMAKE_CXX_FLAGS@${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}\n")
@@ -66,14 +66,14 @@ file(${oa} "VAR@${}CMAKE_CXX_LINK_FLAGS@${CMAKE_CXX_LINK_FLAGS}\n")
 file(${oa} "VAR@${}CMAKE_C_LINK_FLAGS@${CMAKE_C_LINK_FLAGS} -lm\n")#libstdc++ drags in libm, but in C it might be missing
 file(${oa} "VAR@${}CMAKE_Fortran_LINK_FLAGS@${CMAKE_Fortran_LINK_FLAGS}\n")
 
-file(${oa} "VAR@${}DG_GLOBAL_COMPILE_FLAGS_C@${DG_GLOBAL_COMPILE_FLAGS_C}\n")
-file(${oa} "VAR@${}DG_GLOBAL_COMPILE_FLAGS_CXX@${DG_GLOBAL_COMPILE_FLAGS_CXX}\n")
-file(${oa} "VAR@${}DG_GLOBAL_LINK_FLAGS@${DG_GLOBAL_LINK_FLAGS}\n")
-file(${oa} "VAR@${}DG_GLOBAL_LINK_FLAGS_PREPENDED@${DG_GLOBAL_LINK_FLAGS_PREPENDED}\n")
+file(${oa} "VAR@${}SBLD_GLOBAL_COMPILE_FLAGS_C@${SBLD_GLOBAL_COMPILE_FLAGS_C}\n")
+file(${oa} "VAR@${}SBLD_GLOBAL_COMPILE_FLAGS_CXX@${SBLD_GLOBAL_COMPILE_FLAGS_CXX}\n")
+file(${oa} "VAR@${}SBLD_GLOBAL_LINK_FLAGS@${SBLD_GLOBAL_LINK_FLAGS}\n")
+file(${oa} "VAR@${}SBLD_GLOBAL_LINK_FLAGS_PREPENDED@${SBLD_GLOBAL_LINK_FLAGS_PREPENDED}\n")
 
-file(${oa} "VAR@${}DG_EXTRA_LDLIBPATHS@${DG_EXTRA_LDLIBPATHS}\n")
-file(${oa} "VAR@${}DG_EXTRA_PATHS@${DG_EXTRA_PATHS}\n")
-file(${oa} "VAR@${}DG_LIBS_TO_SYMLINK@${DG_LIBS_TO_SYMLINK}\n")
+file(${oa} "VAR@${}SBLD_EXTRA_LDLIBPATHS@${SBLD_EXTRA_LDLIBPATHS}\n")
+file(${oa} "VAR@${}SBLD_EXTRA_PATHS@${SBLD_EXTRA_PATHS}\n")
+file(${oa} "VAR@${}SBLD_LIBS_TO_SYMLINK@${SBLD_LIBS_TO_SYMLINK}\n")
 
 #quick and dirty, not very portable, just enough (hopefully?) for osx/linux/clang/gcc:
 if ( DEFINED CMAKE_SHARED_LIBRARY_RPATH_LINK_C_FLAG

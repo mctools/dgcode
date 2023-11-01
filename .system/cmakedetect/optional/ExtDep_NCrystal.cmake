@@ -15,7 +15,7 @@ function(
 
   set( ${resvar_found} 0 PARENT_SCOPE )
   set( cmd ncrystal-config --show cmakedir )
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     string( JOIN " " tmp ${cmd} )
     message( STATUS "Invoking:" ${tmp})
   else()
@@ -30,7 +30,7 @@ function(
     return()
   endif()
   set( findpkgargs NCrystal 3.7.1 NO_MODULE NO_DEFAULT_PATH )#TODO: If found but version is too old, and in conda, provide conda command for updating ncrystal version.
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     message( STATUS "Found NCrystal_DIR=${NCrystal_DIR}")
     string( JOIN " " tmp ${findpkgargs} )
     message( STATUS "Trying to invoke find_package( ${tmp} )." )
@@ -39,19 +39,19 @@ function(
   find_package( ${findpkgargs} )
   set( NCrystal_DIR "${preserve_NCrystal_DIR}" )
   if ( NOT NCrystal_FOUND )
-    if ( DG_VERBOSE )
+    if ( SBLD_VERBOSE )
       message( STATUS "The find_package call failed.")
     endif()
     return()
   endif()
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     message( STATUS "Now trying to detect CXX settings for NCrystal.")
   endif()
   extract_extdep_flags(
     CXX "${findpkgargs}" "NCrystal::NCrystal" "-DNCrystal_DIR=${NCrystal_DIR}"
     ncrystal_cxx_cflags ncrystal_cxx_linkflags
     )
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     message( STATUS "Now trying to detect C settings for NCrystal.")
   endif()
   extract_extdep_flags(

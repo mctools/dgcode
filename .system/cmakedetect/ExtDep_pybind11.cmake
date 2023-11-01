@@ -6,7 +6,7 @@ function( detect_system_pybind11
     resvar_version
     )
   set( cmd "${Python_EXECUTABLE}" -mpybind11 --cmakedir )
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     string( JOIN " " tmp ${cmd} )
     message( STATUS "Invoking:" ${tmp})
   else()
@@ -20,12 +20,12 @@ function( detect_system_pybind11
   if ( NOT "x${cmd_exitcode}" STREQUAL "x0" )
     message( FATAL_ERROR "Could not find pybind11." )
   endif()
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     message( STATUS "Found pybind11_DIR=${pybind11_DIR}")
   endif()
 
   set( cmd "${Python_EXECUTABLE}" -mpybind11 --version )
-  if ( DG_VERBOSE )
+  if ( SBLD_VERBOSE )
     string( JOIN " " tmp ${cmd} )
     message( STATUS "Invoking:" ${tmp})
   else()
@@ -66,12 +66,12 @@ detect_system_pybind11(
 
 message( STATUS "Found pybind11 version ${PYBIND11_VERSION}")
 
-if ( DG_VERBOSE )
+if ( SBLD_VERBOSE )
   message( STATUS "pybind11 compilation flags (embed): ${PYBIND11_EMBED_CFLAGS_LIST} " )
   message( STATUS "pybind11 link flags (embed): ${PYBIND11_EMBED_LINKFLAGS_LIST} " )
   message( STATUS "pybind11 compilation flags (module): ${PYBIND11_MODULE_CFLAGS_LIST} " )
   message( STATUS "pybind11 link flags (module): ${PYBIND11_MODULE_LINKFLAGS_LIST} " )
 endif()
 
-list(APPEND DG_GLOBAL_VERSION_DEPS_CXX "pybind11##${PYBIND11_VERSION}")
-list(APPEND DG_GLOBAL_VERSION_DEPS_C "pybind11##${PYBIND11_VERSION}")
+list(APPEND SBLD_GLOBAL_VERSION_DEPS_CXX "pybind11##${PYBIND11_VERSION}")
+list(APPEND SBLD_GLOBAL_VERSION_DEPS_C "pybind11##${PYBIND11_VERSION}")

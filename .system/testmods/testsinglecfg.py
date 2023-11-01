@@ -12,11 +12,11 @@ def main( verbose = True ):
     except TypeError as e:
         assert 'direct initialisation disallowed' in str(e).lower()
     class FakeModule:
-        def dgbuild_bundle_name( self ):
-            return 'mystuff'
-        def dgbuild_bundle_pkgroot( self ):
+        def dgbuild_bundle_list( self ):
             import pathlib
-            return pathlib.Path('/tmp/no/where/does/not/exist')
+            return pathlib.Path('/tmp/no/where/does/not/exist/simplebuild.cfg')
+        #return 'mystuff'
+        #def dgbuild_bundle_pkgroot( self ):
 
     SingleCfg.create_from_object_methods( FakeModule(), ignore_build = True )
     class FakeModule2:

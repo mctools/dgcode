@@ -5,7 +5,7 @@ set(autoreconf_bin_OSG "osgversion")
 #Or when one of these vars changed:
 set(autoreconf_env_OSG "OSGDIR;OSG_DIR;OSG_ROOT")
 
-if (NOT DG_VERBOSE)
+if (NOT SBLD_VERBOSE)
   set(OpenSceneGraph_FIND_QUIETLY ON)
 endif()
 

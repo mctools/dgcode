@@ -24,14 +24,14 @@
 #  define __STDC_FORMAT_MACROS
 #endif
 
-#ifdef do_xstringify
-#  undefine do_xstringify
+#ifdef sbld_xstringify
+#  undefine sbld_xstringify
 #endif
-#ifdef do_stringify
-#  undefine do_stringify
+#ifdef sbld_stringify
+#  undefine sbld_stringify
 #endif
-#define dg_xstringify(s) #s
-#define dg_stringify(s) dg_xstringify(s)
+#define sbld_xstringify(s) #s
+#define sbld_stringify(s) sbld_xstringify(s)
 
 #include <pybind11/pybind11.h>
 namespace py = pybind11;

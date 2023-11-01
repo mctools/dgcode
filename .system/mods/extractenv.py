@@ -86,15 +86,15 @@ def parse(filename):
             lvars['compiler'] = cmakevars['CMAKE_%s_COMPILER'%lang]
             lvars['compiler_version_long'] = cmakevars['CMAKE_%s_COMPILER_VERSION_LONG'%lang]
             lvars['compiler_version_short'] = cmakevars['CMAKE_%s_COMPILER_VERSION_SHORT'%lang]
-            lvars['dep_versions'] = cmakevars['DG_GLOBAL_VERSION_DEPS_%s'%lang]
-            cflags = ' '.join([cmakevars['CMAKE_%s_FLAGS'%lang],cmakevars.get('DG_GLOBAL_COMPILE_FLAGS_%s'%lang,'')])
+            lvars['dep_versions'] = cmakevars['SBLD_GLOBAL_VERSION_DEPS_%s'%lang]
+            cflags = ' '.join([cmakevars['CMAKE_%s_FLAGS'%lang],cmakevars.get('SBLD_GLOBAL_COMPILE_FLAGS_%s'%lang,'')])
             if lang=='C':
                 cflags = ' '.join([c for c in cflags.split() if not c.startswith('-std=c++')])
             elif lang=='CXX':
                 cflags = ' '.join([c for c in cflags.split() if not (c.startswith('-std=c') and not c.startswith('-std=c++'))])
             lvars['cflags'] = cflags
-            lvars['ldflags_prepend'] = cmakevars.get('DG_GLOBAL_LINK_FLAGS_PREPENDED','')
-            lvars['ldflags'] = ' '.join([cmakevars['CMAKE_%s_LINK_FLAGS'%lang],cmakevars.get('DG_GLOBAL_LINK_FLAGS','')])
+            lvars['ldflags_prepend'] = cmakevars.get('SBLD_GLOBAL_LINK_FLAGS_PREPENDED','')
+            lvars['ldflags'] = ' '.join([cmakevars['CMAKE_%s_LINK_FLAGS'%lang],cmakevars.get('SBLD_GLOBAL_LINK_FLAGS','')])
             lvars['name_obj'] = '%s'+cmakevars['CMAKE_%s_OUTPUT_EXTENSION'%lang]
             lvars['name_lib'] = cmakevars['CMAKE_SHARED_LIBRARY_PREFIX']+'%s'+cmakevars['CMAKE_SHARED_LIBRARY_SUFFIX']
             lvars['name_exe'] = '%s'
@@ -126,9 +126,9 @@ def parse(filename):
     sysvars['volatile'] = dict((lang,dict((k,v) for k,v in info.items() if k not in non_volatile)) for lang,info in sysvars['langs'].items())
     sysvars['volatile']['sysgeneral'] = dict( (k,v) for k,v in sorted(sysvars['general'].items()) )
 
-    sysvars['runtime']={'extra_lib_path':[e for e in cmakevars['DG_EXTRA_LDLIBPATHS'].split(';') if e],
-                        'extra_bin_path':[e for e in cmakevars['DG_EXTRA_PATHS'].split(';') if e],
-                        'libs_to_symlink':[e for e in cmakevars['DG_LIBS_TO_SYMLINK'].split(';') if e]}
+    sysvars['runtime']={'extra_lib_path':[e for e in cmakevars['SBLD_EXTRA_LDLIBPATHS'].split(';') if e],
+                        'extra_bin_path':[e for e in cmakevars['SBLD_EXTRA_PATHS'].split(';') if e],
+                        'libs_to_symlink':[e for e in cmakevars['SBLD_LIBS_TO_SYMLINK'].split(';') if e]}
 
     autoreconf={}
     autoreconf['bin_list'] = cmakevars['autoreconf_bin_list']
@@ -155,9 +155,9 @@ def extractenv(tmpdir,cmakedir,*,cmakeargs,actually_needed_extdeps,quiet=True,ve
     t0 = time.time()
     ec = utils.system("cd %s/cmake/ && cmake%s%s%s%s %s %s%s"%(tmpdir,
                                                                general_cmake_args,
-                                                               ' -DDG_QUIET=1' if quiet else '',
-                                                               ' -DDG_VERBOSE=1' if verbose else '',
-                                                               ' -DDG_ACTUALLY_USED_EXTDEPS=%s'%(':'.join(actually_needed_extdeps)),
+                                                               ' -DSBLD_QUIET=1' if quiet else '',
+                                                               ' -DSBLD_VERBOSE=1' if verbose else '',
+                                                               ' -DSBLD_ACTUALLY_USED_EXTDEPS=%s'%(':'.join(actually_needed_extdeps)),
                                                                ' '.join('-D'+a for a in cmakeargs),
                                                                cmakedir,
                                                                capture))

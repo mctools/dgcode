@@ -257,6 +257,10 @@ def _generate_toml_schema():
                                    #To use regular expressions rather than shell globbing (fnmatch), prefix the filter with "RE::"
 
                                    extdep_ignore = (decode_is_list_of_valid_identifier_string,[]),
+                                   cmake_flags = (decode_is_list_of_nonempty_str,[]),
+                                   extra_cflags = (decode_is_list_of_nonempty_str,[]),
+                                   extra_linkflags = (decode_is_list_of_nonempty_str,[]),
+                                   relaxed_compilation = (decode_is_bool,False),
                                   ),
                 )
 

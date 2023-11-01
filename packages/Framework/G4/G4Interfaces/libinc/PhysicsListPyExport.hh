@@ -37,9 +37,9 @@ namespace PhysicsListPyExport {
   py::class_<T> exportPhysList( py::module_ themod )
   {
     //remember, if not using gcc, __GNUCC__ will evaluate to 0 (we want to exclude gcc <= 4.5)
-    if ( strncmp("g4physlist_",dg_stringify(PYMODNAME),11)!=0 )
+    if ( strncmp("g4physlist_",sbld_stringify(PYMODNAME),11)!=0 )
       throw std::runtime_error("ERROR: Names of python modules containing G4 physics lists must all be prefixed with g4physlist_");
-    std::string bstr = dg_stringify(PYMODNAME);
+    std::string bstr = sbld_stringify(PYMODNAME);
     const char * class_name = &bstr[11];
 
     pyextra::pyimport("G4Interfaces");

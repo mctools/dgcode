@@ -25,5 +25,5 @@ if ( NOT "x${tmp_python_exec_found}" STREQUAL "x${tmp_python_exec_in_path}" )
   message( FATAL_ERROR "CMake found a different Python interpreter (${tmp_python_exec_found}) than the python3 one in the path (${tmp_python_exec_in_path}).")
 endif()
 
-list(APPEND DG_GLOBAL_VERSION_DEPS_CXX "Python##${PYTHON_VERSION_STRING}")
-list(APPEND DG_GLOBAL_VERSION_DEPS_C "Python##${PYTHON_VERSION_STRING}")
+list(APPEND SBLD_GLOBAL_VERSION_DEPS_CXX "Python##${PYTHON_VERSION_STRING}")
+list(APPEND SBLD_GLOBAL_VERSION_DEPS_C "Python##${PYTHON_VERSION_STRING}")

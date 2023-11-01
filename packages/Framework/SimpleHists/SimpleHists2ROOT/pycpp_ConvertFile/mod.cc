@@ -23,7 +23,7 @@ PYTHON_MODULE3
   mod.doc() =
     "Python module providing the convertToROOTFile functions from"
     " Convert.hh. If the convertToROOT functions are needed, one"
-    " must use the sister module " dg_stringify(PACKAGE_NAME) ".Convert instead.";
+    " must use the sister module " sbld_stringify(PACKAGE_NAME) ".Convert instead.";
   mod.def("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_hc);
   mod.def("convertToROOTFile",&SimpleHists_pycppcf::convertToROOTFile_fn);
 }
