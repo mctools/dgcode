@@ -218,7 +218,7 @@ def _generate_toml_schema():
 
     def decode_dir( ctx : TOMLSchemaDecodeContext, item ):
         if isinstance( item, pathlib.Path ):
-            #special case, for simple python plugins which already returns Path's rather than str's (fixme: no longer needed?)
+            #special case (likely no longer needed, for sources which already provides Path's rather than str's)
             p = item
             item = str(item)
         else:

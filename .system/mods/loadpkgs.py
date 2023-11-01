@@ -349,7 +349,7 @@ class PackageLoader:
         Locates package directories and inits wrapper Package objects for each.
         It will respect select_pkg_filter or exclude_pkg_filter and attempt to be
         economical about loading the package configuration files. Filters will
-        receive package reldirname and basename as input.' #FIXME Milan
+        receive package reldirname and basename as input.'
         """
         #use load_all to (inefficiently) load all cfg info even when select filter is set (to produce pkg graphs)
 
