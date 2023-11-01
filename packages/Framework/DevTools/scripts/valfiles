@@ -4,7 +4,7 @@
 
 import pathlib
 import os
-import dgbuild.cfg as cfg
+import simplebuild.cfg as cfg
 pkgs = cfg.pkgs
 
 topdirs = cfg.dirs.pkgsearchpath

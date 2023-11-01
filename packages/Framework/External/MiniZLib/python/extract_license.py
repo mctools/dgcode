@@ -1,5 +1,5 @@
 from pathlib import Path
-import dgbuild.cfg as cfg
+import simplebuild.cfg as cfg
 
 def extract_zlib_license():
     zlib_h=Path(cfg.pkgs['MiniZLib']['dirname']) / 'libinc/zlib.h'

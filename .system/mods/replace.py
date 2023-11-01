@@ -35,7 +35,6 @@ def replacefile(filename,printname,search_pattern,replace_pattern):
     return n
 
 def replace(pkg,search_pattern,replace_pattern):
-    assert not pkg.isdynamicpkg
     n=0
     for f in pkgfiles(pkg):
         n+=replacefile(pjoin(pkg.dirname,f),pjoin(pkg.name,f),search_pattern,replace_pattern)

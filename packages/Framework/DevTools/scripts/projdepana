@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 
-import dgbuild.cfg
+
+import simplebuild.cfg
 import pathlib
 
 AbsPath = lambda p : pathlib.Path(p).expanduser().resolve().absolute()
 
 def pkgs_in_dir(p):
     p=AbsPath(p)
-    for pkgname,info in sorted(dgbuild.cfg.pkgs.items()):
+    for pkgname,info in sorted(simplebuild.cfg.pkgs.items()):
         dn=AbsPath(info['dirname'])
         if ( p == dn ) or ( p in dn.parents ):
             yield pkgname,info
 
 def find_project_topdir(projectName):
-    for p in dgbuild.cfg.dirs.pkgsearchpath:
-        if p == dgbuild.cfg.dirs.fmwkdir:
-            continue
+    for p in simplebuild.cfg.dirs.pkgsearchpath:
         if ( p / projectName ).is_dir():
             return p / projectName
 
@@ -30,11 +29,11 @@ def filter_pkgs_exclude_dirs( pkginfos, excluded_dirs ):
             yield info
 
 def analyse_project(projectName):
-    cfg = dgbuild.cfg
+    cfg = simplebuild.cfg
     projtopdir = find_project_topdir(projectName)
     if not projtopdir:
         raise RuntimeError(f'Project topdirectory for project named "{projectName}" not found.')
-    exclude_dirs = [ projtopdir, cfg.dirs.fmwkdir ]
+    exclude_dirs = [ projtopdir ]
 
     for pkgname,info in pkgs_in_dir(projtopdir):
         clients = [ cfg.pkgs[name] for name in info.get('clients_direct',[]) ]

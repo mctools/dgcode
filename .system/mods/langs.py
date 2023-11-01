@@ -9,10 +9,10 @@ srcext2lang={}
 hdrext2lang={}
 for lang,exts in conf.lang_extensions.items():
     for hext in exts[0]:
-        assert not hext in hdrext2lang
+        assert hext not in hdrext2lang
         hdrext2lang['.'+hext]=lang
     for sext in exts[1]:
-        assert not sext in srcext2lang
+        assert sext not in srcext2lang
         srcext2lang['.'+sext]=lang
 
 assert set(srcext2lang.keys()).isdisjoint(set(hdrext2lang.keys()))

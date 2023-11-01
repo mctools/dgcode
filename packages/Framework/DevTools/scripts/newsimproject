@@ -7,7 +7,7 @@ import argparse
 import pathlib
 import os
 import copy
-import dgbuild.cfg as cfg
+import simplebuild.cfg as cfg
 
 normpath_or_none = lambda p : (PU.normpath(p) if p else None)
 legacy_mode = not hasattr(cfg.dirs,'projdir')

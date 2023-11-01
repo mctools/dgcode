@@ -50,8 +50,6 @@ def grepfile(filename,pattern,color=None):
 
 #TODO to dirs.py ?:
 def pkgdir_for_search(pkg,*subpath):
-    if pkg.isdynamicpkg and pkg.enabled:
-        return dirs.pkg_dir(pkg,*subpath)#look in dynamic content
     return os.path.join(pkg.dirname,*subpath)
 
 def pkgfiles(pkg):
@@ -72,9 +70,6 @@ def grep(pkg,pattern,countonly=False):
     for f in pkgfiles(pkg):
         pdir=pkgdir_for_search(pkg)
         ff=pjoin(pdir,f)
-        if pkg.isdynamicpkg and os.path.islink(ff) and os.path.exists(ff):
-            ff=os.path.realpath(ff)
-            pdir=os.path.dirname(ff)
         for linenum,line in grepfile(ff,pattern,color=None if countonly else col.grep_match):
             if not countonly:
                 pkgdir=os.path.relpath(pdir)

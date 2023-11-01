@@ -192,7 +192,7 @@ def _generate_toml_schema():
             if not len(parts)>=2:
                 error.error(f'Invalid value "{e}" for list entry #{idx+1} in item {ctx.item_name} (expected format like "VARNAME:<install>/SUBDIRNAME" but got "{e}") in {ctx.src_descr}')
             varname, install_subdirnames = parts[0],parts[1:]
-            if not varname in res:
+            if varname not in res:
                 res[varname] = set()
             res[varname].update(install_subdirnames)
         return res

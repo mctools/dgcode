@@ -24,12 +24,13 @@ runnable_prefix = 'sb_'
 print_prefix_name = 'simplebuild'
 print_prefix = f'{print_prefix_name}: '
 quiet = False#might be overridden by a cal to make_quiet
-_printfcts = [print]
+_printfct = [print]
 def print( *args, **kwargs ):
-    _printfcts[0]( print_prefix, *args, **kwargs )
+    _printfct[0]( print_prefix, *args, **kwargs )
 def print_no_prefix( *args, **kwargs ):
-    _printfcts[0]( *args, **kwargs )
+    _printfct[0]( *args, **kwargs )
 def make_quiet():
+    global quiet
     if not quiet:
         quiet = True
         _printfct[0] = lambda *args, **kwargs : None

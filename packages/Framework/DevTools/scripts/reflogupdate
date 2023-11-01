@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os,sys,random,string,time,shutil,glob,filecmp
 import Core.System as Sys
-import dgbuild.cfg as cfg
+import simplebuild.cfg as cfg
 
 def find_reflog(command):
     rl = os.path.join(cfg.dirs.testrefdir,'%s.log'%command)

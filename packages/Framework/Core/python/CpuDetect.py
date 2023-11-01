@@ -6,8 +6,8 @@ def get_n_cores(prefix=''):
     if os.path.exists('/proc/cpuinfo'):
         #linux
         n=0
-        for l in open('/proc/cpuinfo'):
-            if l.startswith('processor') and l.split()[0:2]==['processor',':']:
+        for line in open('/proc/cpuinfo'):
+            if line.startswith('processor') and line.split()[0:2]==['processor',':']:
                 n+=1
         if not n:
             print(prefix+'Warning: Could not determine number of processors. Assuming just one present (override with -jN)')

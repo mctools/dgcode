@@ -69,7 +69,7 @@ def abort_if_unclean( specific_paths = None, allow_untracked = False ):
         raise SystemExit(f'Aborting since git reports the following unclean file: {f}')
 
 def abort_if_pkg_unclean( pkg_name ):
-    from dgbuild.cfg import pkgs
+    from simplebuild.cfg import pkgs
     if is_unclean( [pkgs[pkg_name]['dirname']] ):
         raise SystemExit(f'Aborting since git reports unclean files in the package {pkg_name}')
 

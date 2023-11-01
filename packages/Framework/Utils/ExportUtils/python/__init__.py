@@ -5,7 +5,7 @@ sources and monitor which files we depend on (for extraction of git commit id).
 import Core.System as Sys
 import Utils.GitUtils
 import os,sys,shutil,datetime
-import dgbuild.cfg as cfg
+import simplebuild.cfg as cfg
 legacy_mode = not hasattr(cfg.dirs,'projdir')
 
 import pathlib

@@ -213,7 +213,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         (opt, args) = parser.parse_args(argv[1:])
         for a in args:
             t=a.split('=',1)
-            if len(t)==2 and t[0] and not ' ' in t[0]:
+            if len(t)==2 and t[0] and ' ' not in t[0]:
                 if t[0] in new_cfgvars:
                     parser.error('Configuration variable %s supplied multiple times'%t[0])
                 new_cfgvars[t[0]]=t[1]
@@ -263,7 +263,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
               if not projs:
                   extra=extra[:-1]#remove comma
               new_cfgvars['ONLY']='%s%s'%(extra,','.join('Projects::%s*'%p for p in projs))
-              if not 'NOT' in new_cfgvars:
+              if 'NOT' not in new_cfgvars:
                   new_cfgvars['NOT']=''
 
         #if opt.pkgs and opt.enableall:
@@ -286,7 +286,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
                 parser.error('Do not set ONLY=... variable when supplying --all flag')
             #if 'NOT' in new_cfgvars:
             #    parser.error('Do not set NOT=... variable when supplying --all flag')
-            if not 'NOT' in new_cfgvars:
+            if 'NOT' not in new_cfgvars:
                 new_cfgvars['NOT']=''
             new_cfgvars['ONLY']='*'#this is how we make sure --all is remembered
 
@@ -395,14 +395,14 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
     #combine old and new config vars:
     cfgvars=dict((k,v) for k,v in new_cfgvars.items() if v)
     for k,v in old_cfgvars.items():
-        if not k in new_cfgvars:
+        if k not in new_cfgvars:
             cfgvars[k]=v
 
     #Make sure that if nothing is specified, we compile ALL packages,
     #or just Framework packages if project package selection is enabled (+ all extrapkgpath packages, if the path is set):
     if legacy_mode:
         pkg_selection_default = "*" if not proj_pkg_selection_enabled else ("Framework::*,Extra::*" if dirs.extrapkgpath else "Framework::*")
-        if not 'NOT' in cfgvars and not 'ONLY' in cfgvars: #and not opt.pkgs
+        if 'NOT' not in cfgvars and 'ONLY' not in cfgvars: #and not opt.pkgs
             cfgvars['ONLY'] = pkg_selection_default
 
     #Old check, we try to allow both variables now:
@@ -491,7 +491,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
         aliases = dirs.pkgdir_aliases
         def expand_alias(part):
-          if not '::' in part:
+          if '::' not in part:
             return [part]
           pkgdirAlias = part.split('::')[0].lower()
           subdirPattern = part.split('::')[1].lower()
@@ -513,7 +513,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         namepatterns = []
         dirpatterns = []
         for p in pattern_parts:
-          if not '/' in p:
+          if '/' not in p:
             namepatterns.append(re.compile(fnmatch.translate(p.lower())).match)
           elif p.startswith('/'):
             dirpatterns.append(re.compile(fnmatch.translate(p.lower())).match)
@@ -533,7 +533,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
     if legacy_mode:
         select_filter=create_filter(cfgvars['ONLY']) if 'ONLY' in cfgvars else None
         exclude_filter=create_filter(cfgvars['NOT']) if 'NOT' in cfgvars else None
-        cmakeargs=[shlex.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if not k in set(['ONLY','NOT'])]
+        cmakeargs=[shlex.quote('%s=%s'%(k,v)) for k,v in cfgvars.items() if k not in set(['ONLY','NOT'])]
         cmakeargs.sort()
     else:
         #fixme: cleanup variable usage after migration!
@@ -625,8 +625,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         print("\nReplacing all \"%s\" with \"%s\""%(search_pat,replace_pat))
         n = 0
         for pkg in qp:
-            if not pkg.isdynamicpkg:#TODO: Can we somehow support dynamic packages?
-                n+=replace.replace(pkg,search_pat,replace_pat)
+            n+=replace.replace(pkg,search_pat,replace_pat)
         print("\nPerformed %i replacements"%n)
         sys.exit(0)
 
@@ -890,7 +889,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
             print() # DGBUILD-NO-EXPORT
 
     if not opt.quiet:
-        if legacy_mode and cfgvars.get('ONLY','')=='Framework::*' and not 'NOT' in cfgvars:
+        if legacy_mode and cfgvars.get('ONLY','')=='Framework::*' and 'NOT' not in cfgvars:
             print("%sNote that only Framework packages were enabled by default:%s"%(col.bldmsg_notallselectwarn,col.end))
             print()
             print("%s  - To enable pkgs for a given project do: simplebuild -p<projectname>%s"%(col.bldmsg_notallselectwarn,col.end))

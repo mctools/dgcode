@@ -13,11 +13,7 @@ def find(pkg,pattern):
         f = pjoin(rd,flocal)
         if fnmatch.fnmatch(f.lower(),pattern):
             ff=os.path.relpath(pjoin(pkg.dirname,flocal))
-            if not pkg.isdynamicpkg or flocal==conf.package_cfg_file:
-                print('match:',ff)
-            else:
-                ffreal=os.path.relpath(os.path.realpath(pjoin(pkgdir_for_search(pkg),flocal)))
-                print('match in dynamic content: %s (real file is %s)'%(ff,ffreal))
+            print('match:',ff)
             n+=1
     return n
 

@@ -30,7 +30,7 @@ def parse_stdouterr(fh):
             if l.startswith('  '):
                 l=l.strip()
                 assert l
-                if not l in unused_vars:
+                if l not in unused_vars:
                    unused_vars.append( l )
                 continue
             else:
@@ -51,11 +51,11 @@ def parse(filename):
         if l[0]=='EXT':
             l[2:]=l[2].split('@',1)#can actually have 4 fields in this case, not just 3
             ext=l[1]
-            if not ext in extdeps:
+            if ext not in extdeps:
                 extdeps[ext]={}
             if l[2]=='PRESENT': extdeps[ext]['present']=bool(int(l[3]))
             elif l[2]=='LINK': extdeps[ext]['ldflags']=l[3]
-#            elif l[2]=='COMPILE': extdeps[ext]['cflags']=l[3]
+            #elif l[2]=='COMPILE': extdeps[ext]['cflags']=l[3]
             elif l[2]=='VERSION': extdeps[ext]['version']=l[3]
             elif l[2]=='COMPILE_CXX': extdeps[ext]['cflags_cxx']=l[3]
             elif l[2]=='COMPILE_C': extdeps[ext]['cflags_c']=l[3]
@@ -123,7 +123,7 @@ def parse(filename):
     #main Makefile and so changes in those will not need new package
     #makefiles):
     non_volatile=set(['cflags','ldflags','ldflags_prepend','compiler_version_long','compiler_version_short','dep_versions'])
-    sysvars['volatile'] = dict((lang,dict((k,v) for k,v in info.items() if not k in non_volatile)) for lang,info in sysvars['langs'].items())
+    sysvars['volatile'] = dict((lang,dict((k,v) for k,v in info.items() if k not in non_volatile)) for lang,info in sysvars['langs'].items())
     sysvars['volatile']['sysgeneral'] = dict( (k,v) for k,v in sorted(sysvars['general'].items()) )
 
     sysvars['runtime']={'extra_lib_path':[e for e in cmakevars['DG_EXTRA_LDLIBPATHS'].split(';') if e],

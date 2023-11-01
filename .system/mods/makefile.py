@@ -10,14 +10,14 @@ def _write_targets(fh,targets):
     cmdpat='\t${P}%s\n'
     for t in targets:
         tn=t.name
-        if not '/' in t.name: tn='${TRG}/%s'%tn
+        if '/' not in t.name: tn='${TRG}/%s'%tn
         l=['%s:'%tn]
         for dn in t.deps:
             l+=[dn if '/' in dn else '${TRG}/%s'%dn]
         fh.write('%s\n'%' '.join(l))
         for c in t.code:
             fh.write(cmdpat%c)
-        if not '/' in t.name:
+        if '/' not in t.name:
             fh.write(cmdpat%('touch %s'%tn))
         if False and not t.contains_message:
             fh.write('\t${P}echo Target %s done\n\n'%t.name)
@@ -38,7 +38,7 @@ def ldflags_to_rpath_dirs(ldflags):
             e=os.path.dirname(e)
         if e and e not in ignore and os.path.isdir(e):
             e=os.path.abspath(os.path.realpath(e))
-            if not e in res:
+            if e not in res:
                 res += [e]
     return res
 
@@ -97,7 +97,7 @@ def write_main(global_targets,enabled_pkgnames):
     block_cflags_for_exe = []
     block_cflags_for_shlib = ['-pie','-fPIE']
     def remove_flags(orig,blocked_flags):
-        return ' '.join(e for e in shlex.split(orig) if not e in blocked_flags)
+        return ' '.join(e for e in shlex.split(orig) if e not in blocked_flags)
 
     for lang,info in env.env['system']['langs'].items():
         if info:#info is only available for available languages:

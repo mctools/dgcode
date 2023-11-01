@@ -45,9 +45,6 @@ def find_includes(cfile,pkg):
             else:
                 possible_privincs.add(bytes2str(fn))
     if pkg.extra_include_deps:
-        if pkg.isdynamicpkg:
-            from . import error
-            error.error('EXTRA_INCDEPS not currently supported for dynamic packages')
         from os.path import relpath
         rp=relpath(cfile,pkg.dirname)#todo: this will have to be changed if we want to support dynamic packages (but perhaps we should rather obsolete the EXTRA_INCDEPS flag?)
         for fn0,incdep in pkg.extra_include_deps:

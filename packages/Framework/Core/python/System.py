@@ -1,4 +1,11 @@
-import os, errno, sys, subprocess, shutil, contextlib, tempfile
+import os
+import errno
+import sys
+import subprocess
+import shutil
+import contextlib
+import tempfile
+
 __all__ = [ 'quote', 'mkdir_p', 'chmod_x', 'rm_rf', 'rm_f', 'isemptydir', 'system',
             'system_throw', 'which', 'quote_cmd', 'recursive_find', 'remove_atexit' ]
 
@@ -101,7 +108,7 @@ def system(cmd,catch_output=False,env=None):
         try:
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,env=env)
             output = p.communicate()[0]
-        except:
+        except subprocess.CalledProcessError:
             #todo: in case of failure we should return the output as well!
             return 1,''
         return fixec(p.returncode),output

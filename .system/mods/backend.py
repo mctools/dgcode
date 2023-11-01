@@ -17,7 +17,6 @@ def perform_configuration(cmakeargs=[],
     from . import dirs
     from . import conf
     from . import error
-    from . import dynpkg
     from . import mtime
     from . import envcfg
     import pickle
@@ -193,8 +192,6 @@ def perform_configuration(cmakeargs=[],
     #        => Load pkg targets from pickle file (they still need to have setup() called).
     #   c) Timestamp of package itself changed.
     #        => Create targets for package from scratch.
-    #
-    #As part of this, all dynamic packages must be rebuilt when appropriate.
 
     ts=db.db['pkg2timestamp']
     rd=db.db['pkg2reldir']
@@ -207,47 +204,36 @@ def perform_configuration(cmakeargs=[],
             pkgdb_directextdeps[p.name] = set(e for e in p.direct_deps_extnames)
 
     #TODO: Implement the following for increased safety: We should first check
-    #all packages if they moved reldirname or changed isdynamicpkg value. Those
-    #packages all have to be nuked for safety, and if any packages are nuked,
-    #all must be reconfigured (updating a symlink is not enough, as it could be
-    #that the compiler reads the ultimate located of links and embeds the
-    #realpath in executables). Moving packages or changing isdynamicpkg flags
-    #should be rather rare, so best to be sure.
+    #all packages if they moved reldirname. Those packages all have to be nuked
+    #for safety, and if any packages are nuked, all must be reconfigured
+    #(updating a symlink is not enough, as it could be that the compiler reads
+    #the ultimate located of links and embeds the realpath in
+    #executables). Moving packages should be rather rare, so best to be sure.
 
     for p in pl.enabled_pkgs_iter():
         mt=mtime.mtime_pkg(p)
-        dynpkgbuilder = dynpkg.DynPkgBuilder(p) if p.isdynamicpkg else None
-        if dynpkgbuilder:
-            mt = max(mt,dynpkgbuilder.get_mtime_deps())
         if not ( ts.get(p.name,None) == mt ):
-            if dynpkgbuilder:
-                dynpkgbuilder.rebuild_dynamic_package(prefix)#NB: this removes any old pkgs/<pkgname> symlink in case package was just made dynamic.
             p.set_files_in_pkg_changed()
             ts[p.name]=mt
         if rd.get(p.name,None)!=p.reldirname:
             p.set_files_in_pkg_changed()#added adhoc for safety
-            if not p.isdynamicpkg:
-                #Make sure pkg symlink is in place (refering to the package in
-                #symlinked location allows users to move pkgs around). Dynamic
-                #packages already updated everything during the call to
-                #rebuild_dynamic_package above, but those that *used* to be
-                #dynamic but are now static, might have leftover a real
-                #directory with obsolete contents:
-                lt=dirs.pkg_dir(p)
-                if lt.is_dir() and not lt.is_symlink():
-                    assert utils.path_is_relative_to( lt, conf.build_dir() ) and ( conf.build_dir()/'.sbbuilddir' ).exists()
-                    shutil.rmtree( lt, ignore_errors=True)
-                else:
-                    lt.parent.mkdir( parents = True, exist_ok = True )
-                    if lt.is_symlink():
-                        lt.unlink()
-                    lt.symlink_to(p.dirname,target_is_directory=True)
+            #Make sure pkg symlink is in place (refering to the package in
+            #symlinked location, potentially allows users to move pkgs around).
+            lt=dirs.pkg_dir(p)
+            if lt.is_dir() and not lt.is_symlink():
+                assert utils.path_is_relative_to( lt, conf.build_dir() ) and ( conf.build_dir()/'.sbbuilddir' ).exists()
+                shutil.rmtree( lt, ignore_errors=True)
+            else:
+                lt.parent.mkdir( parents = True, exist_ok = True )
+                if lt.is_symlink():
+                    lt.unlink()
+                lt.symlink_to(p.dirname,target_is_directory=True)
             rd[p.name]=p.reldirname#ok to update immediately?
 
     def nuke_pkg(pkgname):
         conf.uninstall_package(pkgname)
         utils.rm_rf(dirs.pkg_cache_dir(pkgname))
-        utils.rm_rf(dirs.pkg_dir(pkgname))#remove link to pkg or dynamic package contents.
+        utils.rm_rf(dirs.pkg_dir(pkgname))#remove link to pkg
         nt=pipes.quote(os.path.join(dirs.blddir,'named_targets',pkgname))
         utils.system('rm -f %s %s_*'%(nt,nt))#Fixme: this is potentially
                                              #clashy... we should not use single

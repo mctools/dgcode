@@ -134,7 +134,7 @@ class TargetBinary(target_base.Target):
         rpath_pattern = langinfo['rpath_flag_lib' if shlib else 'rpath_flag_exe']
         def append_to_rpath( extra_flags, p ):
             extra_flags += [ rpath_pattern%str(p) ]
-            if langinfo['can_use_rpathlink_flag'] and '-rpath' in rpath_pattern and not '-rpath-link' in rpath_pattern:
+            if langinfo['can_use_rpathlink_flag'] and '-rpath' in rpath_pattern and '-rpath-link' not in rpath_pattern:
                 extra_flags += [ rpath_pattern.replace('-rpath','-rpath-link')%str(p) ]
         append_to_rpath( extra_flags, join('${INST}','lib') )
         append_to_rpath( extra_flags, join('${INST}','lib','links') )
@@ -221,7 +221,7 @@ def create_tfactory_binary(instsubdir=None,pkglib=False,shlib=False,allowed_lang
             assert len(langspresent)>1
             error.error("Files for multiple languages found in %s/%s"%(pkg.name,subdir))
         langspresent=langspresent.pop()
-        if not langspresent in allowed_langs:
+        if langspresent not in allowed_langs:
             error.error("Files of language '%s' found in %s/%s where only allowed languages are '%s'"%(langspresent,
                                                                                                        pkg.name,subdir,
                                                                                                        ';'.join(allowed_langs)))

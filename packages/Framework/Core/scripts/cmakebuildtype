@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from dgbuild.cfg import cmakeargs
+from simplebuild.cfg import cmakeargs
 bt=None
 s='-DCMAKE_BUILD_TYPE='
 for e in cmakeargs:

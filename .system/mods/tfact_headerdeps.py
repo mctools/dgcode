@@ -122,16 +122,16 @@ def tfactory_headerdeps(pkg,subdir):
         else:
             tgts+=[TargetIncDep_HeaderFileInGroup(pkg,subdir,hh,igroup)]
             if deps[0]:
-                if not igroup in igroup2priv: igroup2priv[igroup]=deps[0]
+                if igroup not in igroup2priv: igroup2priv[igroup]=deps[0]
                 else: igroup2priv[igroup].update(deps[0])
             if deps[1]:
-                if not igroup in igroup2pub: igroup2pub[igroup]=deps[1]
+                if igroup not in igroup2pub: igroup2pub[igroup]=deps[1]
                 else: igroup2pub[igroup].update(deps[1])
     for igroup,group in enumerate(circgroups):
         priv=igroup2priv.get(igroup,None)
         pub=igroup2pub.get(igroup,None)
         possible_privincs = hhs.difference(set(group))
         if pub and subdir=='libinc':
-            pub = [(p,f) for (p,f) in pub if not f in group]
+            pub = [(p,f) for (p,f) in pub if f not in group]
         tgts+=[TargetIncDep(pkg,subdir,group,pub,priv,possible_privincs,igroup)]
     return tgts

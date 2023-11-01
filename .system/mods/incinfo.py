@@ -15,7 +15,7 @@ def ccxx_files_in_dir(d):
     out=[]
     for f in os.listdir(d):
         if not conf.ignore_file(f):
-            if not path.splitext(f)[1] in ccxx_extensions:
+            if path.splitext(f)[1] not in ccxx_extensions:
                 continue
             f=path.join(d,f)
             if path.isdir(f):
@@ -28,9 +28,8 @@ def _printform(pkg,f,for_sortkey=False):
     assert f[0]==pkg.name
     if for_sortkey:
         return tuple(f)
-    return '%s%s/%s/%s%s%s'%(col.ok if pkg.enabled else col.bad,
-                             f[0],f[1],f[2],col.end,
-                             (' %s[dynamic]%s'%(col.inc_dynpkg,col.end) if pkg.isdynamicpkg else ''))
+    return '%s%s/%s/%s%s'%(col.ok if pkg.enabled else col.bad,
+                           f[0],f[1],f[2],col.end)
 
 def _rel_description(f,f2):
     f=path.dirname(f)
@@ -94,7 +93,7 @@ def collect_info(pkgloader,f):
     #collects info from single file and returns in dict.
     pkgname,subdir,fn = f.split(path.sep)[-3:]
     pkg = pkgloader.name2pkg.get(pkgname,None)
-    if not pkg:# used to have this but removed for dynpkgs: ... or not f.startswith(pkg.dirname):
+    if not pkg or not f.startswith(pkg.dirname):
         utils.err('File %s not located inside a package'%f)
     #find isheader,lang from extension:
     _,ext = path.splitext(f)
@@ -105,7 +104,7 @@ def collect_info(pkgloader,f):
         langs.srcext2lang.get(ext,None)
 
     lang = langs.srcext2lang.get(ext,langs.hdrext2lang.get(ext,None))
-    if not lang in ['cxx','c']:
+    if lang not in ['cxx','c']:
         utils.err('File %s not a C++ or C file'%f)
 
     nfo = dict(signature=(pkgname,subdir,fn),
@@ -183,7 +182,7 @@ def provide_info_multifiles(pkgloader,files):
     for key in ('includes_directly', 'includes_indirectly', 'is_included_by_directly', 'is_included_by_indirectly'):
         seen,l=set(),[]
         for nfo in nfos.values():
-            l += [v for v in nfo[key] if not v[1] in files_set and not (v in seen or seen.add(v))]#relies on seen.add returning None
+            l += [v for v in nfo[key] if v[1] not in files_set and not (v in seen or seen.add(v))]#relies on seen.add returning None
         merged_nfo[key] = l
     #print results
     nrelationships = 0
