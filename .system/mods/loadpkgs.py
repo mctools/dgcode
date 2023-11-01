@@ -1,14 +1,13 @@
 import os
+from pathlib import Path
 from . import dirs
 from . import langs
 from . import conf
 from . import error
+import re
 join=os.path.join
-
 ignore_dirs=set(['install'])
 forbidden_names = set([s for s in ignore_dirs]+['simplebuildbuild'])#forbid simplebuild, to avoid conflict with "simplebuild" python module
-
-import re
 _nameval_pattern='^[a-zA-Z][a-zA-Z0-9_]{2,24}$'
 _nameval=re.compile(_nameval_pattern).match
 _nameval_descr='Valid names follow pattern %s, contain no duplicate underscores and is not one of "%s"'%(_nameval_pattern,
@@ -33,11 +32,16 @@ def parse_depfile(pkgdir):
                 extra_incdeps=[]
                 current=None
                 for e in l.split():
-                    if e=='USEPKG': current=pkgdeps
-                    elif e=='USEEXT': current=extdeps
-                    elif e=='EXTRA_COMPILE_FLAGS': current=extra_cflags
-                    elif e=='EXTRA_LINK_FLAGS': current=extra_ldflags
-                    elif e=='EXTRA_INCDEPS': current=extra_incdeps
+                    if e=='USEPKG':
+                        current=pkgdeps
+                    elif e=='USEEXT':
+                        current=extdeps
+                    elif e=='EXTRA_COMPILE_FLAGS':
+                        current=extra_cflags
+                    elif e=='EXTRA_LINK_FLAGS':
+                        current=extra_ldflags
+                    elif e=='EXTRA_INCDEPS':
+                        current=extra_incdeps
                     else:
                         if current is None:
                             _err()
@@ -50,7 +54,6 @@ def parse_depfile(pkgdir):
                          extra_incdeps )
         _err(' : missing package() statement.')
 
-from pathlib import Path
 def _check_case_insensitive_duplication(path_str):
     path = Path(path_str)
     if not path.exists():

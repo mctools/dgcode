@@ -33,7 +33,8 @@ def system(cmd,*,env=None):
     #wrap exit code to 0..127, in case the return code is passed on to sys.exit(ec).
     sys.stdout.flush()
     sys.stderr.flush()
-    if ec>=0 and ec<=127: return ec
+    if ec>=0 and ec<=127:
+        return ec
     return 127
 
 

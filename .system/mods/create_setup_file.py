@@ -7,7 +7,8 @@ def recreate():
     fn=dirs.blddir / 'setup.sh'
 
     extra_binpath=':'.join(env.env['system']['runtime']['extra_bin_path'])
-    if extra_binpath: extra_binpath+=":"
+    if extra_binpath:
+        extra_binpath+=":"
 
     t="""#!/usr/bin/env bash
 

@@ -1,7 +1,6 @@
 import os
 import fnmatch
-from . import conf
-from .grep import pkgfiles, pkgdir_for_search
+from .grep import pkgfiles#, pkgdir_for_search
 pjoin=os.path.join
 
 def find(pkg,pattern):

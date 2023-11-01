@@ -5,6 +5,7 @@ import re
 from . import dirs
 from . import utils
 from . import error
+from . import conf
 
 patterns=[]
 dirtypes=set()
@@ -16,7 +17,6 @@ def register_pattern(pattern,target_factory):
     dirtype_info[dt] = (re.compile('^'+pattern+'$').match,target_factory)
     assert len(dirtype_info)==len(patterns),"patterns not uniquely defined by first 4 chars"
 
-from . import conf
 for p,f in conf.target_factories_for_patterns():
     register_pattern(p,f)
 nonpattern_tfacts=conf.target_factories()

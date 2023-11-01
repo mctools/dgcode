@@ -242,8 +242,10 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
             parser.error('Do not supply both --debug and --release flags')
         if (opt.release or opt.debug) and 'CMAKE_BUILD_TYPE' in new_cfgvars:
             parser.error('Do not supply --debug or --release flags while setting CMAKE_BUILD_TYPE directly')
-        if opt.release: new_cfgvars['CMAKE_BUILD_TYPE']='RELEASE'
-        if opt.debug: new_cfgvars['CMAKE_BUILD_TYPE']='DEBUG'
+        if opt.release:
+            new_cfgvars['CMAKE_BUILD_TYPE']='RELEASE'
+        if opt.debug:
+            new_cfgvars['CMAKE_BUILD_TYPE']='DEBUG'
 
         if legacy_mode and proj_pkg_selection_enabled:
           if opt.project and opt.enableall:
@@ -424,8 +426,10 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         systs = oldsysts
 
     if not opt.insist and oldsysts!=systs:
-        if oldsysts[0]!=systs[0]: opt.examine = True
-        if oldsysts[1]!=systs[1]: opt.insist = True
+        if oldsysts[0]!=systs[0]:
+            opt.examine = True
+        if oldsysts[1]!=systs[1]:
+            opt.insist = True
 
     if dirs.envcache.exists():
         envdict=utils.pkl_load(dirs.envcache)
@@ -523,9 +527,11 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
         def the_filter(pkgname,absdir):
             for p in namepatterns:
-                if p(pkgname.lower()): return True
+                if p(pkgname.lower()):
+                    return True
             for d in dirpatterns:
-                if d(absdir.lower()): return True
+                if d(absdir.lower()):
+                    return True
             return False
 
         return the_filter
@@ -570,8 +576,10 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
         sys.exit(ce._the_ec)
     except Exception as e:
         err_txt=str(e)
-        if not err_txt: err_txt='<unknown error>'
-        if not isinstance(e,error.Error): unclean_exception = e
+        if not err_txt:
+            err_txt='<unknown error>'
+        if not isinstance(e,error.Error):
+            unclean_exception = e
     except SystemExit as e:
         if str(e)!="knownhandledexception":
             err_txt = "Halted by unexpected call to system exit!"
@@ -717,9 +725,12 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
     # -1: always quiet
     #  0: only warnings
     #  1: extra verbose printouts
-    if opt.verbose: extramakeopts=' VERBOSE=1'
-    elif opt.quiet: extramakeopts=' VERBOSE=-1'
-    else: extramakeopts=''
+    if opt.verbose:
+        extramakeopts=' VERBOSE=1'
+    elif opt.quiet:
+        extramakeopts=' VERBOSE=-1'
+    else:
+        extramakeopts=''
     if not opt.quiet:
         print("Configuration completed => Launching build with %i parallel processes"%opt.njobs)
 
@@ -756,21 +767,23 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
             l=lin[:]
             colbegin = col if col else ''
             colend = col_end if col else ''
-            if not l or l==['']: return '<none>'
+            if not l or l==['']:
+                return '<none>'
             first=True
             out=''
             while l:
                 s=''
                 while l and len(s)<40:
-                    if s: s+=' '
-                    s+=l.pop(0)
+                    if s:
+                        s += ' '
+                    s += l.pop(0)
                 if first:
                     out+='%s%s%s'%(colbegin,s,colend)
                     first=False
                 else:
                     out += '\n%s                                     %s%s%s'%(prefix,colbegin,s,colend)
             return out
-            return ' '.join(l)
+            #return ' '.join(l)
 
         pkg_src_info = []
         for basedir in dirs.pkgsearchpath:

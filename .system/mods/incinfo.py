@@ -5,8 +5,8 @@ from . import langs
 from . import col
 from . import includes
 from . import conf
-path=os.path
 from .grep import pkgdir_for_search
+_ospath = os.path
 
 ccxx_extensions = set(ext for ext,lang in langs.hdrext2lang.items() if lang in ('cxx','c'))
 ccxx_extensions.update(set(ext for ext,lang in langs.srcext2lang.items() if lang in ('cxx','c')))
@@ -15,10 +15,10 @@ def ccxx_files_in_dir(d):
     out=[]
     for f in os.listdir(d):
         if not conf.ignore_file(f):
-            if path.splitext(f)[1] not in ccxx_extensions:
+            if _ospath.splitext(f)[1] not in ccxx_extensions:
                 continue
-            f=path.join(d,f)
-            if path.isdir(f):
+            f=_ospath.join(d,f)
+            if _ospath.isdir(f):
                 continue
             out+=[f]
     return out
@@ -32,12 +32,12 @@ def _printform(pkg,f,for_sortkey=False):
                            f[0],f[1],f[2],col.end)
 
 def _rel_description(f,f2):
-    f=path.dirname(f)
-    f2=path.dirname(f2)
+    f=_ospath.dirname(f)
+    f2=_ospath.dirname(f2)
     if f==f2:
         return ' %s(same directory)%s'%(col.inc_samedir,col.end)
-    f=path.dirname(f)
-    f2=path.dirname(f2)
+    f=_ospath.dirname(f)
+    f2=_ospath.dirname(f2)
     if f==f2:
         return ' %s(same package)%s'%(col.inc_samepkg,col.end)
     return ''
@@ -49,11 +49,11 @@ def _incs_direct(pkg,f):
         return _cache_incs_direct[f]
     res={}
     possible_privincs,possible_pkgincs = includes.find_includes(f,pkg)
-    d=path.dirname(f)
+    d=_ospath.dirname(f)
     if possible_privincs:
         for p in possible_privincs:
-            pp=path.join(d,p)
-            if path.exists(pp) and pp!=f:
+            pp=_ospath.join(d,p)
+            if _ospath.exists(pp) and pp!=f:
                 res[_printform(pkg,pp,for_sortkey=True)] = (pkg,pp)
     if possible_pkgincs:
         deppkgs = dict((p.name,p) for p in pkg.deps())
@@ -64,7 +64,7 @@ def _incs_direct(pkg,f):
                 continue
             assert ppkg.name==ppkgname
             p=pkgdir_for_search(ppkg,'libinc',p)
-            if path.exists(p) and os.path.realpath(p)!=os.path.realpath(f):
+            if _ospath.exists(p) and _ospath.realpath(p)!=_ospath.realpath(f):
                 res[_printform(ppkg,p,for_sortkey=True)] = (ppkg,p)
     _cache_incs_direct[f]=res
     return res
@@ -91,12 +91,12 @@ def _incs_indirect(pkg,f):
 
 def collect_info(pkgloader,f):
     #collects info from single file and returns in dict.
-    pkgname,subdir,fn = f.split(path.sep)[-3:]
+    pkgname,subdir,fn = f.split(_ospath.sep)[-3:]
     pkg = pkgloader.name2pkg.get(pkgname,None)
     if not pkg or not f.startswith(pkg.dirname):
         utils.err('File %s not located inside a package'%f)
     #find isheader,lang from extension:
-    _,ext = path.splitext(f)
+    _,ext = _ospath.splitext(f)
     isheader=True
     lang = langs.hdrext2lang.get(ext,None)
     if lang is None:
@@ -133,7 +133,7 @@ def collect_info(pkgloader,f):
         for pp in pkgs:
             for d in os.listdir(pkgdir_for_search(pp)):
                 d=pkgdir_for_search(pp,d)
-                if path.isdir(d):
+                if _ospath.isdir(d):
                     files += [(pp,ff) for ff in ccxx_files_in_dir(d)]
     files.remove((pkg,f))#not ourself
     files = [(_printform(pp,ff,for_sortkey=True),pp,ff) for pp,ff in files]

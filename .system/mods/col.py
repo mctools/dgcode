@@ -1,3 +1,6 @@
+from . import envcfg
+import sys
+
 black = '\033[30m'
 red = '\033[31m'
 green = '\033[32m'
@@ -40,13 +43,11 @@ if __name__=='__main__':
         print (''.join([cname.ljust(20),' : ',col,cname,end]))
 
 #allow users to modify colours by having stuff like "export SIMPLEBUILD_COLOR_FIX=bldmsg_symlink=red" in their environment:
-from . import envcfg
 cf = envcfg.var.color_fix_code
 if cf:
     exec(cf)
 
 #Disable colours when output is redirected:
-import sys
 if not sys.stdout.isatty():
     for cname in [c for c in dir() if not c[0]=='_']:
         exec('%s=""'%cname)

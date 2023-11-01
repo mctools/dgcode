@@ -53,12 +53,18 @@ def parse(filename):
             ext=l[1]
             if ext not in extdeps:
                 extdeps[ext]={}
-            if l[2]=='PRESENT': extdeps[ext]['present']=bool(int(l[3]))
-            elif l[2]=='LINK': extdeps[ext]['ldflags']=l[3]
-            #elif l[2]=='COMPILE': extdeps[ext]['cflags']=l[3]
-            elif l[2]=='VERSION': extdeps[ext]['version']=l[3]
-            elif l[2]=='COMPILE_CXX': extdeps[ext]['cflags_cxx']=l[3]
-            elif l[2]=='COMPILE_C': extdeps[ext]['cflags_c']=l[3]
+            if l[2]=='PRESENT':
+                extdeps[ext]['present']=bool(int(l[3]))
+            elif l[2]=='LINK':
+                extdeps[ext]['ldflags']=l[3]
+            #elif l[2]=='COMPILE':
+            #    extdeps[ext]['cflags']=l[3]
+            elif l[2]=='VERSION':
+                extdeps[ext]['version']=l[3]
+            elif l[2]=='COMPILE_CXX':
+                extdeps[ext]['cflags_cxx']=l[3]
+            elif l[2]=='COMPILE_C':
+                extdeps[ext]['cflags_c']=l[3]
             else:
                 assert False,"unexpected field: %s"%l[2]
         elif l[0]=='VAR':
@@ -140,9 +146,11 @@ def parse(filename):
 def extractenv(tmpdir,cmakedir,*,cmakeargs,actually_needed_extdeps,quiet=True,verbose=False,prefix=''):
     assert not (quiet and verbose)
     ec = utils.system("rm -rf %s/cmake/"%tmpdir)
-    if ec!=0: return
+    if ec!=0:
+        return
     ec = utils.system("mkdir -p %s/cmake/"%tmpdir)
-    if ec!=0: return
+    if ec!=0:
+        return
     print("%sInspecting environment via CMake"%prefix)#don't silence this even if quiet==true (since cmake will always give a bit of output)
     capture = ' 2>&1|tee cmake_output21_capture.txt; exit ${PIPESTATUS[0]}'
 

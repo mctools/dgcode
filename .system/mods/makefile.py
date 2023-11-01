@@ -10,7 +10,8 @@ def _write_targets(fh,targets):
     cmdpat='\t${P}%s\n'
     for t in targets:
         tn=t.name
-        if '/' not in t.name: tn='${TRG}/%s'%tn
+        if '/' not in t.name:
+            tn='${TRG}/%s'%tn
         l=['%s:'%tn]
         for dn in t.deps:
             l+=[dn if '/' in dn else '${TRG}/%s'%dn]

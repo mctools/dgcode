@@ -32,7 +32,7 @@
 #
 #It is OK to keep other target instances, but only if they are from the same package.
 
-
+from . import col
 
 class Target:
     contains_message=False#todo: we should probably have a custom message in all targets
@@ -53,8 +53,6 @@ class Target:
             assert isinstance(self.pkgname,str)
         assert isinstance(self.deps,list)#names of other targets which we depend on
         assert isinstance(self.code,list)#The code to run
-
-from . import col
 
 class TargetPkgDone(Target):
     def __init__(self,pkg,pkgtargets):

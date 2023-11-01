@@ -115,18 +115,24 @@ def tfactory_headerdeps(pkg,subdir):
             possible_privincs = hhs.difference(set([hh]))
             priv,pub=deps
             if subdir=='libinc':
-                if pub: pub = [(p,f) for (p,f) in pub if f!=hh]
+                if pub:
+                    pub = [(p,f) for (p,f) in pub if f!=hh]
             else:
-                if priv and hh in priv: priv.remove(hh)
+                if priv and hh in priv:
+                    priv.remove(hh)
             tgts+=[TargetIncDep(pkg,subdir,hh,pub,priv,possible_privincs)]
         else:
             tgts+=[TargetIncDep_HeaderFileInGroup(pkg,subdir,hh,igroup)]
             if deps[0]:
-                if igroup not in igroup2priv: igroup2priv[igroup]=deps[0]
-                else: igroup2priv[igroup].update(deps[0])
+                if igroup not in igroup2priv:
+                    igroup2priv[igroup]=deps[0]
+                else:
+                    igroup2priv[igroup].update(deps[0])
             if deps[1]:
-                if igroup not in igroup2pub: igroup2pub[igroup]=deps[1]
-                else: igroup2pub[igroup].update(deps[1])
+                if igroup not in igroup2pub:
+                    igroup2pub[igroup]=deps[1]
+                else:
+                    igroup2pub[igroup].update(deps[1])
     for igroup,group in enumerate(circgroups):
         priv=igroup2priv.get(igroup,None)
         pub=igroup2pub.get(igroup,None)

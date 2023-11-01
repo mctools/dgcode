@@ -18,7 +18,8 @@ def create_include_decoder(exts):
             return None,None
         _,pkg,fn,ext = m.groups()
         fn=b'%s%s'%(fn,ext)
-        if pkg: pkg=pkg[:-1]
+        if pkg:
+            pkg=pkg[:-1]
         return pkg,fn
     return decoder
 include_decoder = create_include_decoder(langs.hdrext2lang.keys())

@@ -1,4 +1,6 @@
 import os
+from . import dirs
+from . import utils
 
 #Database for remembering package info between invocations.
 
@@ -12,8 +14,6 @@ db = { 'pkg2timestamp' : {},#to detect when files changed
    }
 
 #initial load:
-from . import dirs
-from . import utils
 dbfile=dirs.blddir / 'globdb.pkl'
 
 if os.path.exists(dbfile):#fixme: utils should have pkl_load safe which returns None if file does not exists (avoids potential race conds)

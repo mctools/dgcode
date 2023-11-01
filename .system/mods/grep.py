@@ -1,7 +1,6 @@
 import os
 from . import conf
 from . import col
-from . import dirs
 pjoin=os.path.join
 
 def grepfile(filename,pattern,color=None):

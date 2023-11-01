@@ -11,6 +11,7 @@ from . import col
 from . import db
 from . import error
 from . import envcfg
+from . import tfact_headerdeps
 
 join=os.path.join
 
@@ -177,9 +178,6 @@ class TargetBinary(target_base.Target):
         if l:
             l.insert(0, '-L${INST}/lib')
         self.code[-1]=self.code[-1]%(' '.join(l))
-
-from . import tfact_headerdeps
-
 
 def create_tfactory_binary(instsubdir=None,pkglib=False,shlib=False,allowed_langs=None,namefct=None,flagfct=None,descrfct=None,checkfct=None):
     if not allowed_langs:

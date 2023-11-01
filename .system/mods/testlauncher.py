@@ -2,16 +2,15 @@
 import os
 import sys
 import fnmatch
-join=os.path.join
 import shutil
 import shlex
 import pathlib
-
 from .conf import runnable_is_test
 from .utils import mkdir_p
 from .utils import system
 from . import testxml
 from . import dirs
+_ospathjoin=os.path.join
 
 def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverage,pkgloader=None):
 
@@ -27,20 +26,20 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
     testdir=os.path.abspath(testdir)
     line_hr = "%s ---------------------------------------+-----------+--------+----------+------------------"%prefix
     line_titles = "%s  Test job results                      | Time [ms] | Job EC | Log-diff | Trouble info"%prefix
-    header='\n'.join([line_hr,line_titles,line_hr])
+    header='\n'._ospathjoin([line_hr,line_titles,line_hr])
     footer=line_hr
 
-    logdir=join(installdir,'tests/testref')
-    #bindirs=[join(installdir,'bin'),join(installdir,'scripts')]
+    logdir=_ospathjoin(installdir,'tests/testref')
+    #bindirs=[_ospathjoin(installdir,'bin'),_ospathjoin(installdir,'scripts')]
     logfiles = set(fn for fn in os.listdir(logdir) if fn.endswith('.log')) if os.path.exists(logdir) else set()
 
     def ldtest(d):
         if os.path.exists(d):
             for f in os.listdir(d):
-                if os.path.isdir(os.path.join(d,f)):
+                if os.path.isdir(_ospathjoin(d,f)):
                     continue#skip some weird .DSYM dirs for fortran apps on osx
                 if f+'.log' in logfiles or runnable_is_test(f):
-                    yield join(d,f)
+                    yield _ospathjoin(d,f)
     tests=set()
     testinfo = {}
     #Load pkg list from the generated simplebuild.cfg module, for complete
@@ -98,7 +97,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         return 0
 
     mkdir_p(testdir)
-    mf=open(join(testdir,'Makefile'),'w')
+    mf=open(_ospathjoin(testdir,'Makefile'),'w')
 
     mf.write('TESTDIR:=%s\n\n'%os.path.abspath(testdir))
 
@@ -114,9 +113,9 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
 
     for t in tests:
         bn=os.path.basename(t)
-        td=join(testdir,bn)
+        td=_ospathjoin(testdir,bn)
         mkdir_p(td)
-        tf=open(join(td,'run.sh'),'w')
+        tf=open(_ospathjoin(td,'run.sh'),'w')
         tf.write('#!/usr/bin/env bash\n')
         cmdstr = bn
         if do_pycoverage:
@@ -132,7 +131,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         tf.write('echo $EC > ../ec.txt\n')
         tf.write('python3 -c \'import os.path;print(1000.0*(os.path.getmtime("../time_end")-os.path.getmtime("../time_start")))\' > ../timing_ms\n')
         if bn+'.log' in logfiles:
-            ref=join(installdir,'tests/testref/%s.log'%bn)
+            ref=_ospathjoin(installdir,'tests/testref/%s.log'%bn)
             tf.write("""if [ $EC == 0 ]; then
       diff -a --ignore-all-space %s ../output.log > ../refdiff.log || diff -a --ignore-all-space -y %s ../output.log > ../refdiff_sidebyside.log; EC=$?; echo $EC > ../ecdiff.txt
     fi"""%(ref,ref))
@@ -144,7 +143,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         mf.write('\t@cd ${TESTDIR}/%s && chmod +x run.sh && ./run.sh'%bn)
         mf.write('\n\n')
 
-    mf.write('all: %s\n\n'%(' '.join(alltests)))
+    mf.write('all: %s\n\n'%(' '._ospathjoin(alltests)))
     mf.close()
 
     from .envsetup import create_install_env_clone
@@ -154,23 +153,23 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
     ec_global=system('make -j%i -k -f %s/Makefile all'%(njobs,testdir), env = test_env )
     rep=[]
     for t in alltests:
-        td=join(testdir,t)
-        ecdiff=None if not os.path.exists(join(td,'ecdiff.txt')) else int(open(join(td,'ecdiff.txt')).read())
-        rep+=[(t,int(open(join(td,'ec.txt')).read()),ecdiff)]
+        td=_ospathjoin(testdir,t)
+        ecdiff=None if not os.path.exists(_ospathjoin(td,'ecdiff.txt')) else int(open(_ospathjoin(td,'ecdiff.txt')).read())
+        rep+=[(t,int(open(_ospathjoin(td,'ec.txt')).read()),ecdiff)]
     rep.sort()
     excerpts_to_print=[]
     if nfiltered:
         print('%sNote: %i tests were blocked by specified filters.\n%s'%(prefix,nfiltered,prefix))
     print(header)
     for t,ec,ecdiff in rep:
-        time_ms=float(open(join(testdir,t,'timing_ms')).read())
+        time_ms=float(open(_ospathjoin(testdir,t,'timing_ms')).read())
         ecstr='FAIL' if ec else ' OK '
         logdiffstr=' -- '
         if ecdiff is not None:
             logdiffstr='FAIL' if ecdiff else ' OK '
         info='--'
         if ec!=0 or ( (ecdiff is not None) and ecdiff):
-            info=os.path.realpath(join(testdir,t))
+            info=os.path.realpath(_ospathjoin(testdir,t))
             ec_global=1
             if nexcerpts>0:
                 excerpts_to_print += [(t,testdir,'output.log' if ec!=0 else 'refdiff.log')]
@@ -180,11 +179,11 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         logdiffok = (ecdiff is None or not ecdiff)
         testinfo[t].update( dict(time_ms = time_ms,
                                  exitcode = ec,
-                                 logfile = join(testdir,t,'output.log'),
+                                 logfile = _ospathjoin(testdir,t,'output.log'),
                                  logdiffok = logdiffok,
-                                 logdifffile = (join(testdir,t,'refdiff.log') if not logdiffok else None)))
+                                 logdifffile = (_ospathjoin(testdir,t,'refdiff.log') if not logdiffok else None)))
     if do_pycoverage:
-         _cov_infiles = ' '.join(shlex.quote(str(e.absolute().resolve())) for e in coverage_all_out_files)
+         _cov_infiles = ' '._ospathjoin(shlex.quote(str(e.absolute().resolve())) for e in coverage_all_out_files)
          _cov_outfile = coverage_out_dir / 'combined.coverage'
          ec = system(f'cd {shlex.quote(str(coverage_out_dir))} && '
                      f'python3 -mcoverage combine --keep --data-file={shlex.quote(str(_cov_outfile.name))} {_cov_infiles}')
@@ -225,10 +224,10 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
     if excerpts_to_print:
         for t,testdir,logname in excerpts_to_print:
             print('\n====>\n====> First %i lines from %s/%s:\n====>'%(nexcerpts,t,logname))
-            system('head -%i %s'%(nexcerpts,os.path.join(testdir,t,logname)))
+            system('head -%i %s'%(nexcerpts,_ospathjoin(testdir,t,logname)))
             print('====> (end of %s/%s)\n'%(t,logname))
             print('\n====>\n====> Last %i lines from %s/%s:\n====>'%(nexcerpts,t,logname))
-            system('tail -%i %s'%(nexcerpts,os.path.join(testdir,t,logname)))
+            system('tail -%i %s'%(nexcerpts,_ospathjoin(testdir,t,logname)))
             print('====> (end of %s/%s)\n'%(t,logname))
 
     sys.stdout.flush()
