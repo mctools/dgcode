@@ -911,7 +911,7 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
         from .envsetup import calculate_env_setup
         if not legacy_mode and not prevent_env_setup_msg and calculate_env_setup():
-            print(f'{prefix}{col.warnenvsetup}Build done. To use the resulting environment you must first enable it!{col.end}')
+            print(f'{col.warnenvsetup}Build done. To use the resulting environment you must first enable it!{col.end}')
             print()
             print(f'{col.warnenvsetup}Type the following command (exactly) to do so (undo later by --env-unsetup instead):{col.end}')
             print()
