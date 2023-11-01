@@ -26,7 +26,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
     testdir=os.path.abspath(testdir)
     line_hr = "%s ---------------------------------------+-----------+--------+----------+------------------"%prefix
     line_titles = "%s  Test job results                      | Time [ms] | Job EC | Log-diff | Trouble info"%prefix
-    header='\n'._ospathjoin([line_hr,line_titles,line_hr])
+    header='\n'.join([line_hr,line_titles,line_hr])
     footer=line_hr
 
     logdir=_ospathjoin(installdir,'tests/testref')
@@ -143,7 +143,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
         mf.write('\t@cd ${TESTDIR}/%s && chmod +x run.sh && ./run.sh'%bn)
         mf.write('\n\n')
 
-    mf.write('all: %s\n\n'%(' '._ospathjoin(alltests)))
+    mf.write('all: %s\n\n'%(' '.join(alltests)))
     mf.close()
 
     from .envsetup import create_install_env_clone
@@ -183,7 +183,7 @@ def perform_tests(testdir,installdir,njobs,prefix,nexcerpts,filters,do_pycoverag
                                  logdiffok = logdiffok,
                                  logdifffile = (_ospathjoin(testdir,t,'refdiff.log') if not logdiffok else None)))
     if do_pycoverage:
-         _cov_infiles = ' '._ospathjoin(shlex.quote(str(e.absolute().resolve())) for e in coverage_all_out_files)
+         _cov_infiles = ' '.join(shlex.quote(str(e.absolute().resolve())) for e in coverage_all_out_files)
          _cov_outfile = coverage_out_dir / 'combined.coverage'
          ec = system(f'cd {shlex.quote(str(coverage_out_dir))} && '
                      f'python3 -mcoverage combine --keep --data-file={shlex.quote(str(_cov_outfile.name))} {_cov_infiles}')
