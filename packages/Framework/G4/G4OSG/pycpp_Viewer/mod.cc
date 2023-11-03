@@ -56,7 +56,7 @@ namespace G4OSG {
 
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("run",&G4OSG::run_viewer);
   mod.def("run",&G4OSG::run_viewer_with_griff);

@@ -11,7 +11,7 @@ namespace {
 }
 
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   py::class_<Utils::RefCountBase,std::unique_ptr<Utils::RefCountBase, BlankDeleter<Utils::RefCountBase>>>(mod, "RefCountBase")
     .def("refCount",&Utils::RefCountBase::refCount)

@@ -1,7 +1,7 @@
 #include "Core/Python.hh"
 #include "Utils/MaxwellDist.hh"
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("maxwellDist",Utils::maxwellDist);
   mod.def("maxwellDistCommulative",Utils::maxwellDistCommulative);

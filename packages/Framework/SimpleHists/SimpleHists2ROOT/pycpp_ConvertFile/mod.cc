@@ -18,7 +18,7 @@ namespace SimpleHists_pycppcf {
 
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.doc() =
     "Python module providing the convertToROOTFile functions from"

@@ -21,7 +21,7 @@ namespace SimpleHists_Sampler_py {
 
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   pyextra::pyimport("SimpleHists");
   py::class_<SimpleHists::Sampler >(mod,"Sampler")

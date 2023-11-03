@@ -131,7 +131,7 @@ void py_Mesh3D_merge_files(std::string output_file, py::list input_files) {
 }
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
 
   py::class_<py_Mesh3D>(mod,"Mesh3D")

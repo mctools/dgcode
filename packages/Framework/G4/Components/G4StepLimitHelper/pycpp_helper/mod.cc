@@ -1,7 +1,7 @@
 #include "Core/Python.hh"
 #include "G4StepLimitHelper/G4StepLimitHelper.hh"
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   py::class_<G4StepLimitHelper>(mod, "G4StepLimitHelper")
               .def("setLimit", &G4StepLimitHelper::setLimit)

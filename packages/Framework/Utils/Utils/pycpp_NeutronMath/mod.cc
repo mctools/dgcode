@@ -1,7 +1,7 @@
 #include "Core/Python.hh"
 #include "Utils/NeutronMath.hh"
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("neutronWavelengthToEKin",Utils::neutronWavelengthToEKin);
   mod.def("neutronEKinToWavelength",Utils::neutronEKinToWavelength);

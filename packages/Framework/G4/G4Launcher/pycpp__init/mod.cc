@@ -169,7 +169,7 @@ namespace G4Launcher_py {
   };
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   pyextra::pyimport("G4Interfaces");
   pyextra::pyimport("Utils.ParametersBase");

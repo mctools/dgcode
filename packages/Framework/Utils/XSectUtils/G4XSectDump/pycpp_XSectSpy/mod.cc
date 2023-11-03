@@ -24,7 +24,7 @@ namespace {
   }
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("install",&spyG4XSect);
   mod.def("installForOneFile",&spyOneG4XSect);

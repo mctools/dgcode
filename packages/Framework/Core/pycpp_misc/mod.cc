@@ -13,7 +13,7 @@ namespace {
   }
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("is_debug_build",&Core::is_debug_build);
 }

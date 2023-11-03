@@ -188,7 +188,7 @@ namespace SimpleHists_pycpp {
 
 namespace shp = SimpleHists_pycpp;
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   //Change the module name to avoid type(Hist1D()) giving
   //'SimpleHists._init.Hist1D' but rather give 'SimpleHists.Hist1D':

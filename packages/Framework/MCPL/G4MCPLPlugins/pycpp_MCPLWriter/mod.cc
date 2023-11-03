@@ -621,7 +621,7 @@ namespace G4MCPLWriter {
 
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   using namespace G4MCPLWriter;
 

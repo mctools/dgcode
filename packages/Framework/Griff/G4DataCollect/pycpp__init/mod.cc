@@ -1,7 +1,7 @@
 #include "Core/Python.hh"
 #include "G4DataCollect/G4DataCollect.hh"
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("installHooks",&G4DataCollect::installHooks,
           "Installs hooks necessary to record the output of the Geant4 simulation.",

@@ -10,7 +10,7 @@ namespace Core {
 }
 
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("catch_fpe",&Core::catch_fpe);
 

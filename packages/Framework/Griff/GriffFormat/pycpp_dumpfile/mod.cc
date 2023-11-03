@@ -1,7 +1,7 @@
 #include "Core/Python.hh"
 #include "GriffFormat/DumpFile.hh"
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("dumpFileInfo",&GriffFormat::dumpFileInfo,
           "dump content of G4 event file",

@@ -49,7 +49,7 @@ namespace{
 }
 //todo: expose some of the FrameworkGlobals here??
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   pyextra::pyimport("Utils.ParametersBase");
 

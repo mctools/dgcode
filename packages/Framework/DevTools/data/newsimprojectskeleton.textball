@@ -34,7 +34,7 @@ public:
   //(add more member functions and data here if needed)
 };
 
-PYTHON_MODULE3 { GeoConstructPyExport::exportGeo<GeoSkeletonSP>(mod, "GeoSkeletonSP"); }
+PYTHON_MODULE( mod ) { GeoConstructPyExport::exportGeo<GeoSkeletonSP>(mod, "GeoSkeletonSP"); }
 
 ////////////////////////////////////////////
 // Implementation of our geometry module: //

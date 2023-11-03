@@ -7,7 +7,7 @@ namespace G4CustomPyGen {
   void gun_set_type_v2(G4GunWrapper*g,int pdg) { g->set_type(pdg); }
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   pyextra::pyimport("G4Interfaces");
   py::class_<G4CustomPyGen::GenBaseCpp,G4Interfaces::ParticleGenBase>( mod, "_GenBaseCpp" )

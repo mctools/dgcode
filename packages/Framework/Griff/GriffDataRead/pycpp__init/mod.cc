@@ -60,7 +60,7 @@ namespace {
   void pyGriffDataRead_FilterParams_dump_0args(GriffDataRead::FilterParams*self) { self->dump(); }
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   pyextra::pyimport("Utils.DummyParamHolder");
   pyextra::pyimport("Utils.RefCountBase");

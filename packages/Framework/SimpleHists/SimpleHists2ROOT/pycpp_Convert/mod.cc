@@ -50,7 +50,7 @@ namespace SimpleHists_pycpp {
 
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.doc() =
     "Python module providing the convertToROOT and convertToROOTFile"

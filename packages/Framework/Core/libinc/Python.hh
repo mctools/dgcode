@@ -46,12 +46,13 @@ namespace pyextra {
   inline py::object pyimport( const char * name ) { return py::module_::import(name); }
 }
 
-//TODO: Revist these here post-migration:
-//#define PYTHON_MODULE( modvarname ) PYBIND11_MODULE(PYMODNAME, modvarname)
+//FIXME: Obsolete macro:
+#define PYTHON_MODULE3( mod ) PYBIND11_MODULE(PYMODNAME, mod)
+
 #ifdef PYTHON_MODULE
 #  undefine PYTHON_MODULE
 #endif
-#define PYTHON_MODULE3 PYBIND11_MODULE(PYMODNAME, mod)
+#define PYTHON_MODULE( modvarname ) PYBIND11_MODULE(PYMODNAME, modvarname)
 
 //sbld_stringify macro here for convenience:
 #ifdef sbld_xstringify

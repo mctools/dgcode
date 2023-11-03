@@ -355,7 +355,7 @@ namespace DMWriter {
   }
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   py::class_<DMWriter::HeatMapWriter,
              std::shared_ptr<DMWriter::HeatMapWriter> >(mod,"HeatMapWriter")

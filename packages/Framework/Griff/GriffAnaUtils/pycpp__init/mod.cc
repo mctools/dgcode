@@ -19,7 +19,7 @@
 #include "filters.hh"
 #include "iterators.hh"
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   pyextra::pyimport("GriffDataRead");
   GriffAnaUtils::pyexport_filters(mod);

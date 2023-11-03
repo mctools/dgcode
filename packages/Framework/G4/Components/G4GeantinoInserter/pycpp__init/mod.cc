@@ -74,7 +74,7 @@ namespace G4GeantinoInserter {
   }
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("install",&G4GeantinoInserter::install);
 }

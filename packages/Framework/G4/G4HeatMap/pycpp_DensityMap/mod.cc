@@ -56,7 +56,7 @@ void py_createDensityMap(const std::string& outfile,
   mesh.saveToFile(outfile);
 }
 
-PYTHON_MODULE3
+PYTHON_MODULE( mod )
 {
   mod.def("create_density_map",&py_createDensityMap);
 }
