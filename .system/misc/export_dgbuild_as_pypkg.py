@@ -23,16 +23,18 @@ def parse():
 
 def create_metadata_files_core( tgtdir ):
     ( tgtdir / 'LICENSE' ).write_text('https://www.apache.org/licenses/LICENSE-2.0')
-    descr='Simple build system multi-user and multi-project development focused on C++/Python projects.'
+    descr = ("A very simple to use build system for projects with primarily C++/Python code,"
+             " intended for usage by scientific developers without a strong SW-engineering background.")
+
     ( tgtdir / 'README.md' ).write_text(descr)
     ( tgtdir / 'MANIFEST.in' ).write_text("""
-recursive-include src/simplebuild/data/cmake *.cmake *.txt *.py
-recursive-include src/simplebuild/data/pkgs-core LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
-recursive-include src/simplebuild/data/pkgs-core/**/data *
-recursive-include src/simplebuild/data/pkgs-core/**/scripts *
-recursive-include src/simplebuild/data/pkgs-core_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
-recursive-include src/simplebuild/data/pkgs-core_val/**/data *
-recursive-include src/simplebuild/data/pkgs-core_val/**/scripts *
+recursive-include src/_simple_build_system/data/cmake *.cmake *.txt *.py
+recursive-include src/_simple_build_system/data/pkgs-core LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/_simple_build_system/data/pkgs-core/**/data *
+recursive-include src/_simple_build_system/data/pkgs-core/**/scripts *
+recursive-include src/_simple_build_system/data/pkgs-core_val LICENSE pkg.info *.cc *.hh *.icc *.c *.h *.f *.py
+recursive-include src/_simple_build_system/data/pkgs-core_val/**/data *
+recursive-include src/_simple_build_system/data/pkgs-core_val/**/scripts *
 recursive-include src simplebuild.cfg
 
 global-exclude *~* *\#* .*
@@ -50,9 +52,8 @@ build-backend = "setuptools.build_meta"
 enabled = true
 
 [project]
-name = "simplebuild"
-dynamic = ["version"] # Version based on git tag...
-#... not static: version = "0.0.1"
+name = "simple-build-system"
+dynamic = ["version"] # Version based on git tag
 authors = [
   {{ name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" }},
 ]
@@ -65,16 +66,8 @@ classifiers = [
     "Operating System :: Unix",
 ]
 dependencies = [
-    #Very light-weight, not a big deal if we happen to install with both conda and pip:
-    'tomli; python_version < "3.11"'
-]
-
-[project.optional-dependencies]
-all = [
-    #Non-trivial dependencies which is most likely already installed in conda
-    #(if we actually make conda-packages, we can move these up to the
-    #non-optional dependencies above):
-   'pybind11 >= 2.10.4',
+    'tomli; python_version < "3.11"',
+    'pybind11 >= 2.10.4',
     'cmake >= 3.24.2'
 ]
 
@@ -83,10 +76,11 @@ all = [
 "Bug Tracker" = "https://github.com/mctools/simplebuild/issues"
 
 [project.scripts]
-simplebuild = "simplebuild._cli:main"
-unwrapped_simplebuild = "simplebuild._cli:unwrapped_main"
-sbenv = "simplebuild._cli:sbenv_main"
-sbrun = "simplebuild._cli:sbrun_main"
+simplebuild = "_simple_build_system._cli:main"
+sb = "_simple_build_system._cli:main"
+unwrapped_simplebuild = "_simple_build_system._cli:unwrapped_main"
+sbenv = "_simple_build_system._cli:sbenv_main"
+sbrun = "_simple_build_system._cli:sbrun_main"
 """)
 
 def create_metadata_files_dgcode( tgtdir ):
@@ -266,7 +260,7 @@ def main():
     opt.targetdir_dgcode.mkdir( parents=True )
     create_metadata_files_core( opt.targetdir_core )
     create_metadata_files_dgcode( opt.targetdir_dgcode )
-    destdir_mods = opt.targetdir_core / 'src' / 'simplebuild'
+    destdir_mods = opt.targetdir_core / 'src' / '_simple_build_system'
     destdir_mods_dgcode = opt.targetdir_dgcode / 'src' / 'simplebuild-dgcode'
     destdir_data = destdir_mods / 'data'
     destdir_data_dgcode = destdir_mods_dgcode / 'data'
@@ -336,8 +330,8 @@ f"""# Special simplebuild cfg file which allows one to use the pkgs in the conta
 
 [special]
   redirect_search_path = [
-  "./src/simplebuild/data/{destdir_pkgs_core.name}",
-  "./src/simplebuild/data/{destdir_pkgs_coreval.name}",
+  "./src/_simple_build_system/data/{destdir_pkgs_core.name}",
+  "./src/_simple_build_system/data/{destdir_pkgs_coreval.name}",
   ]
 """ )
 
