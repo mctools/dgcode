@@ -53,7 +53,7 @@ enabled = true
 
 [project]
 name = "simple-build-system"
-dynamic = ["version"] # Version based on git tag
+dynamic = ["version"]
 authors = [
   {{ name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" }},
 ]
@@ -112,7 +112,7 @@ enabled = true
 
 [project]
 name = "simplebuild-dgcode"
-dynamic = ["version"] # Version based on git tag
+dynamic = ["version"]
 authors = [
   { name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" },
 ]
@@ -121,16 +121,16 @@ readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Operating System :: Unix",
 ]
 dependencies = [
-    'simplebuild'
+    'simple-build-system'
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/mctools/dgcode"
-"Bug Tracker" = "https://github.com/mctools/dgcode/issues"
+"Homepage" = "https://github.com/mctools/simplebuild-dgcode"
+"Bug Tracker" = "https://github.com/mctools/simplebuild-dgcode/issues"
 """)
 
 def extract_file_content( f ):
