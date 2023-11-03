@@ -1,7 +1,6 @@
 #ifndef RandUtils_Rand_hh
 #define RandUtils_Rand_hh
 
-#include "CLHEP/Random/RandomEngine.h"
 #ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
 #  include "NCrystal/internal/NCRandUtils.hh" // DGBUILD-NO-EXPORT
 namespace NC = NCrystal; // DGBUILD-NO-EXPORT
