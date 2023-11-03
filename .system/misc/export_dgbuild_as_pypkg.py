@@ -112,8 +112,7 @@ enabled = true
 
 [project]
 name = "simplebuild-dgcode"
-dynamic = ["version"] # Version based on git tag...
-#... not static: version = "0.0.1"
+dynamic = ["version"] # Version based on git tag
 authors = [
   { name="Thomas Kittelmann", email="thomas.kittelmann@ess.eu" },
 ]
