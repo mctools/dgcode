@@ -44,7 +44,7 @@ namespace PhysicsListPyExport {
 
     pyextra::pyimport("G4Interfaces");
 
-    themod.def("create_provider",&_internal_create_provider<T>,py::return_ptr());
+    themod.def("create_provider",&_internal_create_provider<T>,py::return_value_policy::reference);
 
     py::class_<Provider<T>,G4Interfaces::PhysListProviderBase >(themod,(std::string("Provider__")+class_name).c_str());
     return py::class_<T>(themod,class_name);

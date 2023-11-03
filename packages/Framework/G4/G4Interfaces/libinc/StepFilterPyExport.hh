@@ -21,7 +21,7 @@ namespace StepFilterPyExport {
   void exportFilter(py::module_ themod,const char* name)
   {
     pyextra::pyimport("G4Interfaces");
-    themod.def("create",&_internal_create<T>,py::return_ptr());
+    themod.def("create",&_internal_create<T>,py::return_value_policy::reference);
     py::class_<T,G4Interfaces::StepFilterBase>(themod,name)
       ;
   }

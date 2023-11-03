@@ -310,7 +310,7 @@ void MCPLGen::gen(G4Event* evt)
 }
 
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  ParticleGenPyExport::exportGen<MCPLGen>(PYMOD "MCPLGen");
+  ParticleGenPyExport::exportGen<MCPLGen>(mod,"MCPLGen");
 }

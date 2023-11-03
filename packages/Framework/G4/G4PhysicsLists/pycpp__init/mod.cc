@@ -13,8 +13,8 @@ namespace {
   }
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  PYDEF("getAllReferenceListNames",pyPhysicsListFactory_getAllReferenceListNames);
+  mod.def("getAllReferenceListNames",pyPhysicsListFactory_getAllReferenceListNames);
 }
 

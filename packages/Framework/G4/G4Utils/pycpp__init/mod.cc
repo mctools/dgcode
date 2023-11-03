@@ -8,9 +8,9 @@ namespace pyG4Utils {
   const char * g4date() { return G4Date.c_str(); }
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  PYDEF("flush", &G4Utils::flush, "flushes the G4cout and G4cerr buffers");
-  PYDEF("G4Version", &pyG4Utils::g4version, "Geant4 version string from G4Version.hh");
-  PYDEF("G4Date", &pyG4Utils::g4version, "Geant4 date string from G4Version.hh");
+  mod.def("flush", &G4Utils::flush, "flushes the G4cout and G4cerr buffers");
+  mod.def("G4Version", &pyG4Utils::g4version, "Geant4 version string from G4Version.hh");
+  mod.def("G4Date", &pyG4Utils::g4version, "Geant4 date string from G4Version.hh");
 }

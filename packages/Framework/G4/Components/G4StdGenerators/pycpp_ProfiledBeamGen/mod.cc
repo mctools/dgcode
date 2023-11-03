@@ -1,7 +1,7 @@
 #include "G4Interfaces/ParticleGenPyExport.hh"
 #include "G4StdGenerators/ProfiledBeamGen.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  ParticleGenPyExport::exportGen<ProfiledBeamGen>(PYMOD "ProfiledBeamGen");
+  ParticleGenPyExport::exportGen<ProfiledBeamGen>(mod, "ProfiledBeamGen");
 }

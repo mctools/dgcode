@@ -85,12 +85,12 @@ private:
 
 
 
-PYTHON_MODULE2
+PYTHON_MODULE3
 {
-  py::class_<NeutronGravity>(PYMOD2 "NeutronGravity")
-                    .def("setDir", &NeutronGravity::setDir)
-                    .def("set", &NeutronGravity::set)
-                    ;
+  py::class_<NeutronGravity>(mod, "NeutronGravity")
+    .def("setDir", &NeutronGravity::setDir)
+    .def("set", &NeutronGravity::set)
+    ;
 
 }
 

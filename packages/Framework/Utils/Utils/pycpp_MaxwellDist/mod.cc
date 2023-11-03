@@ -1,27 +1,27 @@
 #include "Core/Python.hh"
 #include "Utils/MaxwellDist.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  PYDEF("maxwellDist",Utils::maxwellDist);
-  PYDEF("maxwellDistCommulative",Utils::maxwellDistCommulative);
-  PYDEF("maxwellShoot",Utils::maxwellShoot);
-  PYDEF("maxwellParFromMean",Utils::maxwellParFromMean);
-  PYDEF("maxwellParFromPeak",Utils::maxwellParFromPeak);
-  PYDEF("maxwellMean",Utils::maxwellMean);
-  PYDEF("maxwellPeak",Utils::maxwellPeak);
-  PYDEF("maxwellRMS",Utils::maxwellRMS);
-  PYDEF("thermalMaxwellPar",Utils::thermalMaxwellPar);
-  PYDEF("shootThermalSpeed",Utils::shootThermalSpeed);
-  PYDEF("shootThermalEKin",Utils::shootThermalEKin);
-  PYDEF("shootThermalWavelength",Utils::shootThermalWavelength);
-  PYDEF("thermalNeutronMaxwellPar",Utils::thermalNeutronMaxwellPar);
-  PYDEF("shootThermalNeutronSpeed",Utils::shootThermalNeutronSpeed);
-  PYDEF("shootThermalNeutronEKin",Utils::shootThermalNeutronEKin);
-  PYDEF("shootThermalNeutronWavelength",Utils::shootThermalNeutronWavelength);
-  PYDEF("thermalEnergyDistPeak",Utils::thermalEnergyDistPeak);
-  PYDEF("thermalEnergyDistMean",Utils::thermalEnergyDistMean);
-  PYDEF("thermalEnergyDistMedian",Utils::thermalEnergyDistMedian);
-  PYDEF("thermalEnergyDist",Utils::thermalEnergyDist);
-  PYDEF("thermalEnergyDistCommulative",Utils::thermalEnergyDistCommulative);
+  mod.def("maxwellDist",Utils::maxwellDist);
+  mod.def("maxwellDistCommulative",Utils::maxwellDistCommulative);
+  mod.def("maxwellShoot",Utils::maxwellShoot);
+  mod.def("maxwellParFromMean",Utils::maxwellParFromMean);
+  mod.def("maxwellParFromPeak",Utils::maxwellParFromPeak);
+  mod.def("maxwellMean",Utils::maxwellMean);
+  mod.def("maxwellPeak",Utils::maxwellPeak);
+  mod.def("maxwellRMS",Utils::maxwellRMS);
+  mod.def("thermalMaxwellPar",Utils::thermalMaxwellPar);
+  mod.def("shootThermalSpeed",Utils::shootThermalSpeed);
+  mod.def("shootThermalEKin",Utils::shootThermalEKin);
+  mod.def("shootThermalWavelength",Utils::shootThermalWavelength);
+  mod.def("thermalNeutronMaxwellPar",Utils::thermalNeutronMaxwellPar);
+  mod.def("shootThermalNeutronSpeed",Utils::shootThermalNeutronSpeed);
+  mod.def("shootThermalNeutronEKin",Utils::shootThermalNeutronEKin);
+  mod.def("shootThermalNeutronWavelength",Utils::shootThermalNeutronWavelength);
+  mod.def("thermalEnergyDistPeak",Utils::thermalEnergyDistPeak);
+  mod.def("thermalEnergyDistMean",Utils::thermalEnergyDistMean);
+  mod.def("thermalEnergyDistMedian",Utils::thermalEnergyDistMedian);
+  mod.def("thermalEnergyDist",Utils::thermalEnergyDist);
+  mod.def("thermalEnergyDistCommulative",Utils::thermalEnergyDistCommulative);
 }

@@ -51,7 +51,7 @@ namespace GDR_material {
         .def("stateStr",&Material::stateCStr)
         .def("numberElements",&Material::numberElements)
         .def("elementFraction",&Material::elementFraction)
-        .def("getElement",&Material::getElement,py::return_ptr())
+        .def("getElement",&Material::getElement,py::return_value_policy::reference)
         .def_property_readonly("elements", &py_get_elem_list)
         .def("dump",&dump_mat)
         .def("transient_id",&py_mat_id)//temporary workaround...
@@ -66,7 +66,7 @@ namespace GDR_material {
         .def("naturalAbundances",&Element::naturalAbundances)
         .def("numberIsotopes",&Element::numberIsotopes)
         .def("isotopeRelativeAbundance",&Element::isotopeRelativeAbundance)
-        .def("getIsotope",&Element::getIsotope,py::return_ptr())
+        .def("getIsotope",&Element::getIsotope,py::return_value_policy::reference)
         .def_property_readonly("isotopes", &py_get_isotope_list)
         .def("dump",&dump_elem)
         ;

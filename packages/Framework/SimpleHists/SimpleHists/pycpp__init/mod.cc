@@ -219,7 +219,7 @@ PYTHON_MODULE3
     .def("isSimilar",&sh::HistBase::isSimilar)
     .def("scale",&sh::HistBase::scale)
     .def("norm",&sh::HistBase::norm)
-    .def("clone",&sh::HistBase::clone,py::return_ptr())
+    .def("clone",&sh::HistBase::clone,py::return_value_policy::reference)
     .def("reset",&sh::HistBase::reset)
     //properties (all lowercase):
     .def_property("title", &shp::HistBase_getTitle,&sh::HistBase::setTitle)
@@ -230,7 +230,7 @@ PYTHON_MODULE3
     ;
 
   mod.def("histTypeOfData",&sh::histTypeOfData);
-  mod.def("deserialise",&sh::deserialise,py::return_ptr());
+  mod.def("deserialise",&sh::deserialise,py::return_value_policy::reference);
   mod.def("deserialiseAndManage",&sh::deserialise,py::return_value_policy::take_ownership);
 
   //Hist1D:
@@ -456,18 +456,18 @@ PYTHON_MODULE3
   py::class_<sh::HistCollection>(mod,"HistCollection")
     .def(py::init<>())
     .def(py::init<const std::string&>(),py::arg("filename"))
-    .def("book1D",&shp::HistCol_book1Dv1,py::return_ptr())
-    .def("book1D",&shp::HistCol_book1Dv2,py::return_ptr())
-    .def("book2D",&shp::HistCol_book2Dv1,py::return_ptr())
-    .def("book2D",&shp::HistCol_book2Dv2,py::return_ptr())
-    .def("bookCounts",&shp::HistCol_bookCountsv1,py::return_ptr())
-    .def("bookCounts",&shp::HistCol_bookCountsv2,py::return_ptr())
+    .def("book1D",&shp::HistCol_book1Dv1,py::return_value_policy::reference)
+    .def("book1D",&shp::HistCol_book1Dv2,py::return_value_policy::reference)
+    .def("book2D",&shp::HistCol_book2Dv1,py::return_value_policy::reference)
+    .def("book2D",&shp::HistCol_book2Dv2,py::return_value_policy::reference)
+    .def("bookCounts",&shp::HistCol_bookCountsv1,py::return_value_policy::reference)
+    .def("bookCounts",&shp::HistCol_bookCountsv2,py::return_value_policy::reference)
     .def("hasKey",&sh::HistCollection::hasKey)
     .def("getKey",&shp::HistCol_getKey)
-    .def("hist",&shp::HistCol_histnonconst,py::return_ptr())
-    .def("hist",&shp::HistCol_histconst,py::return_ptr())
+    .def("hist",&shp::HistCol_histnonconst,py::return_value_policy::reference)
+    .def("hist",&shp::HistCol_histconst,py::return_value_policy::reference)
     .def("add",&sh::HistCollection::add)
-    .def("remove",&sh::HistCollection::remove,py::return_ptr())
+    .def("remove",&sh::HistCollection::remove,py::return_value_policy::reference)
     .def("removeAndManage",&sh::HistCollection::remove,py::return_value_policy::take_ownership)
     .def("saveToFile",&sh::HistCollection::saveToFile)
     .def("saveToFile",&shp::HistColl_saveToFile_1arg)

@@ -5,6 +5,8 @@
 
 namespace Utils {
 
+  //FIXME: We should stop using this and use std::shared_ptr instead.
+
   //NOTE: Destructor of derived classes must not be public!
 
   class RefCountBase {
@@ -34,31 +36,5 @@ namespace Utils {
   };
 
 }
-
-//The following RefCountHolder is useful for exposing ref-counted classes with
-//to boost::python (for some reason, it only works if not in the Utils
-//namespace):
-template< class T >
-struct RefCountHolder
-{
-  typedef T element_type;
-  explicit RefCountHolder( T* t ) : obj( t ) { if ( obj ) obj->ref(); }
-  ~RefCountHolder() { if ( obj ) obj->unref(); }
-  RefCountHolder( const RefCountHolder & o ) : obj(o.obj) { if (obj) obj->ref(); }
-  RefCountHolder & operator= ( const RefCountHolder & o)
-  {
-    if (o.obj!=obj) {
-      T* old = obj;
-      obj = o.obj;
-      if (obj)
-        obj->ref();
-      if (old)
-        old->unref();
-    }
-  }
-  T* obj;
-};
-template< class T >
-T* get_pointer(const RefCountHolder<T>& r) { return r.obj; }
 
 #endif

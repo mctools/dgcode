@@ -80,9 +80,9 @@ namespace Utils_ParametersBase_py {
   void addParameterString(Utils::ParametersBase*p, const std::string&n, const std::string& s) { static_cast<PB*>(p)->aps(n,s); }
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  py::class_<Utils::ParametersBase PYBOOSTNONCOPYABLE>(PYMOD "ParametersBase" PYBOOSTNOINIT)
+  py::class_<Utils::ParametersBase>(mod, "ParametersBase")
     .def("setParameterDouble",&Utils::ParametersBase::setParameterDouble)
     .def("setParameterInt",&Utils::ParametersBase::setParameterInt)
     .def("setParameterBoolean",&Utils::ParametersBase::setParameterBoolean)

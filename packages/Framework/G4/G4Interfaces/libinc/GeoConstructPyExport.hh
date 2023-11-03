@@ -24,7 +24,7 @@ namespace GeoConstructPyExport {
     //Fixme: std::shared_ptr instead?
     themod.def("create",&_internal_create<T>,py::return_value_policy::reference);
     return py::class_<T,G4Interfaces::GeoConstructBase>(themod,name)
-      .def("Construct",&T::Construct,py::return_ptr());
+      .def("Construct",&T::Construct,py::return_value_policy::reference);
   }
 
 

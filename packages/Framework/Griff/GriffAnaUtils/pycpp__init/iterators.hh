@@ -1,7 +1,8 @@
 namespace GriffAnaUtils {
 
-  //NB: For a pure c++ implementation of the iterator we should wrap the
-  //next() methods and inside it end the iteration by an exception:
+  //NB (comment possibly obsolete?): For a pure c++ implementation of the
+  //iterator we should wrap the next() methods and inside it end the iteration
+  //by an exception:
   //
   // const TIteratedObject* obj = t->next();
   // if (!obj) {
@@ -18,19 +19,19 @@ namespace GriffAnaUtils {
   {
     py::class_<TrackIterator>(themod,"TrackIterator_cpp")
       .def(py::init<GriffDataReader*>())
-      .def("_next_cpp",&TrackIterator::next,py::return_ptr())
+      .def("_next_cpp",&TrackIterator::next,py::return_value_policy::reference)
       .def("_reset_cpp",&TrackIterator::reset)
-      .def("addFilter",&TrackIterator::addFilter,py::return_ptr());
+      .def("addFilter",&TrackIterator::addFilter,py::return_value_policy::reference);
 
     ITrackFilter* (SegmentIterator::*segit_addtrackfilter)(ITrackFilter*) = &SegmentIterator::addFilter;
     ISegmentFilter* (SegmentIterator::*segit_addsegmentfilter)(ISegmentFilter*) = &SegmentIterator::addFilter;
 
     py::class_<SegmentIterator>(themod,"SegmentIterator_cpp")
       .def(py::init<GriffDataReader*>())
-      .def("_next_cpp",&SegmentIterator::next,py::return_ptr())
+      .def("_next_cpp",&SegmentIterator::next,py::return_value_policy::reference)
       .def("_reset_cpp",&SegmentIterator::reset)
-      .def("addFilter",segit_addtrackfilter,py::return_ptr())
-      .def("addFilter",segit_addsegmentfilter,py::return_ptr());
+      .def("addFilter",segit_addtrackfilter,py::return_value_policy::reference)
+      .def("addFilter",segit_addsegmentfilter,py::return_value_policy::reference);
 
     ITrackFilter* (StepIterator::*stepit_addtrackfilter)(ITrackFilter*) = &StepIterator::addFilter;
     ISegmentFilter* (StepIterator::*stepit_addsegmentfilter)(ISegmentFilter*) = &StepIterator::addFilter;
@@ -38,11 +39,11 @@ namespace GriffAnaUtils {
 
     py::class_<StepIterator>(themod,"StepIterator_cpp")
       .def( py::init<GriffDataReader*>() )
-      .def("_next_cpp",&StepIterator::next,py::return_ptr())
+      .def("_next_cpp",&StepIterator::next,py::return_value_policy::reference)
       .def("_reset_cpp",&StepIterator::reset)
-      .def("addFilter",stepit_addtrackfilter,py::return_ptr())
-      .def("addFilter",stepit_addsegmentfilter,py::return_ptr())
-      .def("addFilter",stepit_addstepfilter,py::return_ptr());
+      .def("addFilter",stepit_addtrackfilter,py::return_value_policy::reference)
+      .def("addFilter",stepit_addsegmentfilter,py::return_value_policy::reference)
+      .def("addFilter",stepit_addstepfilter,py::return_value_policy::reference);
   }
 
 }

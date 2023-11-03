@@ -1,9 +1,9 @@
 #include "Core/Python.hh"
 #include "G4StepLimitHelper/G4StepLimitHelper.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  py::class_<G4StepLimitHelper>(PYMOD "G4StepLimitHelper")
+  py::class_<G4StepLimitHelper>(mod, "G4StepLimitHelper")
               .def("setLimit", &G4StepLimitHelper::setLimit)
               .def("addLimit", &G4StepLimitHelper::addLimit)
               .def("setWorldLimit", &G4StepLimitHelper::setWorldLimit)

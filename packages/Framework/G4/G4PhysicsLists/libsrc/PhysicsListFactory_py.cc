@@ -10,7 +10,7 @@ G4VUserPhysicsList * PhysicsListFactory::attemptCreateCustomPhysicsList(const st
   auto pyp = mod.attr("extractProvider")(name);
   if (!pyp)
     return nullptr;
-  G4Interfaces::PhysListProviderBase* p = py::extract<G4Interfaces::PhysListProviderBase*>(pyp);
+  G4Interfaces::PhysListProviderBase* p = pyp.cast<G4Interfaces::PhysListProviderBase*>();
   assert(p);
   return p->construct();
 }

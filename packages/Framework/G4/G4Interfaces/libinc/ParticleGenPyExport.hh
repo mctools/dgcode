@@ -23,9 +23,9 @@ namespace ParticleGenPyExport {
   py::class_<T,G4Interfaces::ParticleGenBase> exportGen(py::module_ themod, const char* name)
   {
     pyextra::pyimport("G4Interfaces");
-    themod.def("create",&_internal_create<T>,py::return_ptr());
+    themod.def("create",&_internal_create<T>,py::return_value_policy::reference);
     return py::class_<T,G4Interfaces::ParticleGenBase>(themod,name)
-      .def("getAction",&T::getAction,py::return_ptr());
+      .def("getAction",&T::getAction,py::return_value_policy::reference);
   }
 }
 

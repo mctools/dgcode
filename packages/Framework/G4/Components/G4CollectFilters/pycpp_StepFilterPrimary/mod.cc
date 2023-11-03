@@ -1,7 +1,7 @@
 #include "G4Interfaces/StepFilterPyExport.hh"
 #include "G4CollectFilters/StepFilterPrimary.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  StepFilterPyExport::exportFilter<StepFilterPrimary>(PYMOD "StepFilterPrimary");
+  StepFilterPyExport::exportFilter<StepFilterPrimary>(mod, "StepFilterPrimary");
 }

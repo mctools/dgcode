@@ -1,7 +1,7 @@
 #include "G4Interfaces/ParticleGenPyExport.hh"
 #include "GriffGen.hh"
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
-  ParticleGenPyExport::exportGen<GriffGen>(PYMOD "GriffGen");
+  ParticleGenPyExport::exportGen<GriffGen>(mod, "GriffGen");
 }

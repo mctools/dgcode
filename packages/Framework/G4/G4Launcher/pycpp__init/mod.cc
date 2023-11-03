@@ -169,7 +169,7 @@ namespace G4Launcher_py {
   };
 }
 
-PYTHON_MODULE
+PYTHON_MODULE3
 {
   pyextra::pyimport("G4Interfaces");
   pyextra::pyimport("Utils.ParametersBase");
@@ -178,13 +178,13 @@ PYTHON_MODULE
   //well (at least register_ptr so it can be passed around on the python side)
   //... update: can't find register_ptr anymore, so here is a very basic
   //declaration of at least the stepping and event actions:
-  py::class_<G4UserSteppingAction>(m,"G4UserSteppingAction")
+  py::class_<G4UserSteppingAction>(mod,"G4UserSteppingAction")
     ;
-  py::class_<G4UserEventAction>(m,"G4UserEventAction")
+  py::class_<G4UserEventAction>(mod,"G4UserEventAction")
     ;
-  PYDEF("g4version",G4Launcher_py::g4version);
-  PYDEF("g4versionstr",G4Launcher_py::g4versionstr);
-  py::class_<G4Launcher_py::LauncherExtraPars,Utils::ParametersBase>(m,"LauncherExtraPars")
+  mod.def("g4version",G4Launcher_py::g4version);
+  mod.def("g4versionstr",G4Launcher_py::g4versionstr);
+  py::class_<G4Launcher_py::LauncherExtraPars,Utils::ParametersBase>(mod,"LauncherExtraPars")
     .def(py::init<>())
     .def("addParameterBoolean",&G4Launcher_py::LauncherExtraPars::pyaddPB)
     .def("addParameterInt",&G4Launcher_py::LauncherExtraPars::pyaddPI)
@@ -192,14 +192,14 @@ PYTHON_MODULE
     .def("addParameterDouble",&G4Launcher_py::LauncherExtraPars::pyaddPD)
     ;
 
-  py::class_<G4Launcher::Launcher>(m,"Launcher",py::dynamic_attr())//py::dynamic_attr to allow py-layer to add attributes (in _launcher.py)
-    .def(py::init(&G4Launcher_py::Launcher_pyinit),py::return_ptr())
+  py::class_<G4Launcher::Launcher>(mod,"Launcher",py::dynamic_attr())//py::dynamic_attr to allow py-layer to add attributes (in _launcher.py)
+    .def(py::init(&G4Launcher_py::Launcher_pyinit),py::return_value_policy::reference)
     .def("setGeo",&G4Launcher_py::Launcher_setGeo)
     .def("setGen",&G4Launcher_py::Launcher_setGen)
     .def("setFilter",&G4Launcher_py::Launcher_setFilter)
     .def("setKillFilter",&G4Launcher_py::Launcher_setKillFilter)
     .def("setMultiProcessing",&G4Launcher::Launcher::setMultiProcessing)
-    .def("getRunManager",&G4Launcher::Launcher::getRunManager,py::return_ptr())
+    .def("getRunManager",&G4Launcher::Launcher::getRunManager,py::return_value_policy::reference)
     .def("setVis",&G4Launcher::Launcher::setVis)
     .def("setVis",&G4Launcher_py::Launcher_setVis_0args)
     .def("startSession",&G4Launcher::Launcher::startSession)
@@ -230,9 +230,9 @@ PYTHON_MODULE
     .def("getOutputFile",&G4Launcher::Launcher::getOutputFile)
     .def("getOutputMode",&G4Launcher::Launcher::getOutputMode)
     .def("getVis",&G4Launcher::Launcher::getVis)
-    .def("getGeo",&G4Launcher::Launcher::getGeo,py::return_ptr())
-    .def("getGen",&G4Launcher::Launcher::getGen,py::return_ptr())
-    .def("getFilter",&G4Launcher::Launcher::getFilter,py::return_ptr())
+    .def("getGeo",&G4Launcher::Launcher::getGeo,py::return_value_policy::reference)
+    .def("getGen",&G4Launcher::Launcher::getGen,py::return_value_policy::reference)
+    .def("getFilter",&G4Launcher::Launcher::getFilter,py::return_value_policy::reference)
     .def("getPhysicsList",&G4Launcher::Launcher::getPhysicsList)
     .def("getPrintPrefix",&G4Launcher::Launcher::getPrintPrefix)
     .def("allowMultipleSettings",&G4Launcher::Launcher::allowMultipleSettings)
@@ -258,5 +258,5 @@ PYTHON_MODULE
     .def("_shutdown",&G4Launcher::Launcher::shutdown)
     ;
 
-  PYDEF("getTheLauncher",&G4Launcher::Launcher::getTheLauncher,py::return_ptr());
+  mod.def("getTheLauncher",&G4Launcher::Launcher::getTheLauncher,py::return_value_policy::reference);
 }

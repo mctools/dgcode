@@ -57,9 +57,9 @@ public:
 #if 0
     //Would be this simple if python 2.6 didn't produce slightly different
     //output of floats inside containers, breaking unit tests:
-    std::string tmp = py::extract<std::string>(py::str(m_cells_py));
+    std::string tmp = py::str(m_cells_py).cast<std::string>();
     printf("  Cells      : %s\n",tmp.c_str());
-    tmp = py::extract<std::string>(py::str(m_stats));
+    tmp = py::str(m_stats).cast<std::string>();
     printf("  Stats      : %s\n",tmp.c_str());
 #else
     //But we do it the hard way instead:
@@ -78,9 +78,9 @@ public:
     keys.attr("sort")();
     printf("  Stats      : {");
     for (py::size_t i = 0; i<py::len(keys); ++i) {
-      tmp[0] = py::extract<std::string>(keys[i]);
+      tmp[0] = keys[i].cast<std::string>();
       py::object o = m_stats[keys[i]];
-      tmp[1] = py::extract<std::string>(py::str(o));
+      tmp[1] = py::str(o).cast<std::string>();
       printf("'%s': %s%s",
              tmp[0].c_str(),tmp[1].c_str(),
              (i+1==py::len(keys)?"}\n":", "));
@@ -121,11 +121,10 @@ void py_Mesh3D_merge_files(std::string output_file, py::list input_files) {
     PyErr_SetString(PyExc_ValueError, "List of files to merge must be at least length 2");
     throw py::error_already_set();
   }
-  std::string tmp;
-  tmp = py::extract<std::string>(input_files[0]);
+  std::string tmp = input_files[0].cast<std::string>();
   Mesh::Mesh<3> mesh(tmp);
   for (py::ssize_t i = 1; i < n; ++i) {
-    tmp = py::extract<std::string>(input_files[i]);
+    tmp = input_files[i].cast<std::string>();
     mesh.merge(tmp);
   }
   mesh.saveToFile(output_file);

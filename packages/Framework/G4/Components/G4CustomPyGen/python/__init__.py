@@ -6,7 +6,7 @@ from G4CustomPyGen._GenBaseCpp import _GenBaseCpp
 class GenBase(_GenBaseCpp):
     def __init__(self):
 
-        #Very important to call _GenBaseCpp __init__, so boost exports the C++ class correctly:
+        #Calling _GenBaseCpp __init__, so pybind11 exports the C++ class correctly:
         super(GenBase,self).__init__()
 
         #Make sure we generate a proper name based on class name and file where it is implemented:

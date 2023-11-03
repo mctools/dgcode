@@ -519,9 +519,9 @@ namespace G4MCPLWriter {
       const G4Interfaces::GeoConstructBase* geo(0);
       const G4Interfaces::ParticleGenBase* gen(0);
       if (pygeo)
-        geo = py::extract<const G4Interfaces::GeoConstructBase*>(pygeo);
+        geo = pygeo.cast<const G4Interfaces::GeoConstructBase*>();
       if (pygen)
-        gen = py::extract<const G4Interfaces::ParticleGenBase*>(pygen);
+        gen = pygen.cast<const G4Interfaces::ParticleGenBase*>();
       std::string geo_name(geo ? geo->getName() : std::string("<unknown>"));
       std::string gen_name(gen ? gen->getName() : std::string("<unknown>"));
       {
