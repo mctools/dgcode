@@ -17,7 +17,7 @@ namespace G4OSG {
   class Viewer {
   public:
     Viewer(const char * griff_file = 0, bool show_geo = true,
-           const std::set<uint64_t>& griff_event_selection = std::set<uint64_t>());
+           const std::set<std::uint64_t>& griff_event_selection = std::set<std::uint64_t>());
     ~Viewer();
     int run();
 
@@ -68,7 +68,7 @@ namespace G4OSG {
     void init();
     //Event data:
     std::string m_griff_file;
-    std::set<uint64_t> m_griff_eventsToShow;
+    std::set<std::uint64_t> m_griff_eventsToShow;
     bool m_show_geo;
   };
 }

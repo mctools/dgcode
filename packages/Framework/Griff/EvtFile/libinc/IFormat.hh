@@ -12,7 +12,7 @@ namespace EvtFile {
   {
   public:
     //The magic word which all datafiles will start with.
-    virtual uint32_t magicWord() const = 0;
+    virtual std::uint32_t magicWord() const = 0;
 
     //Extension of data files (will be appended automatically by FileWriter):
     virtual const char* fileExtension() const = 0;

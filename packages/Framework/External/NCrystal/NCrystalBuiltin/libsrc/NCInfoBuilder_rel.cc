@@ -1059,7 +1059,7 @@ NC::Info::Composition NC::InfoBuilder::buildCompositionFromChemForm( const std::
   if ( !cf.has_value() )
     NCRYSTAL_THROW2(BadInput,"Could not decode chemical formula (needed for composition): \""<<cf_str<<"\"");
   Info::Composition composition;
-  uint64_t nelem_tot(0);
+  std::uint64_t nelem_tot(0);
   for ( auto& n_smb : cf.value() )
     nelem_tot += n_smb.first;
   nc_assert_always(nelem_tot>0);

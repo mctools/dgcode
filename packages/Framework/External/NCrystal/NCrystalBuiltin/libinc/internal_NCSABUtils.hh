@@ -100,7 +100,7 @@ namespace NCRYSTAL_NAMESPACE {
     //(alphaGrid.size()).
     void activeGridCells( const SABData& data,
                           double ekin_div_kT,
-                          std::vector<std::pair<uint16_t,uint16_t>>& out_alpharanges,
+                          std::vector<std::pair<std::uint16_t,std::uint16_t>>& out_alpharanges,
                           std::size_t& ibeta_low );
 
     //Expand kinematic alpha-limits at each beta point outwards to nearest
@@ -111,7 +111,7 @@ namespace NCRYSTAL_NAMESPACE {
     //alphaGrid.size() in the out_alpharanges vector.
     void activeGridRanges( const SABData& data,
                            double ekin_div_kT,
-                           std::vector<std::pair<uint16_t,uint16_t>>& out_alpharanges,
+                           std::vector<std::pair<std::uint16_t,std::uint16_t>>& out_alpharanges,
                            std::size_t& ibeta_low );
 
     //Break down how XS contributions falls over whole grid cells, as well as

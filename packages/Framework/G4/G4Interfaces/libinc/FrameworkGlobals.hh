@@ -9,7 +9,7 @@ namespace FrameworkGlobals {
 
   //Random seed info for current event (might be useful to put in error
   //messages, embed in output files, etc.):
-  uint64_t currentEvtSeed();
+  std::uint64_t currentEvtSeed();
 
   //Multi-process info (mpID is useful for constructing uniquely named output
   //files, etc.):
@@ -24,7 +24,7 @@ namespace FrameworkGlobals {
 
   //////////////////////// Setters ////////////////////////////////
   //Method to be used only by the seeding framework:
-  void setCurrentEvtSeed(uint64_t&);
+  void setCurrentEvtSeed(std::uint64_t&);
   //Methods to be used only by the multi-process framework:
   void setMpID(unsigned);//0 for parent, 1 .. Nproc-1 for childs
   void setNProcs(unsigned);

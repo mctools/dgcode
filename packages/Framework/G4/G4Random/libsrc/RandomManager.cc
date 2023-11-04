@@ -14,7 +14,7 @@ public:
   //Will set the seed at the beginning of each event and print it (occasionally)
   //along with the event number. First event will start with the seed passed in
   //through the variable "firstseed".
-  RndmSeedCB(uint64_t firstseed,RandomManager::EVTMSGLEVEL l)
+  RndmSeedCB(std::uint64_t firstseed,RandomManager::EVTMSGLEVEL l)
     : PreGenCallBack(),
       m_nextseed(firstseed),
       m_evtcount(0),
@@ -31,7 +31,7 @@ public:
   }
   virtual void preGen()
   {
-    uint64_t seed_to_use;
+    std::uint64_t seed_to_use;
     if (m_nextseed) {
       //1st event...
       if (FrameworkGlobals::isForked()&&FrameworkGlobals::isChild()) {
@@ -41,7 +41,7 @@ public:
         //we can ensure to get the same distributions irrespective of number of
         //processes (also, we should fix the evt/run numbers).
 
-        const uint64_t large_prime = UINT64_C(541234505579);//something larger than 4 billion
+        const std::uint64_t large_prime = UINT64_C(541234505579);//something larger than 4 billion
                                                             //=> should hopefully avoid
                                                             //clashes with multiple seeds
                                                             //specified by the user
@@ -82,13 +82,13 @@ public:
     s_theRndmSeedCB = nullptr;
   }
 private:
-  uint64_t m_nextseed;
+  std::uint64_t m_nextseed;
   NCG4RngEngine * m_engine = nullptr;
   unsigned m_evtcount;
   RandomManager::EVTMSGLEVEL m_evtMsgLvl;
 };
 
-void RandomManager::init(uint64_t seed_of_first_event,EVTMSGLEVEL lvl)
+void RandomManager::init(std::uint64_t seed_of_first_event,EVTMSGLEVEL lvl)
 {
   assert(!s_theRndmSeedCB);
   s_theRndmSeedCB = std::make_shared<RndmSeedCB>(seed_of_first_event,lvl);

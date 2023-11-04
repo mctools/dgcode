@@ -13,7 +13,7 @@ unsigned G4DataCollectInternals::DBMetaDataEntry::calculateHash() const {
 void G4DataCollectInternals::DBMetaDataEntry::write(EvtFile::FileWriter&fw)
 {
   fw.writeDataDBSection((int32_t)0);//version
-  fw.writeDataDBSection((uint32_t)m_data.size());//size
+  fw.writeDataDBSection((std::uint32_t)m_data.size());//size
   auto itE=m_data.end();
   for (auto it=m_data.begin();it!=itE;++it) {
     fw.writeDataDBSection(m_mgr->dbMetaDataStrings.getIndex(it->first));//key

@@ -74,8 +74,8 @@ namespace NCRYSTAL_NAMESPACE {
       ElementBreakdownLW& operator=( ElementBreakdownLW&& o );
       bool valid() const;//objects are always valid, unless has been moved-from.
     private:
-      uint32_t m_ZAN = 0;//lowest 14 bits: nisotopes. Middle 10 bits: A. Highest 8 bits: Z.
-      std::unique_ptr<std::pair<double,uint16_t>[]> m_other;//Other isotopes and their fractions.
+      std::uint32_t m_ZAN = 0;//lowest 14 bits: nisotopes. Middle 10 bits: A. Highest 8 bits: Z.
+      std::unique_ptr<std::pair<double,std::uint16_t>[]> m_other;//Other isotopes and their fractions.
       bool cmpOthers(const ElementBreakdownLW&) const;
       double calcFirstFraction() const;
       unsigned firstA() const { return ( m_ZAN >> 14 ) & 0x3FF; }//0 for natural elements

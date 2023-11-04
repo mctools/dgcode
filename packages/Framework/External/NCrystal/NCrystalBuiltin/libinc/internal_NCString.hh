@@ -115,8 +115,8 @@ namespace NCRYSTAL_NAMESPACE {
   std::string joinstr(const VectS& parts, StrView sep );
 
   //Convert values to/from hex strings:
-  std::string bytes2hexstr(const std::vector<uint8_t>& v);
-  std::vector<uint8_t> hexstr2bytes(const std::string& v);
+  std::string bytes2hexstr(const std::vector<std::uint8_t>& v);
+  std::vector<std::uint8_t> hexstr2bytes(const std::string& v);
 
   //Common access to environment variables - will always be prefixed with
   //NCRYSTAL_. Unset variables means that the default values will be
@@ -164,7 +164,7 @@ namespace NCRYSTAL_NAMESPACE {
   template<class T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
   void streamJSON( std::ostream&, T );
   void streamJSON( std::ostream&, char ) = delete;
-  void streamJSON( std::ostream&, uint8_t ) = delete;
+  void streamJSON( std::ostream&, std::uint8_t ) = delete;
   void streamJSON( std::ostream&, int8_t ) = delete;
   //Bools become true / false in json:
   void streamJSON( std::ostream&, bool );

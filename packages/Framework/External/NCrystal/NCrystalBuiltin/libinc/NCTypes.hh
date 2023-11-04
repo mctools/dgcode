@@ -416,7 +416,7 @@ namespace NCRYSTAL_NAMESPACE {
   NCRYSTAL_API std::ostream& operator<<( std::ostream&, const ScatterOutcomeIsotropic& );
 
   //Index identifying RNG streams:
-  class NCRYSTAL_API RNGStreamIndex final : public EncapsulatedValue<RNGStreamIndex,uint64_t> {
+  class NCRYSTAL_API RNGStreamIndex final : public EncapsulatedValue<RNGStreamIndex,std::uint64_t> {
   public:
     using EncapsulatedValue::EncapsulatedValue;
     static constexpr const char * unit() noexcept { return ""; }

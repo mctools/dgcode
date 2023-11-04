@@ -75,7 +75,7 @@ void G4DataCollectInternals::DCStepData::set(const G4Step*step,DCMgr&mgr, int is
   static_assert((int)fUserDefinedLimit==5);// Step defined by the user Step limit in the logical volume
   static_assert((int)fExclusivelyForcedProc==6);// Step defined by an exclusively forced PostStepDoIt process
   static_assert((int)fUndefined==7);// Step not defined yet
-  stepStatus = (uint32_t)step_status_int;
+  stepStatus = (std::uint32_t)step_status_int;
 
   //post and pre step info:
   const G4AffineTransform& topTransform = touchable->GetHistory()->GetTopTransform();

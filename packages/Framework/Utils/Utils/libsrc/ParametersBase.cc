@@ -1,3 +1,4 @@
+#include "Core/Types.hh"
 #include "Utils/ParametersBase.hh"
 #include "Utils/StringSort.hh"
 #include "Utils/ByteStream.hh"
@@ -485,16 +486,16 @@ void Utils::ParametersBase::serialiseParameters(char*& output, unsigned& outputL
   //  Figure out length of data:  //
   //////////////////////////////////
 
-  unsigned n = ByteStream::nbytesToWrite<uint32_t>();
+  unsigned n = ByteStream::nbytesToWrite<std::uint32_t>();
   //Parameter names and types
   auto itE = m_imp->m_addedorder.end();
   for (auto it = m_imp->m_addedorder.begin(); it!=itE; ++it)
-    n += ByteStream::nbytesToWrite(it->first) + ByteStream::nbytesToWrite<uint8_t>();
+    n += ByteStream::nbytesToWrite(it->first) + ByteStream::nbytesToWrite<std::uint8_t>();
   //parameter values:
   static_assert(sizeof(double)==8);
   n += m_imp->m_mapDouble.size()*ByteStream::nbytesToWrite<double>();
-  n += m_imp->m_mapInt.size()*ByteStream::nbytesToWrite<int32_t>();
-  n += m_imp->m_mapBool.size()*ByteStream::nbytesToWrite<uint8_t>();
+  n += m_imp->m_mapInt.size()*ByteStream::nbytesToWrite<std::int32_t>();
+  n += m_imp->m_mapBool.size()*ByteStream::nbytesToWrite<std::uint8_t>();
   auto itPSE = m_imp->m_mapStr.end();
   for (auto itPS = m_imp->m_mapStr.begin(); itPS!=itPSE;++itPS)
     n+= ByteStream::nbytesToWrite(itPS->second.current_val);
@@ -511,19 +512,19 @@ void Utils::ParametersBase::serialiseParameters(char*& output, unsigned& outputL
   for (unsigned i=0;i<n;++i)
     data[i]='%';
 #endif
-  ByteStream::write(data,(uint32_t)m_imp->m_addedorder.size());
+  ByteStream::write(data,(std::uint32_t)m_imp->m_addedorder.size());
   for (auto it = m_imp->m_addedorder.begin(); it!=itE; ++it) {
     ByteStream::write(data,it->first);
     assert(it->second>=0&&it->second<UINT8_MAX);
-    ByteStream::write(data,uint8_t(it->second));
+    ByteStream::write(data,std::uint8_t(it->second));
     if (it->second==0) {
       ByteStream::write(data,m_imp->m_mapDouble.find(it->first)->second.current_val);
     } else if (it->second==1) {
       int val = m_imp->m_mapInt.find(it->first)->second.current_val;
       assert(val>INT32_MIN&&val<INT32_MAX);
-      ByteStream::write(data,(int32_t)val);
+      ByteStream::write(data,(std::int32_t)val);
     } else if (it->second==2) {
-      ByteStream::write(data,(uint8_t)(m_imp->m_mapBool.find(it->first)->second.current_val?1:0));
+      ByteStream::write(data,(std::uint8_t)(m_imp->m_mapBool.find(it->first)->second.current_val?1:0));
     } else if (it->second==3) {
       ByteStream::write(data,m_imp->m_mapStr.find(it->first)->second.current_val);
     } else {

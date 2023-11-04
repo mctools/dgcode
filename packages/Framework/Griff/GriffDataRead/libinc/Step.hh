@@ -1,6 +1,7 @@
 #ifndef GriffDataRead_Step_hh
 #define GriffDataRead_Step_hh
 
+#include "Core/Types.hh"
 #include <cmath>
 #include <string>
 
@@ -83,7 +84,7 @@ namespace GriffDataRead {
     const char* stepStatusCStr() const;
 
   private:
-    uint32_t stepStatus_raw() const;
+    std::uint32_t stepStatus_raw() const;
     const Segment * m_segment;
     const char * m_data;
     friend class Segment;

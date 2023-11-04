@@ -4,9 +4,9 @@
 
 namespace FrameworkGlobals {
 
-  static uint64_t s_currentEvtSeed = 0;
-  uint64_t currentEvtSeed() { return s_currentEvtSeed; }
-  void setCurrentEvtSeed(uint64_t& s) { s_currentEvtSeed = s; }
+  static std::uint64_t s_currentEvtSeed = 0;
+  std::uint64_t currentEvtSeed() { return s_currentEvtSeed; }
+  void setCurrentEvtSeed(std::uint64_t& s) { s_currentEvtSeed = s; }
 
   static int s_mpID = INT_MAX;
   void setMpID(unsigned mpid) { s_mpID = mpid; }

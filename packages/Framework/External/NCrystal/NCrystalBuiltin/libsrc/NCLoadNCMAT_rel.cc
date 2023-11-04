@@ -311,7 +311,7 @@ NC::Info NC::loadNCMAT( NCMATData&& data,
                   const std::pair<AtomDataSP,std::string>& b) {
                  return ( a.first->getUniqueID() == b.first->getUniqueID() ? a.second < b.second : *a.first < *b.first );
                } );
-    nc_assert_always( (uint64_t)v.size() < (uint64_t)std::numeric_limits<unsigned>::max() );
+    nc_assert_always( (std::uint64_t)v.size() < (std::uint64_t)std::numeric_limits<unsigned>::max() );
     for ( auto&& e : enumerate(v) )
       nc_map_force_emplace( elementname_2_indexedatomdata_map, e.val.second, IndexedAtomData{ std::move(e.val.first), AtomIndex{static_cast<unsigned>(e.idx)} } );
   }

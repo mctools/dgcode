@@ -16,7 +16,7 @@ namespace G4OSG {
   public:
     //Show tracks in griff file. Empty griff_evts_to_show means all, otherwise
     //just show events at those positions in the file.
-    THCommon(Viewer*, const char * griff_file, const std::set<uint64_t>& griff_evts_to_show);
+    THCommon(Viewer*, const char * griff_file, const std::set<std::uint64_t>& griff_evts_to_show);
     ~THCommon();
     osg::Group * sceneHook() { return m_sceneHook; }
 
@@ -65,7 +65,7 @@ namespace G4OSG {
   private:
     Viewer * m_viewer;
     GriffDataReader m_dr;
-    std::set<uint64_t> m_griff_evts_to_show;
+    std::set<std::uint64_t> m_griff_evts_to_show;
     std::vector<TrkHandle*> m_trkhandles;
     //    TrkHandle* m_vhWorld;
     osg::ref_ptr<osg::Group> m_sceneHook;

@@ -6,7 +6,7 @@
 #include "G4ios.hh"
 #include <cstdio>
 
-uint32_t G4MCPLUserFlags::getFlags(const G4Track* trk)
+std::uint32_t G4MCPLUserFlags::getFlags(const G4Track* trk)
 {
   assert(trk);
   const G4DynamicParticle* dp = trk->GetDynamicParticle();

@@ -5,7 +5,7 @@ GriffDataRead::Touchable::Touchable(const char*&data)
 {
   //data will not be available for the entire lifetime of touchable object,
   //so it must be decoded immediately:
-  uint8_t depth8bit;
+  std::uint8_t depth8bit;
   ByteStream::read(data,depth8bit);
   size_t depth = depth8bit;
   m_info.resize(depth);

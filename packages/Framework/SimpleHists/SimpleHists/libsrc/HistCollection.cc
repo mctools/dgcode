@@ -212,10 +212,10 @@ void SimpleHists::HistCollection::saveToFile(const std::string& filename, bool a
     throw std::runtime_error("HistCollection::saveToFile could not open file");
   }
 
-  uint32_t header[3];
-  header[0] = (uint32_t)MAGICWORD;
-  header[1] = (uint32_t)1;//version
-  header[2] = (uint32_t)m_hists.size();
+  std::uint32_t header[3];
+  header[0] = (std::uint32_t)MAGICWORD;
+  header[1] = (std::uint32_t)1;//version
+  header[2] = (std::uint32_t)m_hists.size();
 
   int written = gzwrite ( fp, &header[0], 12);
   if (written != 12) {
@@ -238,7 +238,7 @@ void SimpleHists::HistCollection::saveToFile(const std::string& filename, bool a
       tmp.clear();
       it->second->serialise(tmp);
       //fill data:
-      uint32_t lenhistdata = tmp.size();
+      std::uint32_t lenhistdata = tmp.size();
       //fill header:
       histheader[0]=static_cast<char>(it->first.size());
       std::memcpy(&histheader[1], &lenhistdata, 4);
@@ -287,10 +287,10 @@ SimpleHists::HistCollection::HistCollection(const std::string& filename)
     return;
   }
 
-  uint32_t header[3];
+  std::uint32_t header[3];
   int bytesread = gzread (fp, (char*)&header[0], 12);
 
-  if (bytesread!=12||header[0]!=(uint32_t)MAGICWORD) {
+  if (bytesread!=12||header[0]!=(std::uint32_t)MAGICWORD) {
     printf("HistCollection ERROR shist file header not in right format: \"%s\"\n",fn.c_str());
     throw std::runtime_error("HistCollection shist file header not in right format.");
     return;
@@ -304,7 +304,7 @@ SimpleHists::HistCollection::HistCollection(const std::string& filename)
   //3) Read histogram (and key) data:
 
   char keysize;
-  uint32_t histsize;
+  std::uint32_t histsize;
   std::string keybuf;
   std::string histbuf;
 

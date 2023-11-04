@@ -81,8 +81,8 @@ namespace NCRYSTAL_NAMESPACE {
     //internally generating two numbers (i.e. 128 bits) in genUInt64, and using
     //only the good quality bits in the result.
   public:
-    using state_t = std::array<uint64_t,2>;
-    RandXRSRImpl(uint64_t seed = 0);//NB: seed = 0 is not a special seed value.
+    using state_t = std::array<std::uint64_t,2>;
+    RandXRSRImpl(std::uint64_t seed = 0);//NB: seed = 0 is not a special seed value.
     RandXRSRImpl( no_init_t ) {}//invalid unspecified state
 #if defined(__GNUC__) && (__GNUC__*1000+__GNUC_MINOR__)<7000
     RandXRSRImpl( const state_t& st ) { m_s[0] = st[0]; m_s[1] = st[1]; }
@@ -91,18 +91,18 @@ namespace NCRYSTAL_NAMESPACE {
 #endif
 
     double generate();// uniformly in ]0,1]
-    uint64_t genUInt64();//uniformly over 0..uint64max (i.e. all bits randomised)
-    uint32_t genUInt32();//uniformly over 0..uint32max (i.e. all bits randomised)
+    std::uint64_t genUInt64();//uniformly over 0..uint64max (i.e. all bits randomised)
+    std::uint32_t genUInt32();//uniformly over 0..uint32max (i.e. all bits randomised)
     bool coinflip();
 
-    void seed(uint64_t seed);
+    void seed(std::uint64_t seed);
     const state_t& state() const noexcept  { return m_s; }
     state_t& state() noexcept { return m_s; }
     void jump();
 
     //Internal functions, exposed solely for the purpose of unit tests:
-    static uint64_t splitmix64(uint64_t& state);
-    uint64_t genUInt64WithBadLowerBits();
+    static std::uint64_t splitmix64(std::uint64_t& state);
+    std::uint64_t genUInt64WithBadLowerBits();
   private:
     state_t m_s;
   };
@@ -180,11 +180,11 @@ inline double NCrystal::randExpInterval( RNG& rng, double a, double b, double c 
   return RandExpIntervalSampler(a,b,c).sample(rng);
 }
 
-inline uint64_t NCrystal::RandXRSRImpl::genUInt64WithBadLowerBits()
+inline std::uint64_t NCrystal::RandXRSRImpl::genUInt64WithBadLowerBits()
 {
-  const uint64_t s0 = m_s[0];
-  uint64_t s1 = m_s[1];
-  uint64_t result = s0 + s1;
+  const std::uint64_t s0 = m_s[0];
+  std::uint64_t s1 = m_s[1];
+  std::uint64_t result = s0 + s1;
   s1 ^= s0;
   m_s[0] = ((s0 << 55) | (s0 >> 9)) ^ s1 ^ (s1 << 14);
   m_s[1] = (s1 << 36) | (s1 >> 28);
@@ -196,26 +196,26 @@ inline double NCrystal::RandXRSRImpl::generate()
   return randUInt64ToFP01( genUInt64WithBadLowerBits() );
 }
 
-inline uint64_t NCrystal::RandXRSRImpl::genUInt64()
+inline std::uint64_t NCrystal::RandXRSRImpl::genUInt64()
 {
   //Since lower 3 bits in generator output have unwanted correlations, we simply
   //combine upper bits of two integers into one:
-  const uint64_t g1 = genUInt64WithBadLowerBits();
-  const uint64_t g2 = genUInt64WithBadLowerBits();
+  const std::uint64_t g1 = genUInt64WithBadLowerBits();
+  const std::uint64_t g2 = genUInt64WithBadLowerBits();
   return ( g1 >> 32 ) | ( g2 & 0xffffffff00000000 );
 }
 
-inline uint32_t NCrystal::RandXRSRImpl::genUInt32()
+inline std::uint32_t NCrystal::RandXRSRImpl::genUInt32()
 {
   //Since lower 3 bits in generator output have unwanted correlations, we simply
   //just use the upper bits:
-  return static_cast<uint32_t>(genUInt64WithBadLowerBits() >> 32);
+  return static_cast<std::uint32_t>(genUInt64WithBadLowerBits() >> 32);
 }
 
 inline bool NCrystal::RandXRSRImpl::coinflip()
 {
   //Test one of the high bits, stay far away from the 3 lowest:
-  constexpr uint64_t onebit = 0x1000000000000000ull;
+  constexpr std::uint64_t onebit = 0x1000000000000000ull;
   return onebit & genUInt64WithBadLowerBits();
 }
 

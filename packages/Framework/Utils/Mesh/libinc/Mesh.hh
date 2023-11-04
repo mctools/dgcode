@@ -1,6 +1,7 @@
 #ifndef Mesh_Mesh_hh
 #define Mesh_Mesh_hh
 
+#include "Core/Types.hh"
 #include "Mesh/MeshFiller.hh"
 #include "Utils/DelayedAllocVector.hh"
 #include "Utils/PackSparseVector.hh"
@@ -129,7 +130,7 @@ private:
   inline void Mesh<NDIM>::extractstr(TDataProvider& dp,std::string& t) const
   {
     t.clear();
-    uint16_t sz;
+    std::uint16_t sz;
     extract(dp,sz);
     if (sz) {
       t.resize(sz);
@@ -226,7 +227,7 @@ private:
     //Name, comments, cell dimensions:
     if (m_name.size()>65000||m_comments.size()>65000)
       throw std::runtime_error("Write error - too large string");
-    uint16_t tmp16 = m_name.size();
+    std::uint16_t tmp16 = m_name.size();
     write(da,tmp16);
     da((unsigned char*)m_name.c_str(),tmp16);
     tmp16 = m_comments.size();
@@ -236,7 +237,7 @@ private:
     write(da,tmp16);
     da((unsigned char*)m_cellunits.c_str(),tmp16);
     for (unsigned i = 0; i<NDIM; ++i) {
-      uint32_t tmp = m_filler.nCells(i);
+      std::uint32_t tmp = m_filler.nCells(i);
       write(da,tmp);
       double cl = m_filler.cellLower(i);
       write(da,cl);
@@ -287,7 +288,7 @@ private:
     double cell_upper[NDIM];
 
     for (unsigned i = 0; i<NDIM; ++i) {
-      uint32_t tmp;
+      std::uint32_t tmp;
       extract(dp,tmp);
       ncells[i] = tmp;
       extract(dp,cell_lower[i]);
@@ -297,7 +298,7 @@ private:
 
     //stats:
     sstats.clear();
-    uint16_t nstats;
+    std::uint16_t nstats;
     std::string tmpstr;
     double tmpdbl;
     extract(dp,nstats);

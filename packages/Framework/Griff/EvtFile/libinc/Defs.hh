@@ -6,9 +6,9 @@
 
 namespace EvtFile {
 
-  typedef uint32_t index_type;
+  typedef std::uint32_t index_type;
   static const index_type INDEX_MAX = UINT32_MAX;
-  typedef uint16_t subsectid_type;
+  typedef std::uint16_t subsectid_type;
 
   typedef std::string str_type;
 

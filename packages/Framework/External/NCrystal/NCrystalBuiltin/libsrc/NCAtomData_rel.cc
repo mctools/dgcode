@@ -109,8 +109,8 @@ NC::AtomData::AtomData( const NC::AtomData::ComponentList& components )
   : m_m(), m_ixs(0.0), m_csl(0.0), m_axs(0.0), m_classify(0), m_z(0)
 {
   nc_assert_always(!components.empty());
-  nc_assert_always( static_cast<uint64_t>(components.size())
-                    < static_cast<uint64_t>(-std::numeric_limits<decltype(m_classify)>::lowest()) );
+  nc_assert_always( static_cast<std::uint64_t>(components.size())
+                    < static_cast<std::uint64_t>(-std::numeric_limits<decltype(m_classify)>::lowest()) );
 
   constexpr double fractol = 1e-9;
 

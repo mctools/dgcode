@@ -28,8 +28,8 @@ namespace NC = NCrystal;
 namespace NCRYSTAL_NAMESPACE {
   namespace DICache {
     //Cache keys:
-    using VDOSKey = std::tuple<uint64_t,unsigned,uint32_t,const DI_VDOS*>;//(DI unique id, vdoslux 0..5,vdos2sabExcludeFlag,DI object)
-    using VDOSDebyeKey = std::tuple<unsigned,uint64_t,uint64_t,uint64_t,uint64_t>;//(reduced vdoslux 0..2 + rounded: elementMass, boundXS, T, TDebye)
+    using VDOSKey = std::tuple<std::uint64_t,unsigned,std::uint32_t,const DI_VDOS*>;//(DI unique id, vdoslux 0..5,vdos2sabExcludeFlag,DI object)
+    using VDOSDebyeKey = std::tuple<unsigned,std::uint64_t,std::uint64_t,std::uint64_t,std::uint64_t>;//(reduced vdoslux 0..2 + rounded: elementMass, boundXS, T, TDebye)
 
     //For VDOS Debye we can potentially share work between different Info
     //objects, since the number of dependent parameters is very low. Thus, we
@@ -49,10 +49,10 @@ namespace NCRYSTAL_NAMESPACE {
       sb.validate();
       mass.validate();
       nc_assert(reduced_vdoslux<=2);
-      auto roundFct = [](double x) { nc_assert_always(x>0.0&&x<1.0e11); return static_cast<uint64_t>(1e7*x+0.5); };
+      auto roundFct = [](double x) { nc_assert_always(x>0.0&&x<1.0e11); return static_cast<std::uint64_t>(1e7*x+0.5); };
       return VDOSDebyeKey( reduced_vdoslux,
                            roundFct(mass.get()),
-                           (sb.get()?roundFct(sb.get()):uint64_t(0)),//sb might be zero in rare corner cases
+                           (sb.get()?roundFct(sb.get()):std::uint64_t(0)),//sb might be zero in rare corner cases
                            roundFct(t.get()),
                            roundFct(dt.get()) );
     }
@@ -75,7 +75,7 @@ namespace NCRYSTAL_NAMESPACE {
     }
 
     //Actual worker functions producing results:
-    shared_obj<const SABData> extractFromDIVDOSNoCache( unsigned vdoslux, uint32_t vdos2sabExcludeFlag, const DI_VDOS& );
+    shared_obj<const SABData> extractFromDIVDOSNoCache( unsigned vdoslux, std::uint32_t vdos2sabExcludeFlag, const DI_VDOS& );
     shared_obj<const SABData> extractFromDIVDOSDebyeNoCache( const VDOSDebyeKey& );
 
     //Factories:
@@ -85,7 +85,7 @@ namespace NCRYSTAL_NAMESPACE {
       std::string keyToString( const VDOSKey& key ) const final
       {
         std::ostringstream ss;
-        uint32_t vdos2sabExcludeFlag = std::get<2>(key);
+        std::uint32_t vdos2sabExcludeFlag = std::get<2>(key);
         ss<<"(DI_VDOS id="<<std::get<0>(key)<<";vdoslux="<<std::get<1>(key);
         if ( vdos2sabExcludeFlag > 0 )
           ss<<";vdos2sabExcludeFlag="<<vdos2sabExcludeFlag;
@@ -96,7 +96,7 @@ namespace NCRYSTAL_NAMESPACE {
       virtual ShPtr actualCreate( const VDOSKey& key ) const final
       {
         unsigned vdoslux = std::get<1>(key);
-        uint32_t vdos2sabExcludeFlag = std::get<2>(key);
+        std::uint32_t vdos2sabExcludeFlag = std::get<2>(key);
         const DI_VDOS* di_vdos = std::get<3>(key);
         nc_assert_always( di_vdos && di_vdos->getUniqueID().value == std::get<0>(key) );
         return extractFromDIVDOSNoCache( vdoslux, vdos2sabExcludeFlag, *di_vdos  );
@@ -127,7 +127,7 @@ namespace NCRYSTAL_NAMESPACE {
     static VDOS2SABFactory s_vdos2sabfactory;
     static VDOSDebye2SABFactory s_vdosdebye2sabfactory;
 
-    shared_obj<const SABData> extractFromDIVDOS( unsigned vdoslux, uint32_t vdos2sabExcludeFlag, const DI_VDOS& di )
+    shared_obj<const SABData> extractFromDIVDOS( unsigned vdoslux, std::uint32_t vdos2sabExcludeFlag, const DI_VDOS& di )
     {
       VDOSKey key( di.getUniqueID().value, vdoslux, vdos2sabExcludeFlag, &di );
       return s_vdos2sabfactory.create(key);
@@ -199,7 +199,7 @@ void NC::clearSABDataFromDynInfoCaches()
   DICache::s_vdosdebye2sabfactory.cleanup();
 }
 
-NC::shared_obj<const NC::SABData> NC::DICache::extractFromDIVDOSNoCache( unsigned vdoslux, uint32_t vdos2sabExcludeFlag, const DI_VDOS& di  )
+NC::shared_obj<const NC::SABData> NC::DICache::extractFromDIVDOSNoCache( unsigned vdoslux, std::uint32_t vdos2sabExcludeFlag, const DI_VDOS& di  )
 {
   //If user specified an energy-grid with a specific upper energy, Emax,
   //this is essentially a request to expand the vdos out to that energy:

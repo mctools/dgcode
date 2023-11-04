@@ -15,12 +15,12 @@ GriffDataRead::Element::Element(const char*&data)
   ByteStream::read(data,m_Z);
   ByteStream::read(data,m_N);
   ByteStream::read(data,m_A);
-  uint32_t na;
+  std::uint32_t na;
   ByteStream::read(data,na);
   assert(na==0||na==1);
   m_naturalabundances = bool(na);
 
-  uint32_t nisotopes;
+  std::uint32_t nisotopes;
   ByteStream::read(data,nisotopes);
   m_isotopes.resize(nisotopes);
   auto isoIt = m_isotopes.begin();

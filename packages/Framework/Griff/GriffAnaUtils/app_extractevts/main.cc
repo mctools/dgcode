@@ -28,12 +28,12 @@ int main(int argc,char** argv) {
   auto it = args.begin();
   std::string infile = *it++;
   std::string outfile = *it++;
-  std::set<uint64_t> selected_evts;
+  std::set<std::uint64_t> selected_evts;
   for (;it!=args.end();++it) {
     std::size_t pos;
     unsigned long long l = stoull(*it,&pos);
     if (pos==it->size()) {
-      selected_evts.insert((uint64_t)l);
+      selected_evts.insert((std::uint64_t)l);
     } else {
       printf("ERROR: Invalid event id requested!\n");
       return 1;
@@ -47,8 +47,8 @@ int main(int argc,char** argv) {
   }
   std::vector<char> pending_shared_data;
   std::vector<char> tmp;
-  uint64_t ntaken(0);
-  uint64_t nseen(0);
+  std::uint64_t ntaken(0);
+  std::uint64_t nseen(0);
 
   while (dr.loopEvents()) {
     auto evtid = dr.loopCount();

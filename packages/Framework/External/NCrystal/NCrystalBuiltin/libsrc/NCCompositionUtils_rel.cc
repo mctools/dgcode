@@ -109,7 +109,7 @@ NC::CU::FullBreakdown NC::CU::createFullBreakdown( const Info::Composition& comp
 
   if ( forceiso != ForceIsotopes ) {
     //Bla loop via unsigned idx  and append any expanded isotopes at the end (while setting frac=0 for the A=0 entries that were expanded).
-    nc_assert_always(  (uint64_t)zafrac.size() < (uint64_t)(std::numeric_limits<unsigned>::max()) );
+    nc_assert_always(  (std::uint64_t)zafrac.size() < (std::uint64_t)(std::numeric_limits<unsigned>::max()) );
     const unsigned nnzafrac = zafrac.size();
     for (unsigned i = 0; i < nnzafrac; ) {
       unsigned zval = getZ(i);
@@ -150,7 +150,7 @@ NC::CU::FullBreakdown NC::CU::createFullBreakdown( const Info::Composition& comp
 
   FullBreakdown result;
 
-  nc_assert_always(  (uint64_t)zafrac.size() < (uint64_t)(std::numeric_limits<unsigned>::max()) );
+  nc_assert_always(  (std::uint64_t)zafrac.size() < (std::uint64_t)(std::numeric_limits<unsigned>::max()) );
   const unsigned nzafrac = zafrac.size();
 
   for (unsigned i = 0; i < nzafrac; ) {
@@ -262,9 +262,9 @@ NC::CU::ElementBreakdownLW::ElementBreakdownLW(const NC::CU::FullElementBreakdow
   } else {
 #if __cplusplus >= 201402L
     //Our make_unique for c++11 seems to have problems with arrays
-    m_other = std::make_unique<std::pair<double,uint16_t>[]>(N-1);
+    m_other = std::make_unique<std::pair<double,std::uint16_t>[]>(N-1);
 #else
-    m_other = decltype(m_other)(new std::pair<double,uint16_t>[N-1]());
+    m_other = decltype(m_other)(new std::pair<double,std::uint16_t>[N-1]());
 #endif
     StableSum totfrac;
     for (auto af: Afrac)

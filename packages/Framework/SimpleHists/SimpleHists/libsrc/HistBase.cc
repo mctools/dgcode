@@ -40,22 +40,22 @@ void SimpleHists::HistBase::serialiseBaseToBuffer(char* buf) const
   assert(ht<=255);
   *(buf++) = static_cast<char>(ht);
   //write title:
-  *(reinterpret_cast<uint16_t*>(buf)) = static_cast<uint16_t>(m_title.size());
+  *(reinterpret_cast<std::uint16_t*>(buf)) = static_cast<std::uint16_t>(m_title.size());
   buf+=2;
   std::memcpy(buf,&(m_title[0]),m_title.size());
   buf+=m_title.size();
   //write xLabel:
-  *(reinterpret_cast<uint16_t*>(buf)) = static_cast<uint16_t>(m_xLabel.size());
+  *(reinterpret_cast<std::uint16_t*>(buf)) = static_cast<std::uint16_t>(m_xLabel.size());
   buf+=2;
   std::memcpy(buf,&(m_xLabel[0]),m_xLabel.size());
   buf+=m_xLabel.size();
   //write yLabel:
-  *(reinterpret_cast<uint16_t*>(buf)) = static_cast<uint16_t>(m_yLabel.size());
+  *(reinterpret_cast<std::uint16_t*>(buf)) = static_cast<std::uint16_t>(m_yLabel.size());
   buf+=2;
   std::memcpy(buf,&(m_yLabel[0]),m_yLabel.size());
   buf+=m_yLabel.size();
   //write comment:
-  *(reinterpret_cast<uint16_t*>(buf)) = static_cast<uint16_t>(m_comment.size());
+  *(reinterpret_cast<std::uint16_t*>(buf)) = static_cast<std::uint16_t>(m_comment.size());
   buf+=2;
   std::memcpy(buf,&(m_comment[0]),m_comment.size());
   //buf+=m_comment.size(); <-- no effect, so commented
@@ -70,7 +70,7 @@ void SimpleHists::HistBase::deserialiseBase(const std::string& s,unsigned& offse
   if (s[offset++]!=static_cast<char>(histType()))
     throw std::runtime_error("Histogram deserialisation failed! (histogram type mismatch)");
 
-  uint16_t n = *(reinterpret_cast<const uint16_t*>(&s[offset]));
+  std::uint16_t n = *(reinterpret_cast<const std::uint16_t*>(&s[offset]));
   offset += 2;
   if (n)
     m_title.assign(&(s[offset]),n);
@@ -78,7 +78,7 @@ void SimpleHists::HistBase::deserialiseBase(const std::string& s,unsigned& offse
     m_title.clear();
   offset += n;
 
-  n = *(reinterpret_cast<const uint16_t*>(&s[offset]));
+  n = *(reinterpret_cast<const std::uint16_t*>(&s[offset]));
   offset += 2;
   if (n)
     m_xLabel.assign(&(s[offset]),n);
@@ -86,7 +86,7 @@ void SimpleHists::HistBase::deserialiseBase(const std::string& s,unsigned& offse
     m_xLabel.clear();
   offset += n;
 
-  n = *(reinterpret_cast<const uint16_t*>(&s[offset]));
+  n = *(reinterpret_cast<const std::uint16_t*>(&s[offset]));
   offset += 2;
   if (n)
     m_yLabel.assign(&(s[offset]),n);
@@ -94,7 +94,7 @@ void SimpleHists::HistBase::deserialiseBase(const std::string& s,unsigned& offse
     m_yLabel.clear();
   offset += n;
 
-  n = *(reinterpret_cast<const uint16_t*>(&s[offset]));
+  n = *(reinterpret_cast<const std::uint16_t*>(&s[offset]));
   offset += 2;
   if (n)
     m_comment.assign(&(s[offset]),n);

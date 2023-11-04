@@ -19,12 +19,12 @@ void EvtFile::DBSubSectReaderMgr::clearInfo()
 void EvtFile::DBSubSectReaderMgr::newInfoAvailable(const char*data, unsigned nbytes)
 {
   //Distribute the received data out to the sub section readers
-  uint16_t subsectid_raw;
+  std::uint16_t subsectid_raw;
   unsigned subsectid;
   const char* dataE(data+nbytes);
   while(data<dataE)
     {
-      assert(dataE-data>=int(sizeof(uint16_t)));
+      assert(dataE-data>=int(sizeof(std::uint16_t)));
       ByteStream::read(data,subsectid_raw);
       subsectid=subsectid_raw;
       auto it = m_subSections.find(subsectid);

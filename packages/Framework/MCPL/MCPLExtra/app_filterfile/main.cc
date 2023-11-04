@@ -44,7 +44,7 @@ int app_usage( char const* const* argv, const char * errmsg ) {
 int parse_args(int argc,const char **argv,
                const char** infile, const char **outfile,
                const char **filterexpression,
-               uint64_t* nparticles_limit, int* do_gzip) {
+               std::uint64_t* nparticles_limit, int* do_gzip) {
   //returns: 0 all ok, 1: error, -1: all ok but do nothing (-h/--help mode)
   *infile = 0;
   *outfile = 0;
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
   const char * infile;
   const char * outfile;
   const char * filterexpression;
-  uint64_t nparticles_limit;
+  std::uint64_t nparticles_limit;
   int do_gzip;
   int parse = parse_args( argc, (const char**)argv,
                           &infile, &outfile, &filterexpression,
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
   mcpl_hdr_add_comment(fo,s.str().c_str());
 
   //Transfer particles:
-  uint64_t used(0), posp1(0);
+  std::uint64_t used(0), posp1(0);
   double norig = mcpl_hdr_nparticles(fi);
   int progress = -1;
   const mcpl_particle_t* p;

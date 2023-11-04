@@ -9,10 +9,10 @@ Utils::DummyParamHolder::DummyParamHolder()
 Utils::DummyParamHolder::DummyParamHolder(const char*data)
   : ParametersBase()
 {
-  uint32_t npars;
+  std::uint32_t npars;
   ByteStream::read(data,npars);
   std::string tmpstr;
-  uint8_t tmptype;
+  std::uint8_t tmptype;
   for (unsigned ipar=0;ipar<npars;++ipar) {
     ByteStream::read(data,tmpstr);
     ByteStream::read(data,tmptype);
@@ -25,7 +25,7 @@ Utils::DummyParamHolder::DummyParamHolder(const char*data)
       ByteStream::read(data,val);
       addParameterInt(tmpstr.c_str(),val);
     } else if (tmptype==2) {
-      uint8_t val;
+      std::uint8_t val;
       ByteStream::read(data,val);
       addParameterBoolean(tmpstr.c_str(),val);
     } else if (tmptype==3) {

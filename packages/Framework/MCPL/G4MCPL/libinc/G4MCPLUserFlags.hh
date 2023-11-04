@@ -16,16 +16,16 @@ public:
 
   //Convenience function to access userflags directly via a G4Track pointer
   //(returns 0 both in case of secondary particles or missing userflags):
-  static uint32_t getFlags(const G4Track*);
+  static std::uint32_t getFlags(const G4Track*);
 
 public:
-  G4MCPLUserFlags(uint32_t f) : m_flags(f) {}
+  G4MCPLUserFlags(std::uint32_t f) : m_flags(f) {}
   virtual ~G4MCPLUserFlags();
-  uint32_t userflags() const { return m_flags; }
+  std::uint32_t userflags() const { return m_flags; }
   //required:
   virtual void Print() const;
 private:
-  uint32_t m_flags;
+  std::uint32_t m_flags;
 };
 
 

@@ -42,7 +42,7 @@ namespace NCRYSTAL_NAMESPACE {
     constexpr bool operator<( const TextDataUID& ) const noexcept;
     constexpr bool operator==( const TextDataUID& ) const noexcept;
     constexpr bool operator!=( const TextDataUID& ) const noexcept;
-    uint64_t value() const noexcept;//==0 when unset
+    std::uint64_t value() const noexcept;//==0 when unset
     void set( TextDataUID );
   private:
     UniqueIDValue m_value;
@@ -75,7 +75,7 @@ namespace NCRYSTAL_NAMESPACE {
     ncconstexpr17 const char * end() const noexcept { return m_e; }
 
     //Calculate simple checksum of the data:
-    uint64_t calcCheckSum() const;
+    std::uint64_t calcCheckSum() const;
 
     //Check if kept data is byte-wise identical to data in argument:
     bool hasSameContent( const char* dataBegin, const char* dataEnd ) const;
@@ -83,7 +83,7 @@ namespace NCRYSTAL_NAMESPACE {
     bool hasSameContent( const RawStrData& ) const;
 
     //Expose checksum algorithm for usage without RawStrData objects:
-    static uint64_t checkSumFromRawStringData(const char*begin, const char*end);
+    static std::uint64_t checkSumFromRawStringData(const char*begin, const char*end);
 
   private:
     const char *m_b, *m_e;
@@ -226,7 +226,7 @@ namespace NCRYSTAL_NAMESPACE {
   inline constexpr bool TextDataUID::operator<(const TextDataUID&o) const noexcept { return m_value<o.m_value; }
   inline constexpr bool TextDataUID::operator==(const TextDataUID&o) const noexcept { return m_value==o.m_value; }
   inline constexpr bool TextDataUID::operator!=(const TextDataUID&o) const noexcept { return m_value!=o.m_value; }
-  inline uint64_t TextDataUID::value() const noexcept { return m_value.value; }
+  inline std::uint64_t TextDataUID::value() const noexcept { return m_value.value; }
   inline void TextDataUID::set( TextDataUID o ) { m_value = o.m_value; }
   inline TextDataUID TextDataUID::createNewUniqueIDValue() { return TextDataUID{ UniqueID().getUniqueID() }; }
 

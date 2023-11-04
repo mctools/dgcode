@@ -193,7 +193,7 @@ namespace NCRYSTAL_NAMESPACE {
     std::vector<LCPlaneSet> m_planes;//sorted by dspacing, largest first.
     LCStdFrame m_lcstdframe;
     double m_xsfact;
-    void forceUpdateCache( Cache&, uint64_t discr_wl, uint64_t discr_c3 ) const;
+    void forceUpdateCache( Cache&, std::uint64_t discr_wl, std::uint64_t discr_c3 ) const;
     struct Overlay : private MoveOnly {
       static const unsigned ndata = 8;
       Overlay();
@@ -215,7 +215,7 @@ namespace NCRYSTAL_NAMESPACE {
       void invalidateCache() override { reset(); }
     private:
       friend class LCHelper;
-      std::pair<uint64_t,uint64_t> m_signature;//discretised (wavelength,c3)
+      std::pair<std::uint64_t,std::uint64_t> m_signature;//discretised (wavelength,c3)
       double m_wl;//<-- Neutron wavelength. Actually dediscretized m_signature.first
       double m_c3;//<-- dot(indir,lcaxis). Actually dediscretized m_signature.second.
       double m_s3;//sqrt(1-m_c3*m_c3)
@@ -264,8 +264,8 @@ namespace NCRYSTAL_NAMESPACE {
     nc_assert( normal_sign==1. || normal_sign==-1. );
   }
 
-  inline LCHelper::Cache::Cache() : m_signature(std::numeric_limits<uint64_t>::max(),
-                                                std::numeric_limits<uint64_t>::max()),
+  inline LCHelper::Cache::Cache() : m_signature(std::numeric_limits<std::uint64_t>::max(),
+                                                std::numeric_limits<std::uint64_t>::max()),
                                     m_wl(-99), m_c3(-99), m_s3(-99)
   {
     //Starts in same state as after calling Cache::reset()

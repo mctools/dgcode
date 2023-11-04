@@ -375,7 +375,7 @@ std::pair<NS::SABIntegrator::Impl::SamplerAtE_uptr,double> NS::SABIntegrator::Im
   //Figure out which sab alpha-ranges are involved, i.e. intersects the
   //kinematically accessible region (see description of activeGridRanges in
   //NCSABUtils.hh for exactly what is extracted.:
-  std::vector<std::pair<uint16_t,uint16_t>> alpharanges;
+  std::vector<std::pair<std::uint16_t,std::uint16_t>> alpharanges;
   std::size_t ibeta_low;
   SABUtils::activeGridRanges( *m_data, ekin_div_kT, alpharanges, ibeta_low );
 

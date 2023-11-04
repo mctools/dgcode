@@ -53,7 +53,7 @@ namespace NCRYSTAL_NAMESPACE {
         bool operator==( AtomDBKey o) const { return m_key == o.m_key; }
         bool operator!=( AtomDBKey o) const { return m_key != o.m_key; }
       private:
-        uint32_t m_key;
+        std::uint32_t m_key;
       };
 
       //Entry in internal list of raw numbers (MoveOnly to make sure that vector<Entry> is newer copied).

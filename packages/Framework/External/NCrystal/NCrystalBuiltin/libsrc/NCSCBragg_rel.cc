@@ -55,8 +55,8 @@ struct NC::SCBragg::pimpl {
     }
   };
 
-  typedef std::map<std::pair<uint64_t,uint64_t>,std::vector<Vector>,
-                   std::greater<std::pair<uint64_t,uint64_t> > > SCBraggSortMap;
+  typedef std::map<std::pair<std::uint64_t,std::uint64_t>,std::vector<Vector>,
+                   std::greater<std::pair<std::uint64_t,std::uint64_t> > > SCBraggSortMap;
 
   pimpl( const NC::Info&, MosaicityFWHM, double dd,
          const SCOrientation&, PlaneProvider * plane_provider,
@@ -137,8 +137,8 @@ double NC::SCBragg::pimpl::setupFamilies( const NC::Info& cinfo,
   //precision down to 1e-10 angstrom and 1e-10 barn respectively.
   SCBraggSortMap planes;
   //but also try to avoid rounding issues when floating point values are not misbehaving:
-  std::map<uint64_t,double> origvals_dsp;
-  std::map<uint64_t,double> origvals_fsq;
+  std::map<std::uint64_t,double> origvals_dsp;
+  std::map<std::uint64_t,double> origvals_fsq;
 
   const double two30 = 1073741824.0;//2^30 ~= 1.07e9
 
@@ -162,11 +162,11 @@ double NC::SCBragg::pimpl::setupFamilies( const NC::Info& cinfo,
       maxdspacing = pl.dspacing;
 
     nc_assert(pl.dspacing>0.0&&pl.fsq>0.0&&pl.dspacing<1e7&&pl.fsq<1e7);
-    uint64_t ui_dsp = (uint64_t)(pl.dspacing*two30+0.5);
-    uint64_t ui_fsq = (uint64_t)(pl.fsq*two30+0.5);
+    std::uint64_t ui_dsp = (std::uint64_t)(pl.dspacing*two30+0.5);
+    std::uint64_t ui_fsq = (std::uint64_t)(pl.fsq*two30+0.5);
 
     //a bit messy, but nice to preserve values when possible:
-    std::map<uint64_t,double>::iterator itOrig = origvals_dsp.find(ui_dsp);
+    std::map<std::uint64_t,double>::iterator itOrig = origvals_dsp.find(ui_dsp);
     if (itOrig==origvals_dsp.end()) {
       origvals_dsp[ui_dsp] = pl.dspacing;
     } else if (ncabs(pl.dspacing-itOrig->second)>1e-12) {
@@ -179,7 +179,7 @@ double NC::SCBragg::pimpl::setupFamilies( const NC::Info& cinfo,
       itOrig->second = -1;//multiple values observed ...!
     }
 
-    std::pair<uint64_t,uint64_t> key(ui_dsp,ui_fsq);
+    std::pair<std::uint64_t,std::uint64_t> key(ui_dsp,ui_fsq);
 
     SCBraggSortMap::iterator it = planes.find(key);
     if ( it != planes.end() ) {
@@ -196,7 +196,7 @@ double NC::SCBragg::pimpl::setupFamilies( const NC::Info& cinfo,
   SCBraggSortMap::const_iterator it = planes.begin();
   for (;it!=planes.end();++it) {
 
-    std::map<uint64_t,double>::iterator itOrig = origvals_dsp.find(it->first.first);
+    std::map<std::uint64_t,double>::iterator itOrig = origvals_dsp.find(it->first.first);
     nc_assert(itOrig!=origvals_dsp.end());
     const double dsp = (itOrig->second > 0 ? itOrig->second : it->first.first / two30);
 

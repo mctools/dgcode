@@ -9,7 +9,7 @@ GriffDataRead::MetaData::MetaData(const char*&data)
   int32_t version; ByteStream::read(data,version);
   assert(version==0);//only supported version
 
-  uint32_t n; ByteStream::read(data,n);
+  std::uint32_t n; ByteStream::read(data,n);
   m_data.resize(n);
   for (unsigned i=0;i<n;++i) {
     ByteStream::read(data,m_data[i].first);

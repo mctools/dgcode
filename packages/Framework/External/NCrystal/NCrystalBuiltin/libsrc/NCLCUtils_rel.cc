@@ -44,14 +44,14 @@ namespace NC = NCrystal;
 
 #define NCRYSTAL_LCUTILS_DISCRFACT (1099511627776.0) // 2^40 ~= 1.1e12
 namespace NCRYSTAL_NAMESPACE {
-  uint64_t LCdiscretizeValue(double value) {
-    nc_assert_always(value>=0.0&&value<1e7);//range limited by uint64_t bits
-    return static_cast<uint64_t>(value*NCRYSTAL_LCUTILS_DISCRFACT+0.5);
+  std::uint64_t LCdiscretizeValue(double value) {
+    nc_assert_always(value>=0.0&&value<1e7);//range limited by std::uint64_t bits
+    return static_cast<std::uint64_t>(value*NCRYSTAL_LCUTILS_DISCRFACT+0.5);
   }
-  double LCdediscretizeValue(uint64_t dvalue) {
+  double LCdediscretizeValue(std::uint64_t dvalue) {
     return dvalue * ( 1.0 / NCRYSTAL_LCUTILS_DISCRFACT );
   }
-  typedef std::pair<uint64_t,uint64_t> LCInitKey;//discretised (dspacing,alpha)
+  typedef std::pair<std::uint64_t,std::uint64_t> LCInitKey;//discretised (dspacing,alpha)
   typedef std::map<LCInitKey,LCPlaneSet,std::greater<LCInitKey> > LCInitMap;
 }
 
@@ -102,9 +102,9 @@ NC::LCHelper::LCHelper( NC::LCAxis lcaxis,
       nc_assert( alpha>=0.0 && alpha <= kPiHalf );
 
       //avoid floating point keys + merge entries withing 1/DISCRFACT ~= 1e-12:
-      nc_assert_always(plane.dspacing<1e7);//range limited by uint64_t bits
-      uint64_t ui_dsp = LCdiscretizeValue(plane.dspacing);
-      uint64_t ui_alpha = LCdiscretizeValue(alpha);
+      nc_assert_always(plane.dspacing<1e7);//range limited by std::uint64_t bits
+      std::uint64_t ui_dsp = LCdiscretizeValue(plane.dspacing);
+      std::uint64_t ui_alpha = LCdiscretizeValue(alpha);
 
       LCInitKey key(ui_dsp,ui_alpha);
       LCInitMap::iterator it = initmap.find(key);
@@ -335,15 +335,15 @@ void NC::LCHelper::ensureValid(NC::LCHelper::Cache& cache, double wl, const NC::
   nc_assert(indir.isUnitVector());
   double c3 = m_lcaxislab.dot(indir);
   nc_assert(wl>=0&&wl<1e7&&c3>=-1.0&&c3<=1.0);
-  uint64_t discrwl = LCdiscretizeValue(wl);
-  uint64_t discrc3 = LCdiscretizeValue(ncabs(c3));
+  std::uint64_t discrwl = LCdiscretizeValue(wl);
+  std::uint64_t discrc3 = LCdiscretizeValue(ncabs(c3));
   if ( cache.m_signature.first == discrwl && cache.m_signature.second == discrc3 )
     return;
   forceUpdateCache(cache,discrwl,discrc3);
 }
 
 
-void NC::LCHelper::forceUpdateCache( NC::LCHelper::Cache& cache, uint64_t discr_wl, uint64_t discr_c3 ) const
+void NC::LCHelper::forceUpdateCache( NC::LCHelper::Cache& cache, std::uint64_t discr_wl, std::uint64_t discr_c3 ) const
 {
   cache.m_signature.first = discr_wl;
   cache.m_signature.second = discr_c3;
@@ -447,7 +447,7 @@ double NC::LCHelper::crossSection( NC::LCHelper::Cache& cache, double wl, const 
 void NC::LCHelper::Cache::reset()
 {
   //same result as Cache() constructor
-  m_signature.first = m_signature.second = std::numeric_limits<uint64_t>::max();
+  m_signature.first = m_signature.second = std::numeric_limits<std::uint64_t>::max();
   m_wl = m_c3 = m_s3 = -99.0;
   m_roilist.clear();
   m_roixs_commul.clear();

@@ -93,8 +93,8 @@ inline bool GriffDataRead::Track::stable() const { return pdef()->stable; }
 inline bool GriffDataRead::Track::shortLived() const { return pdef()->shortLived; }
 inline int32_t GriffDataRead::Track::trackID() const { return ByteStream::interpret<int32_t>(m_data); }
 inline int32_t GriffDataRead::Track::parentID() const { return ByteStream::interpret<int32_t>(m_data+16); }
-inline uint32_t GriffDataRead::Track::nDaughters() const { return ByteStream::interpret<uint32_t>(m_data+24); }
-inline uint32_t GriffDataRead::Track::nSegments() const { return ByteStream::interpret<uint32_t>(m_data+20); }
+inline std::uint32_t GriffDataRead::Track::nDaughters() const { return ByteStream::interpret<std::uint32_t>(m_data+24); }
+inline std::uint32_t GriffDataRead::Track::nSegments() const { return ByteStream::interpret<std::uint32_t>(m_data+20); }
 inline double GriffDataRead::Track::startTime() const { return m_firstSegment->startTime(); }
 inline double GriffDataRead::Track::startEKin() const { return m_firstSegment->startEKin(); }
 inline const GriffDataRead::Step * GriffDataRead::Track::firstStep() const { return segmentBegin()->stepBegin(); }

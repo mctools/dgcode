@@ -194,7 +194,7 @@ void GriffDataReader::initFile(unsigned i)
       m_fr->goToFirstEvent();
 #else
       bool ok = m_fr->goToFirstEvent();
-      assert(m_fr->nBytesBriefData()>=2*sizeof(uint32_t));
+      assert(m_fr->nBytesBriefData()>=2*sizeof(std::uint32_t));
       assert(ok&&m_fr->ok()&&!m_fr->bad());
       assert(m_fr->verifyEventDataIntegrity());
 #endif

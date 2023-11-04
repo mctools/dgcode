@@ -21,7 +21,7 @@ void G4DataCollectInternals::DBMaterialEntry::write(EvtFile::FileWriter&fw)
   static_assert(kStateGas==3);
   assert(state>=0&&state<=3);
   fw.writeDataDBSection(state);//solid/liquid/gas
-  uint32_t nelem = m_mat->GetNumberOfElements();
+  std::uint32_t nelem = m_mat->GetNumberOfElements();
   fw.writeDataDBSection(nelem);//number of elements
 
   for (unsigned i = 0; i<nelem; ++i) {

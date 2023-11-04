@@ -19,7 +19,7 @@ GriffDataRead::Material::Material(const char*&data)
   ByteStream::read(data,m_ion_meanexcitationenergy);
   ByteStream::read(data,m_state);
   assert(m_state>=0&&m_state<=3);
-  uint32_t nelem;
+  std::uint32_t nelem;
   ByteStream::read(data,nelem);
   m_elements.resize(nelem);
   auto elemIt = m_elements.begin();

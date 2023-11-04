@@ -19,7 +19,7 @@ namespace G4Interfaces {
 
 struct RandomManager {
   enum EVTMSGLEVEL { EVTMSG_NEVER, EVTMSG_ADAPTABLE, EVTMSG_ALWAYS };
-  static void init(uint64_t seed_of_first_event, EVTMSGLEVEL lvl = EVTMSG_ADAPTABLE );
+  static void init(std::uint64_t seed_of_first_event, EVTMSGLEVEL lvl = EVTMSG_ADAPTABLE );
   static void attach(G4Interfaces::ParticleGenBase* the_particle_generator_of_the_job);
 };
 

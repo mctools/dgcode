@@ -34,8 +34,8 @@ namespace GriffFormat {
     float magneticMoment;
     int16_t spin_halfs;// spin in units of 1/2.
     double spin() const { return spin_halfs*0.5; }
-    uint8_t stable;
-    uint8_t shortLived;
+    std::uint8_t stable;
+    std::uint8_t shortLived;
 
     bool operator==(const ParticleDefinition&o) const
     {

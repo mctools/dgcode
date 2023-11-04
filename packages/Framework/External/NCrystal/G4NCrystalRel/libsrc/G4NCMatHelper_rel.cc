@@ -169,8 +169,8 @@ namespace G4NCrystalRel {
         //better than the alternative of possibly getting warnings from Geant4
         //about duplicate material names.
 
-        static std::atomic<uint64_t> s_global_uid_counter(1);
-        uint64_t uidval = s_global_uid_counter++;
+        static std::atomic<std::uint64_t> s_global_uid_counter(1);
+        std::uint64_t uidval = s_global_uid_counter++;
         std::stringstream ss;
         ss << "NCrystalBase[uid=" << uidval << "]::" << breakdownToStr(key,15);
 
@@ -285,7 +285,7 @@ namespace G4NCrystalRel {
     std::map<IsotopeZA,G4Index> m_g4isotopes;
     std::map<NCCU::ElementBreakdownLW,G4Index> m_g4elements;
     std::map<NCCU::LWBreakdown,G4Index> m_g4basematerials;
-    std::map<std::pair<uint64_t,uint64_t>,G4Index> m_g4finalmaterials;
+    std::map<std::pair<std::uint64_t,std::uint64_t>,G4Index> m_g4finalmaterials;
   };
 
   struct NCG4ObjectDB {

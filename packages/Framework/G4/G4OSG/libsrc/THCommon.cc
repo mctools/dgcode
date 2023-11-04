@@ -2,7 +2,7 @@
 #include "G4OSG/TrkHandle.hh"
 #include "G4OSG/Viewer.hh"
 
-G4OSG::THCommon::THCommon(Viewer* viewer,const char * griff_file, const std::set<uint64_t>& griff_evts_to_show)
+G4OSG::THCommon::THCommon(Viewer* viewer,const char * griff_file, const std::set<std::uint64_t>& griff_evts_to_show)
   : m_viewer(viewer),
     m_dr(griff_file),
     m_griff_evts_to_show(griff_evts_to_show),

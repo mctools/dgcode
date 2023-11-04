@@ -102,20 +102,20 @@ void NC::TextData::verifyOnDiskFileUnchanged() const
     NCRYSTAL_THROW2(BadInput,"File unexpectedly changed content while being used: "<<path);
 }
 
-uint64_t NC::RawStrData::checkSumFromRawStringData(const char* c_begin, const char* c_end)
+std::uint64_t NC::RawStrData::checkSumFromRawStringData(const char* c_begin, const char* c_end)
 {
   //Very simply checksum alg, using randomly generated initial value (which will
   //be the checksum of an empty range):
-  uint_fast64_t checksum(static_cast<uint64_t>(0x2254a62a1af0a16bull));
+  uint_fast64_t checksum(static_cast<std::uint64_t>(0x2254a62a1af0a16bull));
   unsigned shift = 0;
   for ( ;c_begin!=c_end; ++c_begin ) {
     checksum += ( static_cast<unsigned char>(*c_begin) << shift);
     shift = ( shift + 8) % 64;
   }
-  return static_cast<uint64_t>(checksum);
+  return static_cast<std::uint64_t>(checksum);
 }
 
-uint64_t NC::RawStrData::calcCheckSum() const
+std::uint64_t NC::RawStrData::calcCheckSum() const
 {
   return checkSumFromRawStringData(m_b,m_e);
 }

@@ -161,7 +161,7 @@ namespace NCRYSTAL_NAMESPACE {
     static_assert( _detail_pos_md > 1, "" );
     static_assert( object_size == buffer_local_size + 1 + metadata_size, "" );
     static_assert( LOCALBUF_MINSIZE <= buffer_local_size, "" );
-    static_assert(sizeof(char)==sizeof(uint8_t), "");
+    static_assert(sizeof(char)==sizeof(std::uint8_t), "");
 
     //Release shared reference if remote mode, otherwise do nothing:
     unsetIfRemote();

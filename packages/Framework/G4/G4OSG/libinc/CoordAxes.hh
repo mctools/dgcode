@@ -26,7 +26,7 @@ namespace G4OSG {
     osg::ref_ptr<osg::MatrixTransform> m_trf;
     osg::Vec3d m_pos;
     unsigned m_scalemod;
-    uint64_t m_scale_base_nanometer;
+    std::uint64_t m_scale_base_nanometer;
     //double m_scale;
     bool m_visible;
     void updateTrf();

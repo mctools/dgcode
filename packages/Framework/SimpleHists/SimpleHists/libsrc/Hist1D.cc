@@ -58,7 +58,7 @@ SimpleHists::Hist1D::Hist1D(const std::string& serialised_data)
   int32_t raw_nbins = (int32_t)m_data.nbins;
 
   if (raw_nbins<0)
-    m_data.nbins = (uint32_t)(-raw_nbins);
+    m_data.nbins = (std::uint32_t)(-raw_nbins);
 
   if (raw_nbins>0 && offset+m_data.nbins*sizeof(double)!=serialised_data.size())
     throw std::runtime_error("Hist1D: Histogram deserialisation failed! (data size error [2])");
@@ -88,7 +88,7 @@ void SimpleHists::Hist1D::serialise(std::string& buf) const
 
   buf.resize(n+nbase);//a bit wasteful initialisation
 
-  uint32_t nbins = m_data.nbins;
+  std::uint32_t nbins = m_data.nbins;
 
   //trick: since nbins<=5e8, we abuse the sign of nbins to indicate whether or
   //not errors are present.

@@ -75,7 +75,7 @@ namespace G4DataCollectInternals {
     double eDep;//persistified as float, but kept in double-precision until then
     double eDepNonIonizing;//persistified as float, but kept in double-precision until then
     double stepLength;//persistified as float, but kept in double-precision until then
-    uint32_t stepStatus; //actually 4 bits would be enough, but no other step data can use the 3.5 leftover bytes
+    std::uint32_t stepStatus; //actually 4 bits would be enough, but no other step data can use the 3.5 leftover bytes
 
     DBTouchableEntry * touchableEntry;//only set when step is likely to be in a
                                       //different volume from previous step (and

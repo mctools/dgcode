@@ -150,7 +150,7 @@ namespace NCRYSTAL_NAMESPACE {
     double m_ixs, m_csl, m_axs;
     Component * m_components = nullptr;
     int16_t m_classify;//>=1: 1 isotope with that A, 0: nat. elem., <0: composite with -m_classify parts.
-    uint16_t m_z;//0 if not element
+    std::uint16_t m_z;//0 if not element
     struct Impl;
     friend struct Impl;
   };

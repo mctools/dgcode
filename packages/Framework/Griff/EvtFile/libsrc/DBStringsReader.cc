@@ -9,10 +9,10 @@ EvtFile::DBStringsReader::DBStringsReader(subsectid_type subSectionID)
 
 void EvtFile::DBStringsReader::load(const char*& data)
 {
-  uint16_t version;
+  std::uint16_t version;
   ByteStream::read(data,version);
   assert(version==0);//only supported version for now!
-  uint16_t nstrings_raw;
+  std::uint16_t nstrings_raw;
   ByteStream::read(data,nstrings_raw);
   unsigned nstrings = nstrings_raw;
 

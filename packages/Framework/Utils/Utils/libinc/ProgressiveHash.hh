@@ -20,7 +20,7 @@
 class ProgressiveHash {
 public:
 
-  typedef uint32_t hashtype;
+  typedef std::uint32_t hashtype;
 
   ProgressiveHash();
   ~ProgressiveHash();
@@ -32,8 +32,8 @@ public:
   void reset();//Forgets all added data.
 
 private:
-  uint32_t m_hash_state;
-  uint32_t m_hash_carry;
+  std::uint32_t m_hash_state;
+  std::uint32_t m_hash_carry;
   int m_data_length;
 };
 

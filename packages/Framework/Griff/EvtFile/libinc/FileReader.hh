@@ -79,7 +79,7 @@ namespace EvtFile {
     bool goToFirstEvent() { return seekEventByIndex(0); };
     bool skipEvents(int n);//n<0 to go backwards
     bool seekEventByIndex(unsigned idx);//event idx in the file [0=first evt in file, 1=second, etc.]
-    bool goToEvent(uint32_t run_number,uint32_t evt_number);
+    bool goToEvent(std::uint32_t run_number,std::uint32_t evt_number);
 
     /////////////////////////
     //  Event data access  //
@@ -101,7 +101,7 @@ namespace EvtFile {
     const char* getFullData();//on demand loading => not const (we could consider mutable, but...)
 
     //Special methods for data hashing / integrity
-    uint32_t eventCheckSum() const;//Checksum stored in file
+    std::uint32_t eventCheckSum() const;//Checksum stored in file
     bool verifyEventDataIntegrity();//Recalculate checksum and verify
                                     //(Semi-expensive, will re-read the DB
                                     //section each time called)
@@ -142,20 +142,20 @@ namespace EvtFile {
 
     void initEventAtIndex(unsigned idx);
     struct EventInfo {
-      uint32_t checkSum;
-      uint32_t runNumber;
-      uint32_t evtNumber;
-      uint32_t sectionSize_database;
-      uint32_t sectionSize_briefdata;
-      uint32_t sectionSize_fulldata;//on-disk, not uncompressed
+      std::uint32_t checkSum;
+      std::uint32_t runNumber;
+      std::uint32_t evtNumber;
+      std::uint32_t sectionSize_database;
+      std::uint32_t sectionSize_briefdata;
+      std::uint32_t sectionSize_fulldata;//on-disk, not uncompressed
       std::streampos evtPosInFile;
-      uint32_t evtIndex;
-      uint32_t dummy;//Here to have sizeof(EventInfo)==8*sizeof(uint32_t)+sizeof(streampos) even on 64bit.
+      std::uint32_t evtIndex;
+      std::uint32_t dummy;//Here to have sizeof(EventInfo)==8*sizeof(std::uint32_t)+sizeof(streampos) even on 64bit.
     };
     EventInfo * m_currentEventInfo;
     std::vector<EventInfo> m_evts;
     ////The next map is only populated on demand when goToEvent is called!
-    std::map<std::pair<uint32_t,uint32_t>,EventInfo* > m_evtMap; //(runNbr,evtNbr) -> EventInfo*
+    std::map<std::pair<std::uint32_t,std::uint32_t>,EventInfo* > m_evtMap; //(runNbr,evtNbr) -> EventInfo*
     std::string m_fileName;
     std::map<unsigned,IDBSubSectionReader*> m_dbsubsects;
 

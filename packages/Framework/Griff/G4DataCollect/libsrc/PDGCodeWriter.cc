@@ -7,8 +7,8 @@
 
 void G4DataCollectInternals::PDGCodeWriter::write(EvtFile::FileWriter&fw)
 {
-  fw.writeDataDBSection((uint8_t)0);//version
-  fw.writeDataDBSection((uint32_t)m_pdgcodesToWrite.size());//number of pdg entries
+  fw.writeDataDBSection((std::uint8_t)0);//version
+  fw.writeDataDBSection((std::uint32_t)m_pdgcodesToWrite.size());//number of pdg entries
 
   auto it = m_pdgcodesToWrite.begin();
   auto itE = m_pdgcodesToWrite.end();

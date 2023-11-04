@@ -1,10 +1,10 @@
 #ifndef GriffDataRead_Track_hh
 #define GriffDataRead_Track_hh
 
+#include "Core/Types.hh"
 #include "Utils/ByteStream.hh"
 #include "GriffFormat/ParticleDefinition.hh"
 #include "EvtFile/Defs.hh"
-#include "Core/Types.hh"
 #include <cassert>
 #include <string>
 
@@ -29,14 +29,14 @@ namespace GriffDataRead
     int32_t parentID() const;
     const Track * getParent() const;
 
-    uint32_t nDaughters() const;
+    std::uint32_t nDaughters() const;
     const Track * getDaughter(unsigned i) const;
     int32_t getDaughterID(unsigned i) const;
 
     const int32_t * daughterIDBegin() const;
     const int32_t * daughterIDEnd() const;
 
-    uint32_t nSegments() const;
+    std::uint32_t nSegments() const;
     const Segment * getSegment(unsigned i) const;
     const Segment * segmentBegin() const;
     const Segment * segmentEnd() const;

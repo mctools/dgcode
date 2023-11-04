@@ -7,7 +7,7 @@
 
 //Access hidden function from mcpl.c:
 extern "C"{
-  void mcpl_dump_particles(mcpl_file_t f, uint64_t nskip, uint64_t nlimit,
+  void mcpl_dump_particles(mcpl_file_t f, std::uint64_t nskip, std::uint64_t nlimit,
                            int(filter)(const mcpl_particle_t*));
 }
 

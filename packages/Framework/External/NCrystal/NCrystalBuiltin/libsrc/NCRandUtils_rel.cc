@@ -412,16 +412,16 @@ double NC::randExpDivSqrt( RNG& rng, double c, double a, double b )
 //   a 64-bit seed, we suggest to seed a splitmix64 generator and use its
 //   output to fill s. */
 //
-//uint64_t s[2];
+//std::uint64_t s[2];
 //
-//static inline uint64_t rotl(const uint64_t x, int k) {
+//static inline std::uint64_t rotl(const std::uint64_t x, int k) {
 //  return (x << k) | (x >> (64 - k));
 //}
 //
-//uint64_t next(void) {
-//  const uint64_t s0 = s[0];
-//  uint64_t s1 = s[1];
-//  const uint64_t result = s0 + s1;
+//std::uint64_t next(void) {
+//  const std::uint64_t s0 = s[0];
+//  std::uint64_t s1 = s[1];
+//  const std::uint64_t result = s0 + s1;
 //
 //  s1 ^= s0;
 //  s[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); // a, b
@@ -436,10 +436,10 @@ double NC::randExpDivSqrt( RNG& rng, double c, double a, double b )
 //   non-overlapping subsequences for parallel computations. */
 //
 //void jump(void) {
-//  static const uint64_t JUMP[] = { 0xbeac0467eba5facb, 0xd86b048b86aa9922 };
+//  static const std::uint64_t JUMP[] = { 0xbeac0467eba5facb, 0xd86b048b86aa9922 };
 //
-//  uint64_t s0 = 0;
-//  uint64_t s1 = 0;
+//  std::uint64_t s0 = 0;
+//  std::uint64_t s1 = 0;
 //  for(int i = 0; i < sizeof JUMP / sizeof *JUMP; i++)
 //    for(int b = 0; b < 64; b++) {
 //      if (JUMP[i] & UINT64_C(1) << b) {
@@ -480,22 +480,22 @@ double NC::randExpDivSqrt( RNG& rng, double c, double a, double b )
 //   computations) or xorshift1024* (for massively parallel computations)
 //   generator. */
 //
-//uint64_t x; /* The state can be seeded with any value. */
+//std::uint64_t x; /* The state can be seeded with any value. */
 //
-//uint64_t next() {
-//  uint64_t z = (x += 0x9e3779b97f4a7c15);
+//std::uint64_t next() {
+//  std::uint64_t z = (x += 0x9e3779b97f4a7c15);
 //  z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
 //  z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
 //  return z ^ (z >> 31);
 //}
 //#endif
 
-NC::RandXRSRImpl::RandXRSRImpl(uint64_t theseed)
+NC::RandXRSRImpl::RandXRSRImpl(std::uint64_t theseed)
 {
   seed(theseed);
 }
 
-void NC::RandXRSRImpl::seed(uint64_t theseed)
+void NC::RandXRSRImpl::seed(std::uint64_t theseed)
 {
   //Seed the state, using splitmix64 as recommended (note that the call to
   //splitmix64 actually changes the "theseed" variable, so m_s[0] and m_s[1]
@@ -511,11 +511,11 @@ void NC::RandXRSRImpl::seed(uint64_t theseed)
 
 void NC::RandXRSRImpl::jump()
 {
-  static const uint64_t JUMP[] = { 0xbeac0467eba5facb, 0xd86b048b86aa9922 };
+  static const std::uint64_t JUMP[] = { 0xbeac0467eba5facb, 0xd86b048b86aa9922 };
   constexpr const int njump = static_cast<int>(sizeof(JUMP)/ sizeof(*JUMP));
 
-  uint64_t s0 = 0;
-  uint64_t s1 = 0;
+  std::uint64_t s0 = 0;
+  std::uint64_t s1 = 0;
   for(int i = 0; i < njump; i++)
     for(int b = 0; b < 64; b++) {
       if (JUMP[i] & UINT64_C(1) << b) {
@@ -529,9 +529,9 @@ void NC::RandXRSRImpl::jump()
   m_s[1] = s1;
 }
 
-uint64_t NC::RandXRSRImpl::splitmix64(uint64_t& x)
+std::uint64_t NC::RandXRSRImpl::splitmix64(std::uint64_t& x)
 {
-  uint64_t z = (x += 0x9e3779b97f4a7c15);
+  std::uint64_t z = (x += 0x9e3779b97f4a7c15);
   z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
   z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
   return z ^ (z >> 31);

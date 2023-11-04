@@ -91,14 +91,14 @@ namespace NCRYSTAL_NAMESPACE {
     static constexpr unsigned MAXSIZE = ( sizeof(T1) > sizeof(T2) ? sizeof(T1) : sizeof(T2) );
     //gcc 4.8 has problems with:
     //  static constexpr unsigned MAXALIGN = ( alignof(T1) > alignof(T2) ? alignof(T1) : alignof(T2) );
-    //  alignas(MAXALIGN) uint8_t m_data[MAXSIZE];
+    //  alignas(MAXALIGN) std::uint8_t m_data[MAXSIZE];
     //So do it like:
 
     //Replicate two NCMath.hh functions here:
     static constexpr unsigned detail_gcd( unsigned a, unsigned b )  { return b ? detail_gcd( b, a % b ) : a; }
     static constexpr unsigned detail_lcm( unsigned a, unsigned b ) { return a * b / detail_gcd(a,b); }
     static constexpr auto align_req = detail_lcm(alignof(T1),alignof(T2));
-    alignas(align_req) uint8_t m_data[MAXSIZE];
+    alignas(align_req) std::uint8_t m_data[MAXSIZE];
     enum class Content { HasT1, HasT2, Empty };
     Content m_content = Content::Empty;
     struct Impl;

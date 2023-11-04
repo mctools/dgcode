@@ -140,12 +140,12 @@ namespace NCRYSTAL_NAMESPACE {
     void produceStatReport(const char *);
 #ifndef NDEBUG
     mutable struct Stats {
-      std::atomic<uint64_t> genpointworst = {0};
-      std::atomic<uint64_t> genpointcalled = {0};
-      std::atomic<uint64_t> genpointtries = {0};
-      std::atomic<uint64_t> circleintworst = {0};
-      std::atomic<uint64_t> circleintnumber = {0};
-      std::atomic<uint64_t> circleintevals = {0};
+      std::atomic<std::uint64_t> genpointworst = {0};
+      std::atomic<std::uint64_t> genpointcalled = {0};
+      std::atomic<std::uint64_t> genpointtries = {0};
+      std::atomic<std::uint64_t> circleintworst = {0};
+      std::atomic<std::uint64_t> circleintnumber = {0};
+      std::atomic<std::uint64_t> circleintevals = {0};
     } m_stats;
 #endif
   };

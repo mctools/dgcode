@@ -200,10 +200,10 @@ namespace NCRYSTAL_NAMESPACE {
     //SmallVector does not have constructors like std::vector(count) or
     //std::vector(count,value). Deleting these explicitly gives better error
     //diagnostics for the user (specifying various bit widths for robustness):
-    SmallVector( uint8_t ) = delete;
-    SmallVector( uint16_t ) = delete;
-    SmallVector( uint32_t ) = delete;
-    SmallVector( uint64_t ) = delete;
+    SmallVector( std::uint8_t ) = delete;
+    SmallVector( std::uint16_t ) = delete;
+    SmallVector( std::uint32_t ) = delete;
+    SmallVector( std::uint64_t ) = delete;
     SmallVector( int8_t ) = delete;
     SmallVector( int16_t ) = delete;
     SmallVector( int32_t ) = delete;
@@ -233,7 +233,7 @@ namespace NCRYSTAL_NAMESPACE {
       //NB: We do not use std::array for local storage, since we rely on address
       //of m_data being the same as the beginning of the local storage, which is
       //certainly guaranteed when we use a C-style array:
-      alignas(TValue) uint8_t small_data[ NSMALL * sizeof(TValue) ];
+      alignas(TValue) std::uint8_t small_data[ NSMALL * sizeof(TValue) ];
     } m_data;
     struct Impl;
   };

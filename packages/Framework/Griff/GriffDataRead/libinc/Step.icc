@@ -42,7 +42,7 @@ inline void GriffDataRead::Step::set(const Segment *ss,const char *d)
 // float edep
 // float edepNonionising
 // float steplength;
-// uint32_t flags
+// std::uint32_t flags
 //---------------------
 // double globpos[3]
 // double time;
@@ -80,7 +80,7 @@ inline const char * GriffDataRead::Step::preProcessDefinedStepCStr() const { ret
 inline double GriffDataRead::Step::eDep() const { return ByteStream::interpret<float>(m_data+68); }
 inline double GriffDataRead::Step::eDepNonIonising() const { return ByteStream::interpret<float>(m_data+72); }
 inline double GriffDataRead::Step::stepLength() const { return ByteStream::interpret<float>(m_data+76); }
-inline uint32_t GriffDataRead::Step::stepStatus_raw() const { return ByteStream::interpret<uint32_t>(m_data+80); }
+inline std::uint32_t GriffDataRead::Step::stepStatus_raw() const { return ByteStream::interpret<std::uint32_t>(m_data+80); }
 inline double GriffDataRead::Step::postGlobalX() const { return ByteStream::interpret<double>(m_data+84); }
 inline double GriffDataRead::Step::postGlobalY() const { return ByteStream::interpret<double>(m_data+92); }
 inline double GriffDataRead::Step::postGlobalZ() const { return ByteStream::interpret<double>(m_data+100); }

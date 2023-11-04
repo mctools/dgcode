@@ -15,7 +15,7 @@ namespace RandUtils {
 
   class Rand {
   public:
-    Rand(uint64_t seed = 123456789) : m_rng( seed ) {}
+    Rand(std::uint64_t seed = 123456789) : m_rng( seed ) {}
     ~Rand();
 
     double shoot() { return m_rng.generate(); }// uniformly in ]0,1]

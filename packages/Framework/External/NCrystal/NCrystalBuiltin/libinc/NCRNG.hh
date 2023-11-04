@@ -43,7 +43,7 @@ namespace NCRYSTAL_NAMESPACE {
   //It is also possible to simply create a completely new instance of the
   //builtin RNG. WARNING: This is not usually what you should do, if you care
   //about unbiased random numbers (or multi-thread safety).
-  NCRYSTAL_API shared_obj<RNGStream> createBuiltinRNG( uint64_t seed = 0 );
+  NCRYSTAL_API shared_obj<RNGStream> createBuiltinRNG( std::uint64_t seed = 0 );
   NCRYSTAL_API shared_obj<RNGStream> createBuiltinRNG( const RNGStreamState& state );
 
   //Check whether a given RNG state is from the builtin RNG:
@@ -89,24 +89,24 @@ namespace NCRYSTAL_NAMESPACE {
     //Default implementations (can be reimplemented if more efficient methods
     //are available from a given generator):
     bool coinflip() override;
-    uint64_t generate64RndmBits() override;
-    uint32_t generate32RndmBits() override;
+    std::uint64_t generate64RndmBits() override;
+    std::uint32_t generate32RndmBits() override;
 
   protected:
     //If supporting state manipulation, please implement the following three
     //functions (type UID should be non-zero number unique to the RNG type and
     //version):
-    virtual uint32_t stateTypeUID() const noexcept;
-    virtual void actualSetState( std::vector<uint8_t>&& );
-    virtual std::vector<uint8_t> actualGetState() const;
-    virtual shared_obj<RNGStream> actualCloneWithNewState( std::vector<uint8_t>&& ) const;
+    virtual std::uint32_t stateTypeUID() const noexcept;
+    virtual void actualSetState( std::vector<std::uint8_t>&& );
+    virtual std::vector<std::uint8_t> actualGetState() const;
+    virtual shared_obj<RNGStream> actualCloneWithNewState( std::vector<std::uint8_t>&& ) const;
 
   public:
     //Utilities for implementing actualSetState/actualGetState:
     template <class TInteger>
-      static void appendToStateVector( std::vector<uint8_t>&, TInteger );
+      static void appendToStateVector( std::vector<std::uint8_t>&, TInteger );
     template <class TInteger>
-      static TInteger popFromStateVector( std::vector<uint8_t>& );
+      static TInteger popFromStateVector( std::vector<std::uint8_t>& );
   };
 
   class NCRYSTAL_API RNGProducer final : private MoveOnly {
@@ -171,17 +171,17 @@ namespace NCRYSTAL_NAMESPACE {
   }
 
   template <class TUInteger>
-  inline void RNGStream::appendToStateVector( std::vector<uint8_t>& v, TUInteger val )
+  inline void RNGStream::appendToStateVector( std::vector<std::uint8_t>& v, TUInteger val )
   {
     constexpr auto nbytes = sizeof(TUInteger);
     static_assert(nbytes>0,"");
     static_assert(std::is_unsigned<TUInteger>::value,"only works with unsigned integers");
     for ( decltype(sizeof(TUInteger)) i = 0; i < nbytes; ++i )
-      v.push_back( static_cast<uint8_t>((val>>8*((nbytes-1)-i)) & 0xFF) );
+      v.push_back( static_cast<std::uint8_t>((val>>8*((nbytes-1)-i)) & 0xFF) );
   }
 
   template <class TUInteger>
-  inline TUInteger RNGStream::popFromStateVector( std::vector<uint8_t>& v )
+  inline TUInteger RNGStream::popFromStateVector( std::vector<std::uint8_t>& v )
   {
     constexpr auto nbytes = sizeof(TUInteger);
     static_assert(nbytes>0,"");

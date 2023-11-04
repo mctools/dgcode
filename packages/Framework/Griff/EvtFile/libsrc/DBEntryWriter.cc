@@ -14,9 +14,9 @@ void EvtFile::DBEntryWriter::write(EvtFile::FileWriter&fw )
 {
   assert(fw.ok());
 
-  fw.writeDataDBSection((uint16_t)0);//version
+  fw.writeDataDBSection((std::uint16_t)0);//version
   assert(m_addedSinceLastWrite.size()<UINT32_MAX);
-  fw.writeDataDBSection((uint32_t)m_addedSinceLastWrite.size());//number of new objects
+  fw.writeDataDBSection((std::uint32_t)m_addedSinceLastWrite.size());//number of new objects
 
   auto it = m_addedSinceLastWrite.begin();
   auto itE = m_addedSinceLastWrite.end();

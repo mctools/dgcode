@@ -429,7 +429,7 @@ void NC::SABUtils::activeGridCells( const NC::SABData& data,
 
   auto itBeta = std::next(data.betaGrid().begin(),ibeta_low1d);
 
-  const uint16_t nalpha_uint16 = data.alphaGrid().size();
+  const std::uint16_t nalpha_uint16 = data.alphaGrid().size();
 
   for ( std::size_t i = 0; i < nnn; ++i, ++itBeta ) {
     const auto& r0 = vectAt(alpha1dranges,i);
@@ -441,8 +441,8 @@ void NC::SABUtils::activeGridCells( const NC::SABData& data,
     } else if ( r1Empty ) {
       out_alpharanges.emplace_back(r0);
     } else {
-      out_alpharanges.emplace_back(std::min<uint16_t>(r0.first,r1.first),
-                                   std::max<uint16_t>(r0.second,r1.second));
+      out_alpharanges.emplace_back(std::min<std::uint16_t>(r0.first,r1.first),
+                                   std::max<std::uint16_t>(r0.second,r1.second));
     }
     //Special case: Cell including beta=0.0 must always extend to lowest alpha
     //cell (the code above might have missed exactly this, because the slope of

@@ -50,7 +50,7 @@ namespace NCRYSTAL_NAMESPACE {
 
   namespace NCCInterface {
 
-    using ObjectTypeID = uint32_t;
+    using ObjectTypeID = std::uint32_t;
 
     class AtomDataObj : private MoveOnly {
       //Hold AtomData and related info. This wrapper class is associated with a
@@ -1373,7 +1373,7 @@ ncrystal_scatter_t ncrystal_clone_scatter_rngbyidx( ncrystal_scatter_t sh, unsig
 {
   try {
     auto& sc = ncc::extract(sh);
-    return ncc::createNewCHandle<ncc::Wrapped_Scatter>(sc.cloneByIdx(NC::RNGStreamIndex{(uint64_t)rngstreamidx}));
+    return ncc::createNewCHandle<ncc::Wrapped_Scatter>(sc.cloneByIdx(NC::RNGStreamIndex{(std::uint64_t)rngstreamidx}));
   } NCCATCH;
   return {nullptr};
 }
@@ -1390,7 +1390,7 @@ ncrystal_scatter_t ncrystal_clone_scatter_rngforcurrentthread( ncrystal_scatter_
 ncrystal_scatter_t ncrystal_create_scatter_builtinrng( const char * cfgstr, unsigned long seed )
 {
   try {
-    auto rng = NC::createBuiltinRNG( static_cast<uint64_t>(seed) );
+    auto rng = NC::createBuiltinRNG( static_cast<std::uint64_t>(seed) );
     auto rngproducer = NC::makeSO<NC::RNGProducer>( rng );
     auto pp = NC::FactImpl::createScatter(cfgstr);
     return ncc::createNewCHandle<ncc::Wrapped_Scatter>( NC::Scatter(std::move(rngproducer), std::move(rng),std::move(pp)));
@@ -1788,7 +1788,7 @@ void ncrystal_setbuiltinrandgen(void)
 void ncrystal_setbuiltinrandgen_withseed(unsigned long seed)
 {
   try {
-    NC::setDefaultRNG( NC::createBuiltinRNG( static_cast<uint64_t>(seed) ) );
+    NC::setDefaultRNG( NC::createBuiltinRNG( static_cast<std::uint64_t>(seed) ) );
   } NCCATCH;
 }
 

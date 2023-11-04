@@ -1,6 +1,7 @@
 #ifndef GriffDataRead_GriffDataReader_hh
 #define GriffDataRead_GriffDataReader_hh
 
+#include "Core/Types.hh"
 #include "GriffDataRead/Touchable.hh"
 #include "GriffDataRead/Material.hh"
 #include "GriffDataRead/Element.hh"
@@ -68,7 +69,7 @@ public:
   int32_t currentEventVersion() const;
   GriffFormat::Format::MODE eventStorageMode() const;
   const char * eventStorageModeStr() const;
-  uint64_t seed() const;//Random seed used for event generation.
+  std::uint64_t seed() const;//Random seed used for event generation.
   std::string seedStr() const;//as string for convenience
 
   bool setupChanged();//true if setup() gives different instance than at previous call
@@ -119,7 +120,7 @@ public:
   //following method which combines eventActive() checks with goToNextEvent():
 
   bool loopEvents();//reset afterwards by goToFirstEvent()
-  uint64_t loopCount() const;//loop counter (0=>first event, 1=>second event, ...)
+  std::uint64_t loopCount() const;//loop counter (0=>first event, 1=>second event, ...)
 
   //callbacks (must live for longer than the GriffDataReader is being used to
   //navigate events, or be deregistered):
@@ -133,7 +134,7 @@ public:
   unsigned eventIndexInCurrentFile() const;
 
   //Special methods for data hashing / integrity
-  uint32_t eventCheckSum() const;//Checksum stored in file
+  std::uint32_t eventCheckSum() const;//Checksum stored in file
   bool verifyEventDataIntegrity();//Recalculate checksum and verify
 
 private:
@@ -141,7 +142,7 @@ private:
   std::vector<std::string> m_inputFiles;
   unsigned m_loopsOrig;//should be const after constructor (for c++11?)
   unsigned m_loops;
-  uint64_t m_loopCount;
+  std::uint64_t m_loopCount;
   bool m_eventLoopStart;
   //current file:
   unsigned m_fileIdx;

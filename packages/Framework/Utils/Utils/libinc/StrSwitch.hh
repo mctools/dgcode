@@ -14,19 +14,19 @@
 
 namespace StrSwitch {
 
-  inline constexpr uint64_t hash_compile_time(char const* str, uint64_t last_value = 0xCBF29CE484222325ull)
+  inline constexpr std::uint64_t hash_compile_time(char const* str, std::uint64_t last_value = 0xCBF29CE484222325ull)
   {
     return *str ? hash_compile_time(str+1, (*str ^ last_value) * 0x100000001B3ull) : last_value;
   }
 
   //runtime versions:
 
-  inline uint64_t hash(const std::string& str)
+  inline std::uint64_t hash(const std::string& str)
   {
     return hash_compile_time(str.c_str());
   }
 
-  inline uint64_t hash(const char * str)
+  inline std::uint64_t hash(const char * str)
   {
     return hash_compile_time(str);
   }

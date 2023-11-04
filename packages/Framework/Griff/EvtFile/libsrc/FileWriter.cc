@@ -61,29 +61,29 @@ namespace EvtFile {
     }
 
     //For efficient hash calculation and file i/o, put the event header in an array:
-    uint32_t eventheader[6];
-    static_assert(EVTFILE_EVENT_HEADER_BYTES==6*sizeof(uint32_t));
+    std::uint32_t eventheader[6];
+    static_assert(EVTFILE_EVENT_HEADER_BYTES==6*sizeof(std::uint32_t));
 
     //The first field in the header is reserved for the hash:
     eventheader[1] = runnumber;
     eventheader[2] = eventnumber;
-    eventheader[3] = (uint32_t)m_section_database.size();
-    eventheader[4] = (uint32_t)m_section_briefdata.size();
+    eventheader[3] = (std::uint32_t)m_section_database.size();
+    eventheader[4] = (std::uint32_t)m_section_briefdata.size();
     if (compress_full_data)
-      eventheader[5] = (uint32_t)(fulldata_compressed_size);
+      eventheader[5] = (std::uint32_t)(fulldata_compressed_size);
     else
-      eventheader[5] = (uint32_t)m_section_fulldata.size();
+      eventheader[5] = (std::uint32_t)m_section_fulldata.size();
 
     //Calculate the hash (from uncompressed data!):
     ProgressiveHash hash;
-    hash.addData((char*)&(eventheader[1]),5*sizeof(uint32_t));
+    hash.addData((char*)&(eventheader[1]),5*sizeof(std::uint32_t));
     if (!m_section_database.empty()) hash.addData(&(m_section_database[0]),m_section_database.size());
     if (!m_section_briefdata.empty()) hash.addData(&(m_section_briefdata[0]),m_section_briefdata.size());
     if (!m_section_fulldata.empty()) hash.addData(&(m_section_fulldata[0]),m_section_fulldata.size());
     eventheader[0] = hash.getHash();
 
     //Write out the header:
-    write((char*)&(eventheader[0]),6*sizeof(uint32_t));
+    write((char*)&(eventheader[0]),6*sizeof(std::uint32_t));
 
     //Write out the three data blobs:
     if (!m_section_database.empty()) write(&(m_section_database[0]),m_section_database.size());

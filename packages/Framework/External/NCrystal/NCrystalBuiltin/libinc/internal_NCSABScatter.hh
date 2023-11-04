@@ -53,7 +53,7 @@ namespace NCRYSTAL_NAMESPACE {
     SABScatter( const DI_ScatKnl&,
                 unsigned vdoslux = 3,
                 bool useCache = true,
-                uint32_t vdos2sabExcludeFlag = 0 );
+                std::uint32_t vdos2sabExcludeFlag = 0 );
     SABScatter( SABData &&,
                 const VectD& energyGrid = VectD() );
     SABScatter( shared_obj<const SABData>,

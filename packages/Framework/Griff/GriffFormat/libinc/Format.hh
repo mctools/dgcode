@@ -1,6 +1,7 @@
 #ifndef GriffFormat_Format_hh
 #define GriffFormat_Format_hh
 
+#include "Core/Types.hh"
 #include "EvtFile/IFormat.hh"
 #include "EvtFile/Defs.hh"
 
@@ -12,7 +13,7 @@ namespace GriffFormat {
 
     static const Format * getFormat();
 
-    virtual uint32_t magicWord() const { return 0xe5506ea4; } //~= ess_gea4
+    virtual std::uint32_t magicWord() const { return 0xe5506ea4; } //~= ess_gea4
     virtual const char* fileExtension() const { return ".griff"; }
     virtual const char* eventBriefDataName() const { return "track"; }
     virtual const char* eventFullDataName() const { return "step"; }
@@ -43,15 +44,15 @@ namespace GriffFormat {
     //3) minimal => no step info at all, just tracks and segments.
 
     //For the implementation of file writer/reader we provide a common reference of expected sizes:
-    static const unsigned SIZE_TRACKHEADER = sizeof(uint32_t)*2+sizeof(uint64_t)+sizeof(EvtFile::index_type);
-    static const unsigned SIZE_PER_TRACK_WO_DAUGHTERLIST = sizeof(uint32_t)*5+sizeof(float)+sizeof(EvtFile::index_type);
-    static const unsigned SIZE_PER_DAUGHTERLIST_ENTRY = sizeof(uint32_t);
+    static const unsigned SIZE_TRACKHEADER = sizeof(std::uint32_t)*2+sizeof(std::uint64_t)+sizeof(EvtFile::index_type);
+    static const unsigned SIZE_PER_TRACK_WO_DAUGHTERLIST = sizeof(std::uint32_t)*5+sizeof(float)+sizeof(EvtFile::index_type);
+    static const unsigned SIZE_PER_DAUGHTERLIST_ENTRY = sizeof(std::uint32_t);
     static const unsigned SIZE_PER_SEGMENT = sizeof(double)*2+sizeof(float)*2+sizeof(EvtFile::index_type)*2;
     static const unsigned SIZE_LAST_SEGMENT_ON_TRACK_EXTRA_SIZE = sizeof(double)*2;
 
-    static const unsigned SIZE_STEPHEADER = 2*sizeof(uint32_t);
+    static const unsigned SIZE_STEPHEADER = 2*sizeof(std::uint32_t);
     static const unsigned SIZE_STEPPREPOSTPART = 68;
-    static const unsigned SIZE_STEPOTHERPART = 3*sizeof(float)+sizeof(uint32_t);
+    static const unsigned SIZE_STEPOTHERPART = 3*sizeof(float)+sizeof(std::uint32_t);
 
   private:
     Format(){}

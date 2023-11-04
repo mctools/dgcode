@@ -1,6 +1,7 @@
 #ifndef GriffDataRead_PDGCodeReader_hh
 #define GriffDataRead_PDGCodeReader_hh
 
+#include "Core/Types.hh"
 #include "GriffFormat/ParticleDefinition.hh"
 #include "EvtFile/IDBSubSectionReader.hh"
 #include <map>
@@ -28,10 +29,10 @@ namespace GriffDataRead {
     virtual EvtFile::subsectid_type uniqueSubSectionID() const { return m_sid; }
     virtual void load(const char*&data)
     {
-      uint8_t version;
+      std::uint8_t version;
       ByteStream::read(data,version);
       assert(version==0);//only known version so far.
-      uint32_t n;//number of new pdg codes
+      std::uint32_t n;//number of new pdg codes
       ByteStream::read(data,n);
       GriffFormat::ParticleDefinition pdef;
       for (unsigned i=0;i<n;++i) {

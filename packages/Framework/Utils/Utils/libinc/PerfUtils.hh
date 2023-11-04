@@ -383,7 +383,7 @@ namespace PerfUtils {
     int err=gettimeofday(&tv, 0);
     if (err!=0)
       return 0.0;
-    uint64_t res_usec=uint64_t(tv.tv_sec)*1000000 + uint64_t(tv.tv_usec);
+    std::uint64_t res_usec=std::uint64_t(tv.tv_sec)*1000000 + std::uint64_t(tv.tv_usec);
     return 0.001*res_usec;
   }
 

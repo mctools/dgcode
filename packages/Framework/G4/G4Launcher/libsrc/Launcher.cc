@@ -118,7 +118,7 @@ struct G4Launcher::Launcher::Imp {
 
   //random:
   bool m_norandom;
-  uint64_t m_seed;
+  std::uint64_t m_seed;
   std::string m_rnd_evtmsg_mode;
 
   //mp:
@@ -953,7 +953,7 @@ void G4Launcher::Launcher::setRndEvtMsgMode(const char * mode)
 }
 
 
-void G4Launcher::Launcher::setSeed(uint64_t seed)
+void G4Launcher::Launcher::setSeed(std::uint64_t seed)
 {
   if (!seed)
     m_imp->error("Only call setSeed with non-zero argument.");
@@ -994,7 +994,7 @@ bool G4Launcher::Launcher::GetNoRandomSetup() const
   return m_imp->m_norandom;
 }
 
-uint64_t G4Launcher::Launcher::getSeed() const
+std::uint64_t G4Launcher::Launcher::getSeed() const
 {
   return m_imp->m_seed;
 }

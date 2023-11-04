@@ -281,7 +281,7 @@ std::string NC::joinstr( const Span<const StrView>& parts, StrView sep)
 unsigned NC::countTrailingDigits( const std::string& ss )
 {
   auto nn = ss.size();
-  nc_assert_always(static_cast<uint64_t>(nn)<static_cast<uint64_t>(std::numeric_limits<int>::max()));
+  nc_assert_always(static_cast<std::uint64_t>(nn)<static_cast<std::uint64_t>(std::numeric_limits<int>::max()));
   int n = static_cast<int>(nn);
 
   int nTrailingDigits(0);
@@ -364,7 +364,7 @@ bool NC::ncgetenv_bool(std::string v)
                   <<" (expected a Boolean value, \"0\" or \"1\", but got \""<<evs<<"\").");
 }
 
-std::string NC::bytes2hexstr(const std::vector<uint8_t>& v) {
+std::string NC::bytes2hexstr(const std::vector<std::uint8_t>& v) {
   const char hexchars[] = "0123456789abcdef";
   std::ostringstream ss;
   for (auto e : v)
@@ -372,8 +372,8 @@ std::string NC::bytes2hexstr(const std::vector<uint8_t>& v) {
   return ss.str();
 }
 
-std::vector<uint8_t> NC::hexstr2bytes(const std::string& v) {
-  std::vector<uint8_t> res;
+std::vector<std::uint8_t> NC::hexstr2bytes(const std::string& v) {
+  std::vector<std::uint8_t> res;
   auto hex2val = [](unsigned c) {
     unsigned val(99);
     constexpr unsigned val_a = static_cast<unsigned>('a');

@@ -1,6 +1,7 @@
 #ifndef SimpleHists_HistBase_hh
 #define SimpleHists_HistBase_hh
 
+#include "Core/Types.hh"
 #include <string>
 #include <cassert>
 

@@ -112,7 +112,7 @@ namespace G4Launcher {
     void closeOutput();//Hook for expert users to close the Griff file early.
 
     void noRandomSetup();
-    void setSeed(uint64_t seed);
+    void setSeed(std::uint64_t seed);
 
     //Tune how often the Random Manager prints out the event number and seed
     //(mode must be "ALWAYS", "NEVER" or "ADAPTABLE", with the latter being the default):
@@ -161,7 +161,7 @@ namespace G4Launcher {
     //getters:
     unsigned getMultiProcessing() const;
     bool GetNoRandomSetup() const;
-    uint64_t getSeed() const;
+    std::uint64_t getSeed() const;
     const char* getOutputFile() const;
     const char* getOutputMode() const;
     const char* getVis() const;

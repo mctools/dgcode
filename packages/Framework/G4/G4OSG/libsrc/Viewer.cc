@@ -43,7 +43,7 @@ G4OSG::Viewer::~Viewer()
 
 G4OSG::Viewer::Viewer(const char* griff_file,
                       bool show_geo,
-                      const std::set<uint64_t>& griff_event_selection)
+                      const std::set<std::uint64_t>& griff_event_selection)
   : m_measurementPoints(0),
     m_userPoints(0),
     m_coordAxes(0),

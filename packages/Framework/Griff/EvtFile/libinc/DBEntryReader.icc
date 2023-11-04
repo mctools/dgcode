@@ -1,11 +1,11 @@
 template<class Tentry>
 inline void EvtFile::DBEntryReader<Tentry>::load(const char*& data)
 {
-  uint16_t version;
+  std::uint16_t version;
   ByteStream::read(data,version);
   assert(version==0);
 
-  uint32_t nobjs;
+  std::uint32_t nobjs;
   ByteStream::read(data,nobjs);
 
   unsigned n=nobjs;

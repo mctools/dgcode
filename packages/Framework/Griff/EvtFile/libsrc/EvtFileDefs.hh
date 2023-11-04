@@ -7,6 +7,6 @@
 
 //Sizes in EVTFILE__VERSION 0,1,2:
 #define EVTFILE_FILE_HEADER_BYTES (2*sizeof(int32_t))
-#define EVTFILE_EVENT_HEADER_BYTES (6*sizeof(uint32_t))
+#define EVTFILE_EVENT_HEADER_BYTES (6*sizeof(std::uint32_t))
 
 #endif

@@ -68,7 +68,7 @@ namespace EvtFile {
     unsigned nevts(0);
 
     printf("  Position RunNbr EvtNbr EvtHdr[B] DBData[B] BriefData[B] FullData[B] Total[B] Integrity\n");
-    uint64_t totdb(0),totbrief(0),totfull(0);
+    std::uint64_t totdb(0),totbrief(0),totfull(0);
     bool badEvents(false);
     while (f.eventActive()) {
       ++nevts;
@@ -80,7 +80,7 @@ namespace EvtFile {
       bool integrity(f.verifyEventDataIntegrity());
       unsigned fulldatasize = uncompressed_sizes ? f.nBytesFullData() : f.nBytesFullDataOnDisk();
       if (!brief||!integrity) {
-        std::ostringstream stmp;stmp<<uint64_t(EVTFILE_EVENT_HEADER_BYTES+db.nBytesReceived()+f.nBytesBriefData()+fulldatasize);
+        std::ostringstream stmp;stmp<<std::uint64_t(EVTFILE_EVENT_HEADER_BYTES+db.nBytesReceived()+f.nBytesBriefData()+fulldatasize);
 
         printf("  %8i %6i %6i %9i %9i %12i %11i %8s %s\n",
                f.eventIndex(),f.runNumber(),f.eventNumber(),
@@ -100,11 +100,11 @@ namespace EvtFile {
 
     std::ostringstream s;
     s<<"Total [nevts="<<nevts<<"]:";
-    std::ostringstream stmp1;stmp1<<uint64_t(nevts*EVTFILE_EVENT_HEADER_BYTES);
+    std::ostringstream stmp1;stmp1<<std::uint64_t(nevts*EVTFILE_EVENT_HEADER_BYTES);
     std::ostringstream stmp2;stmp2<<totdb;
     std::ostringstream stmp3;stmp3<<totbrief;
     std::ostringstream stmp4;stmp4<<totfull;
-    std::ostringstream stmp5;stmp5<<uint64_t(nevts*EVTFILE_EVENT_HEADER_BYTES)+totdb+totbrief+totfull;
+    std::ostringstream stmp5;stmp5<<std::uint64_t(nevts*EVTFILE_EVENT_HEADER_BYTES)+totdb+totbrief+totfull;
 
     printf("  %-22s %9s %9s %12s %11s %8s %s\n",
            s.str().c_str(),

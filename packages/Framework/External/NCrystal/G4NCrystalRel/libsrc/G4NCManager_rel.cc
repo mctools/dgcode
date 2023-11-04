@@ -94,7 +94,7 @@ void NCG4::Manager::addScatterProperty(G4Material* mat,NCrystal::ProcImpl::ProcP
   }
 
   unsigned idx = std::numeric_limits<unsigned>::max();
-  uint64_t scatuid = scat->getUniqueID().value;
+  std::uint64_t scatuid = scat->getUniqueID().value;
   auto it = m_scat2idx.find(scatuid);
   if ( it == m_scat2idx.end() ) {
     idx = m_scatters.size();

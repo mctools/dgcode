@@ -26,8 +26,8 @@ public:
       vect[i] = doGenerate();
   }
   //Direct access to RNG:
-  void dgcode_set64BitSeed(uint64_t seed) { m_rng = NC::RandXRSRImpl{ seed }; }
-  uint64_t dgcode_genHighQuality64bitUint() { return m_rng.genUInt64(); }
+  void dgcode_set64BitSeed(std::uint64_t seed) { m_rng = NC::RandXRSRImpl{ seed }; }
+  std::uint64_t dgcode_genHighQuality64bitUint() { return m_rng.genUInt64(); }
   //Implementing the full interface just to be safe, but the following functions
   //are not really tested:
   void setSeed(long seed, int) override;

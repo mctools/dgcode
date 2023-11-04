@@ -370,10 +370,10 @@ namespace G4DataCollectInternals {
     auto itTrackE=tracks.end();
     EvtFile::FileWriter& fw = m_mgr->fileWriter;
     //This is also where we embed the event seed!
-    fw.writeDataBriefSection((uint64_t)FrameworkGlobals::currentEvtSeed());
+    fw.writeDataBriefSection((std::uint64_t)FrameworkGlobals::currentEvtSeed());
     fw.writeDataBriefSection(m_currentMetaDataIdx);
-    fw.writeDataBriefSection((uint32_t)tracks.size());
-    fw.writeDataBriefSection((uint32_t)m_mode);//could be squeezed into the track size word and hope we had <1e9 tracks
+    fw.writeDataBriefSection((std::uint32_t)tracks.size());
+    fw.writeDataBriefSection((std::uint32_t)m_mode);//could be squeezed into the track size word and hope we had <1e9 tracks
 
     for (auto itTrack=tracks.begin();itTrack!=itTrackE;++itTrack) {
       Track_ & trk = *itTrack;
@@ -386,8 +386,8 @@ namespace G4DataCollectInternals {
       fw.writeDataBriefSection((float)step.preStep.weight);
       fw.writeDataBriefSection((EvtFile::index_type)trk.creatorProcIdx);
       fw.writeDataBriefSection((int32_t)step.parentId);
-      fw.writeDataBriefSection((uint32_t)trk.nSegments);
-      fw.writeDataBriefSection((uint32_t)nDaughters);
+      fw.writeDataBriefSection((std::uint32_t)trk.nSegments);
+      fw.writeDataBriefSection((std::uint32_t)nDaughters);
       assert(trk.nSegments>0);
       if (nDaughters)
         for (auto itD = itDaughters->second.begin();itD!=itDaughters->second.end();++itD)
@@ -446,13 +446,13 @@ namespace G4DataCollectInternals {
         }
         unsigned segmentEnd = step.segmentEnd;
         double edep(0), edep_nonion(0), stepLength(0);
-        uint32_t lastStepStatus(fUndefined);
+        std::uint32_t lastStepStatus(fUndefined);
         if (m_mode!=GriffFormat::Format::MODE_MINIMAL)
           {
             //put nsegsteps info in step section:
-            fw.writeDataFullSection((uint32_t)nsegsteps);//nsegsteps_orig
-            fw.writeDataFullSection((uint32_t)(m_mode==GriffFormat::Format::MODE_FULL ? nsegsteps : 1));//nsegsteps_stored
-            static_assert(GriffFormat::Format::SIZE_STEPHEADER==2*sizeof(uint32_t));
+            fw.writeDataFullSection((std::uint32_t)nsegsteps);//nsegsteps_orig
+            fw.writeDataFullSection((std::uint32_t)(m_mode==GriffFormat::Format::MODE_FULL ? nsegsteps : 1));//nsegsteps_stored
+            static_assert(GriffFormat::Format::SIZE_STEPHEADER==2*sizeof(std::uint32_t));
           }
         if (m_mode==GriffFormat::Format::MODE_REDUCED) {
           //prestep from the first step
@@ -474,8 +474,8 @@ namespace G4DataCollectInternals {
           fw.writeDataFullSection(float(sstep.eDep));
           fw.writeDataFullSection(float(sstep.eDepNonIonizing));
           fw.writeDataFullSection(float(sstep.stepLength));
-          fw.writeDataFullSection(uint32_t(sstep.stepStatus));//waste of 3.5 bytes...
-          static_assert(GriffFormat::Format::SIZE_STEPOTHERPART==3*sizeof(float)+sizeof(uint32_t));
+          fw.writeDataFullSection(std::uint32_t(sstep.stepStatus));//waste of 3.5 bytes...
+          static_assert(GriffFormat::Format::SIZE_STEPOTHERPART==3*sizeof(float)+sizeof(std::uint32_t));
           if (istep+1==segmentEnd) {
             //Only the last step needs postStep, the other ones can read the first part of the next steps.
             assert(istep<nsteps);
@@ -487,8 +487,8 @@ namespace G4DataCollectInternals {
           fw.writeDataFullSection((float)edep);
           fw.writeDataFullSection((float)edep_nonion);
           fw.writeDataFullSection(float(stepLength));
-          fw.writeDataFullSection(uint32_t(nsteps_onsegment == 1 ? lastStepStatus : uint32_t(fUndefined)));//step status undefined for coalesced steps
-          static_assert(GriffFormat::Format::SIZE_STEPOTHERPART==3*sizeof(float)+sizeof(uint32_t));
+          fw.writeDataFullSection(std::uint32_t(nsteps_onsegment == 1 ? lastStepStatus : std::uint32_t(fUndefined)));//step status undefined for coalesced steps
+          static_assert(GriffFormat::Format::SIZE_STEPOTHERPART==3*sizeof(float)+sizeof(std::uint32_t));
           //poststep from the last step
 
           assert(istep==segmentEnd);

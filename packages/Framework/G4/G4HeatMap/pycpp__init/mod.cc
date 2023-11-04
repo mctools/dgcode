@@ -161,7 +161,7 @@ namespace DMWriter {
     if (m_outputFile.size()<7||strcmp(&m_outputFile.at(m_outputFile.size()-7),".mesh3d")!=0)
       m_outputFile += ".mesh3d";
     std::stringstream tmp;
-    tmp << m_outputFile << ".tmpcache_" << (uint64_t)(getpid())<<"_proc";
+    tmp << m_outputFile << ".tmpcache_" << (std::uint64_t)(getpid())<<"_proc";
     m_tmpFileBase = tmp.str();
     setFilterExpression("true");
     setQuantityExpression("step.edep");

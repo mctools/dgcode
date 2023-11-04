@@ -113,11 +113,11 @@ namespace SimpleHists {
       double overflow;
       float minfilled;//FIXME: This should become double!!
       float maxfilled;//FIXME: This should become double!!
-      uint32_t nbins;
+      std::uint32_t nbins;
     };
     union {
       PersistifiedData m_data;
-      char m_serialdata[sizeof(double)*7+sizeof(float)*2+sizeof(uint32_t)];
+      char m_serialdata[sizeof(double)*7+sizeof(float)*2+sizeof(std::uint32_t)];
     };
 
     //non-persistent metadata which can be recreated:

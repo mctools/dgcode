@@ -61,7 +61,7 @@ inline bool GriffDataReader::loopEvents()
   return eventActive();
 }
 
-inline uint64_t GriffDataReader::loopCount() const { return m_loopCount; }
+inline std::uint64_t GriffDataReader::loopCount() const { return m_loopCount; }
 inline bool GriffDataReader::eventActive() const { return m_fr && m_fr->eventActive(); }
 inline unsigned GriffDataReader::runNumber() const { assert(eventActive()); return m_fr->runNumber(); }
 inline unsigned GriffDataReader::eventNumber() const { assert(eventActive()); return m_fr->eventNumber(); }
@@ -70,7 +70,7 @@ inline int32_t GriffDataReader::currentEventVersion() const { assert(eventActive
 inline unsigned GriffDataReader::nTracks() const
 {
   assert(eventActive());
-  return ByteStream::interpret<uint32_t>(m_fr->getBriefData()+sizeof(uint64_t)+sizeof(EvtFile::index_type));
+  return ByteStream::interpret<std::uint32_t>(m_fr->getBriefData()+sizeof(std::uint64_t)+sizeof(EvtFile::index_type));
 }
 
 inline unsigned GriffDataReader::nPrimaryTracks() const
@@ -130,7 +130,7 @@ inline const GriffDataRead::Track* GriffDataReader::primaryTrackEnd() const { lo
 inline GriffFormat::Format::MODE GriffDataReader::eventStorageMode() const
 {
   assert(eventActive());
-  return (GriffFormat::Format::MODE)ByteStream::interpret<uint32_t>(m_fr->getBriefData()+sizeof(uint64_t)+sizeof(EvtFile::index_type)+sizeof(uint32_t));
+  return (GriffFormat::Format::MODE)ByteStream::interpret<std::uint32_t>(m_fr->getBriefData()+sizeof(std::uint64_t)+sizeof(EvtFile::index_type)+sizeof(std::uint32_t));
 }
 
 inline const char * GriffDataReader::eventStorageModeStr() const
@@ -143,10 +143,10 @@ inline const char * GriffDataReader::eventStorageModeStr() const
 }
 
 
-inline uint64_t GriffDataReader::seed() const
+inline std::uint64_t GriffDataReader::seed() const
 {
   assert(eventActive());
-  return ByteStream::interpret<uint64_t>(m_fr->getBriefData());
+  return ByteStream::interpret<std::uint64_t>(m_fr->getBriefData());
 }
 
 inline void GriffDataReader::loadTracks() const
@@ -178,7 +178,7 @@ inline void GriffDataReader::clearEvent()
 inline EvtFile::index_type GriffDataReader::metaDataIdx() const
 {
   assert(eventActive());
-  return ByteStream::interpret<EvtFile::index_type>(m_fr->getBriefData()+sizeof(uint64_t));
+  return ByteStream::interpret<EvtFile::index_type>(m_fr->getBriefData()+sizeof(std::uint64_t));
 }
 
 inline void GriffDataReader::beginEventActions()
@@ -203,7 +203,7 @@ inline bool GriffDataReader::setupChanged()
   return setupChangedFullCheck(mdidx);//new file => must make a full comparison
 }
 
-inline uint32_t GriffDataReader::eventCheckSum() const
+inline std::uint32_t GriffDataReader::eventCheckSum() const
 {
   assert(eventActive());
   return m_fr->eventCheckSum();

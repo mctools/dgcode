@@ -72,7 +72,7 @@ namespace G4NCrystalRel {
     ~Manager();
     static Manager * s_mgr;
     std::vector<NCrystal::ProcImpl::ProcPtr> m_scatters;
-    std::map<uint64_t,unsigned> m_scat2idx;
+    std::map<std::uint64_t,unsigned> m_scat2idx;
     G4String m_key;
     NCrystal::CachePtr& getCachePtrForCurrentThreadAndProcess( unsigned scatter_idx ) const;
     //Returns numeric_limits<unsigned>::max() if not available:

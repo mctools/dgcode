@@ -160,12 +160,12 @@ std::pair<unsigned,unsigned> NC::detectSimpleRationalNumbers(double value)
     return { static_cast<double>(intpart), 1 };
   }
   //ok, value is in (0,1).
-  static std::map<uint64_t,std::pair<unsigned,unsigned>> s_cache = []()
+  static std::map<std::uint64_t,std::pair<unsigned,unsigned>> s_cache = []()
   {
-    std::map<uint64_t,std::pair<unsigned,unsigned>> result;
+    std::map<std::uint64_t,std::pair<unsigned,unsigned>> result;
     for (unsigned b = 2; b <= 64; ++b) {
       for (unsigned a = 1; a < b; ++a) {
-        uint64_t key = static_cast<uint64_t>((double(a)/b)*1e18);//fits in uint64_t since value of a/b is in (0,1)
+        std::uint64_t key = static_cast<std::uint64_t>((double(a)/b)*1e18);//fits in std::uint64_t since value of a/b is in (0,1)
         auto it = result.find(key);
         if (it==result.end())
           result[key] = { a,b };//only insert if not there (because if a1/b1 = a2/b2, we prefer the smallest b-value).
@@ -173,7 +173,7 @@ std::pair<unsigned,unsigned> NC::detectSimpleRationalNumbers(double value)
     }
     return result;
   }();
-  uint64_t key = static_cast<uint64_t>(value*1e18);
+  std::uint64_t key = static_cast<std::uint64_t>(value*1e18);
   auto it = s_cache.find(key);
   if ( it == s_cache.end() )
     return {0,0};

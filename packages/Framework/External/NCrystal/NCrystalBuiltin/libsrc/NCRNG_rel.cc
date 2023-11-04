@@ -37,45 +37,45 @@ bool NC::RNGStream::coinflip()
   return generate() > 0.5;
 }
 
-uint64_t NC::RNGStream::generate64RndmBits()
+std::uint64_t NC::RNGStream::generate64RndmBits()
 {
   //As generate() returns a double with only 53 random bits, we need two
   //calls. Most straight forward to do this by combining two 32 bit integers:
-  const uint32_t g1 = generate32RndmBits();
-  const uint32_t g2 = generate32RndmBits();
-  return ( uint64_t{ g1 } << 32 ) | g2;
+  const std::uint32_t g1 = generate32RndmBits();
+  const std::uint32_t g2 = generate32RndmBits();
+  return ( std::uint64_t{ g1 } << 32 ) | g2;
 }
 
-uint32_t NC::RNGStream::generate32RndmBits()
+std::uint32_t NC::RNGStream::generate32RndmBits()
 {
-  return static_cast<uint32_t>(generate()*std::numeric_limits<uint32_t>::max());
+  return static_cast<std::uint32_t>(generate()*std::numeric_limits<std::uint32_t>::max());
 }
 
-uint32_t NC::RNGStream::stateTypeUID() const noexcept
+std::uint32_t NC::RNGStream::stateTypeUID() const noexcept
 {
   return 0;
 }
 
-void NC::RNGStream::actualSetState( std::vector<uint8_t>&& )
+void NC::RNGStream::actualSetState( std::vector<std::uint8_t>&& )
 {
 }
 
-std::vector<uint8_t> NC::RNGStream::actualGetState() const
+std::vector<std::uint8_t> NC::RNGStream::actualGetState() const
 {
   return {};
 }
 
-NC::shared_obj<NC::RNGStream> NC::RNGStream::actualCloneWithNewState( std::vector<uint8_t>&& ) const
+NC::shared_obj<NC::RNGStream> NC::RNGStream::actualCloneWithNewState( std::vector<std::uint8_t>&& ) const
 {
   return std::shared_ptr<RNGStream>{nullptr};//dummy (will trigger exception immediately)
 }
 
 NC::RNGStreamState NC::RNGStream::getState() const
 {
-  uint32_t stateuid = stateTypeUID();
+  std::uint32_t stateuid = stateTypeUID();
   if (!stateuid)
     NCRYSTAL_THROW(LogicError,"RNG::getState should never be called without first checking supportsStateManipulation().");
-  std::vector<uint8_t> v = actualGetState();
+  std::vector<std::uint8_t> v = actualGetState();
   nc_assert_always(!v.empty());
   v.reserve(v.size()+sizeof(stateuid));
   appendToStateVector(v, stateuid);
@@ -85,26 +85,26 @@ NC::RNGStreamState NC::RNGStream::getState() const
 namespace NCRYSTAL_NAMESPACE {
   namespace RNGStream_detail {
 
-    constexpr uint32_t builtinRNGStateTypeUID = 0xb067bd44;//randomly generated
+    constexpr std::uint32_t builtinRNGStateTypeUID = 0xb067bd44;//randomly generated
 
-    uint32_t extractStateUID( const char * fullfct, const std::string& state )
+    std::uint32_t extractStateUID( const char * fullfct, const std::string& state )
     {
-      std::vector<uint8_t> v = hexstr2bytes(state);
-      if ( ! ( v.size() > sizeof(uint32_t) ) )
+      std::vector<std::uint8_t> v = hexstr2bytes(state);
+      if ( ! ( v.size() > sizeof(std::uint32_t) ) )
         NCRYSTAL_THROW2(BadInput,fullfct<<" got too short state.");
-      return RNGStream::popFromStateVector<uint32_t>(v);
+      return RNGStream::popFromStateVector<std::uint32_t>(v);
     }
 
-    std::vector<uint8_t> extractStateBytes( const char * fct, const std::string& state, uint32_t expected_stateuid )
+    std::vector<std::uint8_t> extractStateBytes( const char * fct, const std::string& state, std::uint32_t expected_stateuid )
     {
       if (!expected_stateuid)
         NCRYSTAL_THROW2(LogicError,"RNGStream::"<<fct<<" should never be called without first checking supportsStateManipulation().");
 
-      std::vector<uint8_t> v = hexstr2bytes(state);
+      std::vector<std::uint8_t> v = hexstr2bytes(state);
       if ( ! ( v.size() > sizeof(expected_stateuid) ) )
         NCRYSTAL_THROW2(BadInput,"RNGStream::"<<fct<<" got too short state.");
 
-      if ( RNGStream::popFromStateVector<uint32_t>(v) != expected_stateuid )
+      if ( RNGStream::popFromStateVector<std::uint32_t>(v) != expected_stateuid )
         NCRYSTAL_THROW2(BadInput,"RNGStream::"<<fct<<" got invalid state (or state originating in different RNG implementation).");
 
       return v;
@@ -140,47 +140,47 @@ namespace NCRYSTAL_NAMESPACE {
   class RNG_XRSR final : public RNGStream {
   public:
 
-    RNG_XRSR( uint64_t seed ) : m_impl{seed} {}
+    RNG_XRSR( std::uint64_t seed ) : m_impl{seed} {}
     RNG_XRSR( RandXRSRImpl&& impl ) : m_impl(std::move(impl)) {}
     RNG_XRSR( no_init_t ) : m_impl(no_init) {}
 
     bool coinflip() override { return m_impl.coinflip(); }
-    uint64_t generate64RndmBits() override { return m_impl.genUInt64(); }
-    uint32_t generate32RndmBits() override { return m_impl.genUInt32(); }
+    std::uint64_t generate64RndmBits() override { return m_impl.genUInt64(); }
+    std::uint32_t generate32RndmBits() override { return m_impl.genUInt32(); }
 
   protected:
 
     double actualGenerate() override { return m_impl.generate(); }
 
-    uint32_t stateTypeUID() const noexcept override {
+    std::uint32_t stateTypeUID() const noexcept override {
       return RNGStream_detail::builtinRNGStateTypeUID;
     }
 
-    static RandXRSRImpl::state_t detail_convstate(std::vector<uint8_t>&& v)
+    static RandXRSRImpl::state_t detail_convstate(std::vector<std::uint8_t>&& v)
     {
       RandXRSRImpl::state_t newstate;
-      nc_assert_always( v.size() == 2*sizeof(uint64_t) );
-      newstate[1] = popFromStateVector<uint64_t>(v);
-      nc_assert( v.size() == sizeof(uint64_t) );
-      newstate[0] = popFromStateVector<uint64_t>(v);
+      nc_assert_always( v.size() == 2*sizeof(std::uint64_t) );
+      newstate[1] = popFromStateVector<std::uint64_t>(v);
+      nc_assert( v.size() == sizeof(std::uint64_t) );
+      newstate[0] = popFromStateVector<std::uint64_t>(v);
       nc_assert(v.empty());
       return newstate;
     }
-    void actualSetState( std::vector<uint8_t>&& v ) override
+    void actualSetState( std::vector<std::uint8_t>&& v ) override
     {
       m_impl.state() = detail_convstate(std::move(v));
     }
-    std::vector<uint8_t> actualGetState() const override
+    std::vector<std::uint8_t> actualGetState() const override
     {
-      std::vector<uint8_t> v;
-      v.reserve( 2*sizeof(uint64_t) );
-      appendToStateVector<uint64_t>(v,m_impl.state()[0]);
-      appendToStateVector<uint64_t>(v,m_impl.state()[1]);
-      nc_assert( v.size() == 2*sizeof(uint64_t) );
+      std::vector<std::uint8_t> v;
+      v.reserve( 2*sizeof(std::uint64_t) );
+      appendToStateVector<std::uint64_t>(v,m_impl.state()[0]);
+      appendToStateVector<std::uint64_t>(v,m_impl.state()[1]);
+      nc_assert( v.size() == 2*sizeof(std::uint64_t) );
       return v;
     }
 
-    shared_obj<RNGStream> actualCloneWithNewState( std::vector<uint8_t>&& v ) const override
+    shared_obj<RNGStream> actualCloneWithNewState( std::vector<std::uint8_t>&& v ) const override
     {
       return makeSO<RNG_XRSR>( RandXRSRImpl( detail_convstate(std::move(v)) ) );
     }
@@ -212,7 +212,7 @@ namespace NCRYSTAL_NAMESPACE {
   };
 }
 
-NC::shared_obj<NC::RNGStream> NC::createBuiltinRNG( uint64_t seed )
+NC::shared_obj<NC::RNGStream> NC::createBuiltinRNG( std::uint64_t seed )
 {
   return makeSO<RNG_XRSR>(seed);
 }
@@ -279,7 +279,7 @@ namespace NCRYSTAL_NAMESPACE {
     shared_obj<RNGStream> produceUnlocked();
     shared_obj<RNGStream> produceByIdxUnlocked( RNGStreamIndex );
     shared_obj<RNGStream> produceByThreadIdxUnlocked( ThreadID );
-    static uint64_t currentThreadID();
+    static std::uint64_t currentThreadID();
   };
 }
 void NC::RNGProducer::Impl::jumpFillNextNextIfAppropriate()

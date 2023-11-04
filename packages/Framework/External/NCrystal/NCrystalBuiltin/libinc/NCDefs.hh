@@ -175,13 +175,13 @@ namespace NCRYSTAL_NAMESPACE {
     double generate();
 
     //Generate integer uniformly in { 0, 1, ..., N-1 }:
-    uint32_t generateInt( uint32_t N );
-    uint64_t generateInt64( uint64_t N );
+    std::uint32_t generateInt( std::uint32_t N );
+    std::uint64_t generateInt64( std::uint64_t N );
 
     //Coin flips (50% true, 50% false) and completely randomised bit patterns:
     virtual bool coinflip() = 0;
-    virtual uint64_t generate64RndmBits() = 0;
-    virtual uint32_t generate32RndmBits() = 0;
+    virtual std::uint64_t generate64RndmBits() = 0;
+    virtual std::uint32_t generate32RndmBits() = 0;
 
   protected:
     virtual double actualGenerate() = 0;//uniformly in (0,1]
@@ -189,7 +189,7 @@ namespace NCRYSTAL_NAMESPACE {
 
   struct NCRYSTAL_API UniqueIDValue {
     //type-safe unique id holder.
-    uint64_t value;
+    std::uint64_t value;
 #if __cplusplus >= 202002L
     auto operator<=>(const UniqueIDValue&) const = default;
 #else
@@ -214,7 +214,7 @@ namespace NCRYSTAL_NAMESPACE {
     UniqueID( UniqueID&& ) = default;
     UniqueID& operator=( UniqueID&& ) = default;
   private:
-    uint64_t m_uid;
+    std::uint64_t m_uid;
   };
 
   //Very simply optional class for C++11, similar to std::optional from C++17,
@@ -357,7 +357,7 @@ namespace NCRYSTAL_NAMESPACE {
   //Structs which can be used in interfaces accepting cross-section values, to
   //make sure one does not accidentally mix up bound and free cross sections.
 
-  //Convert uniformly randomised uint64_t (i.e. 64 independently randomised
+  //Convert uniformly randomised std::uint64_t (i.e. 64 independently randomised
   //bits) to a double precision floating point uniformly distributed over
   //(0,1]. This will map uniformly from 1.0 at input 0x0 to epsilon~=5.42e-20 at
   //uint64_max. The least significant bits in the input integer will also be
@@ -365,7 +365,7 @@ namespace NCRYSTAL_NAMESPACE {
   //lowest bits will only affect the result when the generated values are low
   //(e.g. the lowest 3 bits will only matter when the generated value is below
   //0.004):
-  NCRYSTAL_API ncconstexpr17 double randUInt64ToFP01( uint64_t );
+  NCRYSTAL_API ncconstexpr17 double randUInt64ToFP01( std::uint64_t );
 
   struct NCRYSTAL_API no_init_t {};
   constexpr no_init_t no_init = no_init_t{};
@@ -1178,29 +1178,29 @@ namespace NCRYSTAL_NAMESPACE {
     return r;
   }
 
-  inline uint32_t RNG::generateInt( uint32_t N )
+  inline std::uint32_t RNG::generateInt( std::uint32_t N )
   {
-    constexpr uint32_t nmax = std::numeric_limits<uint32_t>::max();
-    const uint32_t lim = nmax - nmax % N;//remove bias
+    constexpr std::uint32_t nmax = std::numeric_limits<std::uint32_t>::max();
+    const std::uint32_t lim = nmax - nmax % N;//remove bias
     do {
-      uint32_t r = generate32RndmBits();
+      std::uint32_t r = generate32RndmBits();
       if ( r < lim )
         return r % N;
     } while(true);
   }
 
-  inline uint64_t RNG::generateInt64( uint64_t N )
+  inline std::uint64_t RNG::generateInt64( std::uint64_t N )
   {
-    constexpr uint64_t nmax = std::numeric_limits<uint64_t>::max();
-    const uint64_t lim = nmax - nmax % N;//remove bias
+    constexpr std::uint64_t nmax = std::numeric_limits<std::uint64_t>::max();
+    const std::uint64_t lim = nmax - nmax % N;//remove bias
     do {
-      uint64_t r = generate64RndmBits();
+      std::uint64_t r = generate64RndmBits();
       if ( r < lim )
         return r % N;
     } while(true);
   }
 
-  inline ncconstexpr17 double randUInt64ToFP01( uint64_t x )
+  inline ncconstexpr17 double randUInt64ToFP01( std::uint64_t x )
   {
     //A note about the implementation: xoroshiro authors recommend: "(x >> 11) *
     //0x1.0p-53".  This selects all k*(2^53) for k=0..(2^53-1) with equal

@@ -50,7 +50,7 @@ namespace EvtFile {
       close();
       return false;
     }
-    uint32_t magic;
+    std::uint32_t magic;
     read(magic);
     m_is.peek();//always peek before checking eof!
     if (m_is.fail()||m_is.eof()||magic!=m_format->magicWord()) {
@@ -188,7 +188,7 @@ namespace EvtFile {
         EventInfo& lastEvt = m_evts.back();
         newEvtPos = lastEvt.evtPosInFile;
         newEvtPos +=EVTFILE_EVENT_HEADER_BYTES;
-        static_assert(EVTFILE_EVENT_HEADER_BYTES==6*sizeof(uint32_t));
+        static_assert(EVTFILE_EVENT_HEADER_BYTES==6*sizeof(std::uint32_t));
         newEvtPos+=lastEvt.sectionSize_database;
         newEvtPos+=lastEvt.sectionSize_briefdata;
         newEvtPos+=lastEvt.sectionSize_fulldata;
@@ -214,9 +214,9 @@ namespace EvtFile {
       EventInfo& newEvt = m_evts.back();
       newEvt.evtPosInFile = newEvtPos;
       newEvt.evtIndex = m_evts.size()-1;
-      read(reinterpret_cast<char*>(&newEvt.checkSum),sizeof(uint32_t)*6);//Trick to read all 6 variables with one call
-      static_assert(sizeof(EventInfo)==sizeof(uint32_t)*8+sizeof(std::streampos));//make sure there is no padding => our trick would fail
-      static_assert(EVTFILE_EVENT_HEADER_BYTES==sizeof(uint32_t)*6);//make sure we are consistent with EvtFileDefs.hh
+      read(reinterpret_cast<char*>(&newEvt.checkSum),sizeof(std::uint32_t)*6);//Trick to read all 6 variables with one call
+      static_assert(sizeof(EventInfo)==sizeof(std::uint32_t)*8+sizeof(std::streampos));//make sure there is no padding => our trick would fail
+      static_assert(EVTFILE_EVENT_HEADER_BYTES==sizeof(std::uint32_t)*6);//make sure we are consistent with EvtFileDefs.hh
       if (m_is.fail()) {
         m_bad=true;
         m_evts.resize(m_evts.size()-1);
@@ -246,7 +246,7 @@ namespace EvtFile {
     }
   }
 
-  bool FileReader::goToEvent(uint32_t run_number,uint32_t evt_number)
+  bool FileReader::goToEvent(std::uint32_t run_number,std::uint32_t evt_number)
   {
     assert(isInit());
 
@@ -348,7 +348,7 @@ namespace EvtFile {
       }
       if (m_fulldata_compressed) {
         //uncompress:
-        assert(n>sizeof(uint32_t));
+        assert(n>sizeof(std::uint32_t));
         ZLibUtils::decompressToBuffer(&(m_section_fulldata_compressed[0]), n, m_section_fulldata,m_fulldata_size);
       }
     }
@@ -365,7 +365,7 @@ namespace EvtFile {
     assert(m_currentEventInfo);
 
     ProgressiveHash hash;
-    hash.addData(reinterpret_cast<char*>(&(m_currentEventInfo->runNumber)),5*sizeof(uint32_t));
+    hash.addData(reinterpret_cast<char*>(&(m_currentEventInfo->runNumber)),5*sizeof(std::uint32_t));
 
     if (m_currentEventInfo->sectionSize_database>0) {
       m_is.seekg(m_currentEventInfo->evtPosInFile+std::streampos(EVTFILE_EVENT_HEADER_BYTES));

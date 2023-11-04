@@ -16,16 +16,16 @@ namespace EvtFile {
 
   class DBEntryWriter : public IDBSubSectionWriter {
   public:
-    typedef uint32_t index_type;
+    typedef std::uint32_t index_type;
 
-    DBEntryWriter(uint16_t subSectionID, FileWriter& fw)
+    DBEntryWriter(std::uint16_t subSectionID, FileWriter& fw)
       : IDBSubSectionWriter(fw),
         m_nextIndex(0),
         m_subSectionID(subSectionID)
     {}
     virtual ~DBEntryWriter();
 
-    virtual uint16_t uniqueSubSectionID() const { return m_subSectionID; }
+    virtual std::uint16_t uniqueSubSectionID() const { return m_subSectionID; }
 
     //Get unique identifier of object (this will schedule it for next write
     //operation if not previously done):
@@ -44,7 +44,7 @@ namespace EvtFile {
     index_type m_nextIndex;
     map_type m_map[NMAPS];
     std::vector<map_type::const_iterator> m_addedSinceLastWrite;
-    uint16_t m_subSectionID;
+    std::uint16_t m_subSectionID;
   };
 
 }

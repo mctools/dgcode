@@ -60,7 +60,7 @@ inline unsigned GriffDataRead::Segment::nStepsOriginal() const
   }
   assert(m_stepsBegin);
   assert(m_stepsBegin->m_data);
-  return ByteStream::interpret<uint32_t>(m_stepsBegin->m_data - 2*sizeof(uint32_t));
+  return ByteStream::interpret<std::uint32_t>(m_stepsBegin->m_data - 2*sizeof(std::uint32_t));
 }
 
 inline unsigned GriffDataRead::Segment::nStepsStored() const

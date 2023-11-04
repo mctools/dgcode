@@ -27,7 +27,7 @@ namespace ByteStream {
   template<>
   inline void read(const char*& data, std::string&t)
   {
-    uint16_t n;//nb, must cap at UINT16_MAX when writing
+    std::uint16_t n;//nb, must cap at UINT16_MAX when writing
     read(data,n);
     t.assign(data,n);
     data += n;
@@ -36,7 +36,7 @@ namespace ByteStream {
   template<>
   inline void read(const char *& data, std::vector<std::string>&t)
   {
-    uint16_t n;//nb, must cap at UINT16_MAX when writing
+    std::uint16_t n;//nb, must cap at UINT16_MAX when writing
     read(data,n);
     t.clear();
     t.resize(n);
@@ -53,7 +53,7 @@ namespace ByteStream {
   template<>
   inline unsigned nbytesToWrite(const std::string&t)
   {
-    return sizeof(uint16_t)+t.size();
+    return sizeof(std::uint16_t)+t.size();
   }
 
   template<class T>
@@ -66,7 +66,7 @@ namespace ByteStream {
   inline unsigned nbytesToWrite(const std::vector<std::string>&t)
   {
     assert(t.size()<UINT16_MAX);
-    unsigned n = sizeof(uint16_t);//size
+    unsigned n = sizeof(std::uint16_t);//size
     auto itE=t.end();
     for (auto it=t.begin();it!=itE;++it)
       n+=nbytesToWrite(*it);
@@ -84,7 +84,7 @@ namespace ByteStream {
   inline void write(char *& data, const std::string&t)
   {
     assert(t.size()<UINT16_MAX);
-    write(data,uint16_t(t.size()));
+    write(data,std::uint16_t(t.size()));
     if (!t.empty()) {
       std::memcpy(data,&(t[0]),t.size());
       data+=t.size();
@@ -95,7 +95,7 @@ namespace ByteStream {
   inline void write(char *& data, const std::vector<std::string>&t)
   {
     assert(t.size()<UINT16_MAX);
-    write(data,uint16_t(t.size()));
+    write(data,std::uint16_t(t.size()));
     auto itE=t.end();
     for (auto it=t.begin();it!=itE;++it)
       write(data,*it);

@@ -32,7 +32,7 @@ namespace NCRYSTAL_NAMESPACE {
       TextDataSP produceTextDataSP_PreferPreviousObject( TextData&& newtd )
       {
         nc_assert(newtd.dataUID().isUnset());
-        uint64_t checkSum = newtd.rawData().calcCheckSum();
+        std::uint64_t checkSum = newtd.rawData().calcCheckSum();
 
         auto it = m_db.begin();
         auto itE = m_db.end();
@@ -60,7 +60,7 @@ namespace NCRYSTAL_NAMESPACE {
           }
           //add to back (which is the correct position indicating most recent
           //access):
-          m_db.push_back(std::pair<uint64_t,TextDataSP>(checkSum,newtdsp));
+          m_db.push_back(std::pair<std::uint64_t,TextDataSP>(checkSum,newtdsp));
           return newtdsp;
         } else {
           //Found existing! But before returning we need to reorder entries,
@@ -70,13 +70,13 @@ namespace NCRYSTAL_NAMESPACE {
           auto itLast = std::prev(m_db.end());
           for ( auto it2 = it; it2 != itLast; ++it2 )
             *it2 = std::move( *std::next(it2) );
-          *itLast = std::pair<uint64_t,TextDataSP>(checkSum,result);
+          *itLast = std::pair<std::uint64_t,TextDataSP>(checkSum,result);
           return result;
         }
       }
       void clear() { m_db.clear(); }
     private:
-      SmallVector<std::pair<uint64_t,TextDataSP>,NCACHED> m_db;
+      SmallVector<std::pair<std::uint64_t,TextDataSP>,NCACHED> m_db;
     };
 
     class TDProd {

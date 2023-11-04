@@ -47,14 +47,14 @@ namespace NCRYSTAL_NAMESPACE {
   static_assert( ncconstexpr_lcm( 3,7,14 ) == 42, "" );
 
   namespace {
-    std::atomic<uint64_t>& getGlobalUIDCounter() {
-      static std::atomic<uint64_t> s_global_uid_counter(1);
+    std::atomic<std::uint64_t>& getGlobalUIDCounter() {
+      static std::atomic<std::uint64_t> s_global_uid_counter(1);
       return s_global_uid_counter;
     }
   }
 
   //For unit testing:
-  NCRYSTAL_API uint64_t detail_peakNextGlobalUIDValue() { return getGlobalUIDCounter().load(); }
+  NCRYSTAL_API std::uint64_t detail_peakNextGlobalUIDValue() { return getGlobalUIDCounter().load(); }
 }
 
 NCrystal::UniqueID::UniqueID()

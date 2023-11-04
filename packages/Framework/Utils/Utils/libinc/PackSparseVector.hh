@@ -27,7 +27,7 @@ namespace Utils {
                std::function<void(unsigned char* buf, unsigned buflen)> dataAcceptor)
     {
       const std::size_t valsize = sizeof(typename TVector::value_type);
-      uint64_t n64(v.size());
+      std::uint64_t n64(v.size());
       dataAcceptor((unsigned char*)&n64,sizeof(n64));
       if (!n64)
         return;//empty
@@ -93,7 +93,7 @@ namespace Utils {
       typedef typename TVector::value_type TValue;
       const char * errmsg = "Read error - unexpected end of data stream.";
       //First read size of vector:
-      uint64_t length64;
+      std::uint64_t length64;
       unsigned nb = dataProvider((unsigned char*)&length64,sizeof(length64));
       if (nb!=sizeof(length64))
         throw std::runtime_error(errmsg);

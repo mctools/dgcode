@@ -21,7 +21,7 @@ inline void EvtFile::FileReader::clearEOF()
   m_is.clear(m_is.rdstate() & (std::iostream::badbit|std::iostream::failbit));
 }
 
-inline uint32_t EvtFile::FileReader::eventCheckSum() const
+inline std::uint32_t EvtFile::FileReader::eventCheckSum() const
 {
   return m_currentEventInfo->checkSum;
 }

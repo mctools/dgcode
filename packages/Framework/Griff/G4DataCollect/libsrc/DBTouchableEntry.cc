@@ -105,7 +105,7 @@ void G4DataCollectInternals::DBTouchableEntry::write(EvtFile::FileWriter&fw)
 #endif
   }
   assert(actualDepth<=volDepth);
-  fw.writeDataDBSection((uint8_t)actualDepth);
+  fw.writeDataDBSection((std::uint8_t)actualDepth);
   for (unsigned i = 0; i<actualDepth; ++i) {
 #ifdef GRIFF_APPLY_WORKAROUND_FOR_NAMEBUG
     assert(m_vols[i].nameWorkaround.size()<2048);

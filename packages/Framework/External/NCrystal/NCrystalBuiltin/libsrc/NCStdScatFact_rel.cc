@@ -222,7 +222,7 @@ namespace NCRYSTAL_NAMESPACE {
             NCRYSTAL_THROW(BadInput,"inelas=dyninfo does not work for input without specific dynamic information. It is possible that"
                            " other modes might work (try e.g. inelas=auto instead).");
 
-          uint32_t vdos2sabExcludeFlag = 0;
+          std::uint32_t vdos2sabExcludeFlag = 0;
           auto specialIgnoreContribs = getUnofficialHack("vdos2sab_ignorecontrib");
           if ( specialIgnoreContribs.has_value() ) {
             //Parse syntax:  vdos2sab_ignorecontrib low [high] [coherent|incoherent]

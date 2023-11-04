@@ -87,7 +87,7 @@ namespace NCRYSTAL_NAMESPACE {
     //preserve the id's, in case something somewhere is still hanging on to one
     //of them after a cache clearance.
     static std::map< HashValue, std::vector<std::pair<std::shared_ptr<const VectD>, UniqueID>>> s_egridHashCache;
-    static std::map< uint64_t, std::shared_ptr<const VectD>* > s_uid2egrid;
+    static std::map< std::uint64_t, std::shared_ptr<const VectD>* > s_uid2egrid;
     static std::mutex s_egrid2uid_mutex;
   }
 }

@@ -234,7 +234,7 @@ void NC::GaussOnSphere::produceStatReport(const char * callpt)
 {
   markused(callpt);
 #ifndef NDEBUG
-  uint64_t worst = (m_stats.genpointcalled?(uint64_t)m_stats.genpointworst:0);
+  std::uint64_t worst = (m_stats.genpointcalled?(std::uint64_t)m_stats.genpointworst:0);
   std::cout<<"NCrystal GaussOnSphere(sigma="<<m_sigma<<", truncangle="<<m_truncangle/m_sigma<<"sigma, prec="<<m_prec<<") "
            <<callpt<<". Used "<<m_stats.genpointtries
            <<" tries to generate "<<m_stats.genpointcalled <<" pts on circles (acceptance rate: "
@@ -420,7 +420,7 @@ double NC::GaussOnSphere::circleIntegralSlow( double cg, double sg, double ca, d
   if (!statcollect)
     return res;
 #ifndef NDEBUG
-  m_stats.circleintworst = std::max<uint64_t>(m_stats.circleintworst,gosci.nEvals());
+  m_stats.circleintworst = std::max<std::uint64_t>(m_stats.circleintworst,gosci.nEvals());
   ++m_stats.circleintnumber;
   m_stats.circleintevals += gosci.nEvals();
 #endif
@@ -483,9 +483,9 @@ bool NC::GaussOnSphere::genPointOnCircle( RNG& rng, double cg, double sg, double
 #ifndef NDEBUG
   if (m_stats.genpointworst) {
     ++m_stats.genpointcalled;
-    uint64_t triesused = maxtriesplus1-triesleft;
+    std::uint64_t triesused = maxtriesplus1-triesleft;
     m_stats.genpointtries += triesused;;
-    m_stats.genpointworst = std::max<uint64_t>(m_stats.genpointworst,triesused);
+    m_stats.genpointworst = std::max<std::uint64_t>(m_stats.genpointworst,triesused);
   }
 #endif
   if (triesleft<=0) {

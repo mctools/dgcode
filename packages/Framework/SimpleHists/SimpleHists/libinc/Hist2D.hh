@@ -113,12 +113,12 @@ namespace SimpleHists {
       float maxfilledx;
       float minfilledy;
       float maxfilledy;
-      uint32_t nbinsx;
-      uint32_t nbinsy;
+      std::uint32_t nbinsx;
+      std::uint32_t nbinsy;
     };
     union {
       PersistifiedData m_data;
-      char m_serialdata[sizeof(double)*14+4*sizeof(float)+sizeof(uint32_t)*2];
+      char m_serialdata[sizeof(double)*14+4*sizeof(float)+sizeof(std::uint32_t)*2];
     };
 
     //non-persistent metadata which can be recreated:

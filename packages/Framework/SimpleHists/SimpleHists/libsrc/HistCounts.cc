@@ -294,7 +294,7 @@ void SimpleHists::HistCounts::serialise(std::string& buf) const
     std::memcpy(&(buf[offset]),&(it->m_errorsq),sizeof(it->m_errorsq)); offset += sizeof(it->m_errorsq);
     buf[offset] = (char)(it->m_label.size()); offset += 1;
     buf[offset] = (char)(it->m_displayLabel.size()); offset += 1;
-    buf[offset] = (uint16_t)(it->m_comment.size()); offset += 2;
+    buf[offset] = (std::uint16_t)(it->m_comment.size()); offset += 2;
     std::memcpy(&(buf[offset]),&(it->m_label[0]),it->m_label.size()); offset += it->m_label.size();
     std::memcpy(&(buf[offset]),&(it->m_displayLabel[0]),it->m_displayLabel.size()); offset += it->m_displayLabel.size();
     std::memcpy(&(buf[offset]),&(it->m_comment[0]),it->m_comment.size()); offset += it->m_comment.size();
@@ -323,7 +323,7 @@ void SimpleHists::HistCounts::perform_deserialisation(const std::string& buf)
     std::memcpy(&tmp.m_errorsq,&(buf[offset]),sizeof(tmp.m_errorsq)); offset += sizeof(tmp.m_errorsq);
     label_size = buf[offset]; offset+=1;
     displaylabel_size = buf[offset]; offset+=1;
-    comment_size = *((uint16_t*)&buf[offset]); offset+=2;
+    comment_size = *((std::uint16_t*)&buf[offset]); offset+=2;
     tmp.m_label.assign(&buf[offset],label_size); offset+=label_size;
     tmp.m_displayLabel.assign(&buf[offset],displaylabel_size); offset+=displaylabel_size;
     tmp.m_comment.assign(&buf[offset],comment_size); offset+=comment_size;

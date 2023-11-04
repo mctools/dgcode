@@ -32,7 +32,7 @@ void GriffDataRead::Segment::actualSetupSteps() const
   }
   GriffDataReader * dr = m_trk->m_dr;
   const char * stepdata = dr->m_fr->getFullData() + rawstep;
-  unsigned nsteps_stored = ByteStream::interpret<uint32_t>(stepdata + 4);
+  unsigned nsteps_stored = ByteStream::interpret<std::uint32_t>(stepdata + 4);
   assert(nsteps_stored>=1);
   stepdata+=GriffFormat::Format::SIZE_STEPHEADER;
   static_assert(GriffFormat::Format::SIZE_STEPHEADER==8);
