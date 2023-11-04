@@ -43,7 +43,8 @@ def simplebuild_main( argv = None, prevent_env_setup_msg = False ):
 
     def get_simplebuild_pkg_dirs():
         from . import dirs
-        return [dirs.projdir, *dirs.extrapkgpath]
+        return [dirs.fmwkdir, dirs.projdir, *dirs.extrapkgpath]# DGBUILD-NO-EXPORT
+# DGBUILD-EXPORT-ONLY>>        return [dirs.projdir, *dirs.extrapkgpath]
 
     if legacy_mode:
         from . import dirs # noqa: F811
