@@ -29,7 +29,6 @@
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
 #include "G4VModularPhysicsList.hh"
-#include "G4ThermScat/RegisterTS.hh"
 #include "G4OpticalPhysics.hh"
 #include "Utils/Format.hh"
 #include "Utils/ByteStream.hh"
@@ -39,6 +38,7 @@
 #endif
 #include <limits>
 #include <stdexcept>
+#include "launcher_impl_ts.hh"
 
 
 struct G4Launcher::Launcher::Imp {
@@ -457,7 +457,7 @@ void G4Launcher::Launcher::Imp::preinit()
             plm->RegisterPhysics(new G4OpticalPhysics());
           }
           if (extra_ts) {
-            G4ThermScat::registerThermScatPhysics(plm);
+            G4Launcher_impl_ts::registerTSPhysics(plm);
           }
         }
       }

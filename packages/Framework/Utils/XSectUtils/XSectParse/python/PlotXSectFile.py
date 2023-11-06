@@ -73,7 +73,10 @@ def _plot_end(show,save_fig,wl,mfp,logx,logy,extra=None,mfpunit='cm',softbracket
         plt.show()
 
 def plot_file(filename,mfp=False,save_fig=None,show=None,versus_wavelength=False,logx='auto',logy='auto',softbrackets=False):
-    """Plots cross-sections found in file. Set mfp=True to plot mean free path rather than cross-sections and set save_fig to save output. The parameter 'show' controls display of interactive window (default is to show when no saving a figure)"""
+    """Plots cross-sections found in file. Set mfp=True to plot mean free path
+    rather than cross-sections and set save_fig to save output. The parameter
+    'show' controls display of interactive window (default is to show when no
+    saving a figure)"""
 
     _plot_begin()
     showMFP=mfp
@@ -121,7 +124,7 @@ def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,xsectname='Total',
     showMFP=mfp
 
     if not labelstyle_gen:
-        labelstyle_gen = lambda ifile,metadata : ('file %i'%ifile,None,None)
+        labelstyle_gen = lambda ifile,metadata : ('file %i'%ifile,None,None,None)
 
     colors = ['r','c', 'm', 'y','k','g','b','orange','yellow']
     pp=[XSectParse.ParseXSectFile.parse(filename) for filename in filenames]
@@ -133,6 +136,7 @@ def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,xsectname='Total',
         xvals,yvals = _extract_vals(npa,versus_wavelength,showMFP)
         if mfpunit!='cm':
             yvals *= (G4Units.Units.cm/getattr(G4Units.Units,mfpunit))
+
         label,linestyle,linewidth,col = labelstyle_gen(ifile,p['metadata'])
         if col==None: col=colors[ifile%len(colors)]
         if linestyle==None: linestyle='-'
@@ -142,7 +146,7 @@ def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,xsectname='Total',
     if title:
         plt.title(title)
 
-    proctxt=' the process %s'%xsectname if xsectname!='Total' else ''
+    proctxt=' of the process %s'%xsectname if xsectname!='Total' else ''
     if title!=False:
         plt.suptitle(r'Comparison of \texttt{Geant4} %s%s'%('Mean Free Path' if showMFP else 'Cross-sections',proctxt))
 

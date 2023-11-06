@@ -1,4 +1,4 @@
-package(USEPKG G4Random G4DataCollect G4PhysicsLists G4ThermScat)
+package(USEPKG G4Random G4DataCollect G4PhysicsLists)
 
 ######################################################################
 
