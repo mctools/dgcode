@@ -39,12 +39,16 @@ namespace Constants {
 
   // NIST/CODATA 2018 definition of neutron_mass_c2 is 939.56542 MeV (this is
   // compatible with NCrystalv3.7.1), but Geant4-v11.1.2 uses 939.56536MeV. As
-  // this is less than O(1e-7), we use the NIST/CODATA 2018 number directly:
+  // this is less than O(1e-7), we use the NIST/CODATA 2018 number:
   constexpr double  neutron_mass_c2 = 939.56542;
 
-  //We use the NIST/CODATA 2018 value, Geant4-v11.1.2 uses 938.272013, but as is
-  //less than O(1e-7) difference, we use the NIST/CODATA 2018 number directly:
+  //We use the NIST/CODATA 2018 value, Geant4-v11.1.2 uses 938.272013, but as
+  //this is less than O(1e-7) difference, we use the NIST/CODATA 2018 number:
   constexpr double  proton_mass_c2 = 938.27208816;
+
+  //We use the NIST/CODATA 2018 value, Geant4-v11.1.2 uses 931.494028, but as
+  //this is less than O(1e-7) difference, we use the NIST/CODATA 2018 number:
+  constexpr double amu_c2 = 931.49410242;
 }
 
 namespace Units {
