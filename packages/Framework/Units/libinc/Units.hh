@@ -41,6 +41,10 @@ namespace NewConstants {
   // compatible with NCrystalv3.7.1), but Geant4-v11.1.2 uses 939.56536MeV. As
   // this is less than O(1e-7), we use the NIST/CODATA 2018 number directly:
   constexpr double  neutron_mass_c2 = 939.56542;
+
+  //We use the NIST/CODATA 2018 value, Geant4-v11.1.2 uses 938.272013, but as is
+  //less than O(1e-7) difference, we use the NIST/CODATA 2018 number directly:
+  constexpr double  proton_mass_c2 = 938.27208816;
 }
 
 namespace NewUnits {
@@ -62,6 +66,7 @@ namespace NewUnits {
   constexpr double cm3 = 1.0e3;
   constexpr double m2 = 1.0e6;
   constexpr double m3 = 1.0e9;
+  constexpr double barn = 1e-22;
 
   //Time:
   constexpr double second  = 1.0e9;
