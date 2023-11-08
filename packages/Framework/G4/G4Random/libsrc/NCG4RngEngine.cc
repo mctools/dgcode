@@ -7,6 +7,7 @@
 #endif // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCString.hh"
 
+namespace NC = NCrystal;
 
 NCG4RngEngine::~NCG4RngEngine() = default;
 

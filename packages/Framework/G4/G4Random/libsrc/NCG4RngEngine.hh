@@ -7,13 +7,10 @@
 #include "CLHEP/Random/RandomEngine.h"
 #ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
 #  include "NCrystal/internal/NCRandUtils.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 #else // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/internal_NCRandUtils.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 #endif // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCRandUtils.hh"
-// DGBUILD-EXPORT-ONLY>>namespace NC = NCrystal;
 
 class NCG4RngEngine final : public CLHEP::HepRandomEngine  {
 public:
@@ -26,7 +23,7 @@ public:
       vect[i] = doGenerate();
   }
   //Direct access to RNG:
-  void dgcode_set64BitSeed(std::uint64_t seed) { m_rng = NC::RandXRSRImpl{ seed }; }
+  void dgcode_set64BitSeed(std::uint64_t seed) { m_rng = NCrystal::RandXRSRImpl{ seed }; }
   std::uint64_t dgcode_genHighQuality64bitUint() { return m_rng.genUInt64(); }
   //Implementing the full interface just to be safe, but the following functions
   //are not really tested:
@@ -53,7 +50,7 @@ private:
     static_assert( lastvalbefore1 > 1.0-1e-15, "");
     return std::min<double>( m_rng.generate(), lastvalbefore1 );
   }
-  NC::RandXRSRImpl m_rng;
+  NCrystal::RandXRSRImpl m_rng;
 };
 
 #endif

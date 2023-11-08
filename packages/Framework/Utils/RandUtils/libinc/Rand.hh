@@ -3,13 +3,10 @@
 
 #ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
 #  include "NCrystal/internal/NCRandUtils.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 #else // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/internal_NCRandUtils.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 #endif // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCRandUtils.hh"
-// DGBUILD-EXPORT-ONLY>>namespace NC = NCrystal;
 
 namespace RandUtils {
 
@@ -24,7 +21,7 @@ namespace RandUtils {
     bool coinflip() { return m_rng.coinflip(); }
 
   private:
-    NC::RandXRSRImpl m_rng;
+    NCrystal::RandXRSRImpl m_rng;
   };
 
 }

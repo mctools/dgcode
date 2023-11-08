@@ -11,12 +11,10 @@
 #  include "NCrystal/internal/NCMath.hh" // DGBUILD-NO-EXPORT
 #  include "NCrystal/internal/NCCfgTypes.hh" // DGBUILD-NO-EXPORT
 #  include "NCrystal/NCFactImpl.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 #else // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/internal_NCMath.hh" // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/internal_NCCfgTypes.hh" // DGBUILD-NO-EXPORT
 #  include "NCrystalBuiltin/NCFactImpl.hh" // DGBUILD-NO-EXPORT
-namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 #endif // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCCfgTypes.hh"
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCMath.hh"
@@ -32,8 +30,8 @@ namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 #include <sstream>
 #include <stdexcept>
 
-// DGBUILD-EXPORT-ONLY>>namespace NC = NCrystal;
 namespace G4NC = G4NCrystalRel;
+namespace NC = NCrystal; // DGBUILD-NO-EXPORT
 
 namespace NamedMaterialProvider {
 
