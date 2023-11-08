@@ -1,9 +1,9 @@
-#include "SimpleHists/HistCollection.hh"
 #include "Core/String.hh"
+#include "zlib.h"//gzopen, ...
+#include "SimpleHists/HistCollection.hh"
 #include <cassert>
 #include <stdexcept>
 #include "Core/File.hh"
-#include "MiniZLib/zlib.h"//gzopen, ...
 #include <cstring>
 #include <iostream>
 

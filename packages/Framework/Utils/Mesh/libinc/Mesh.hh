@@ -2,10 +2,10 @@
 #define Mesh_Mesh_hh
 
 #include "Core/Types.hh"
+#include "zlib.h"
 #include "Mesh/MeshFiller.hh"
 #include "Utils/DelayedAllocVector.hh"
 #include "Utils/PackSparseVector.hh"
-#include "MiniZLib/zlib.h"
 #include <functional>
 #include <string>
 #include <map>

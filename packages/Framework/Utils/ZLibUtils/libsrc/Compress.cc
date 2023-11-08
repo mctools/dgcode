@@ -1,9 +1,9 @@
 #include "Core/Types.hh"
+#include "zlib.h"
 #include "ZLibUtils/Compress.hh"
 #include <cassert>
 #include <cstdio>
 #include <stdexcept>
-#include "MiniZLib/zlib.h"
 
 void ZLibUtils::compressToBuffer(const char* indata, unsigned indataLength, std::vector<char>& output,unsigned& outdataLength)
 {
