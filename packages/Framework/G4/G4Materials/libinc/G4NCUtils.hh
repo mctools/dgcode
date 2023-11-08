@@ -2,12 +2,7 @@
 #define G4Materials_NCG4Utils_hh
 
 class G4Material;
-#ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
-#  include "NCrystal/NCMatCfg.hh" // DGBUILD-NO-EXPORT
-#else // DGBUILD-NO-EXPORT
-#  include "NCrystalBuiltin/NCMatCfg.hh" // DGBUILD-NO-EXPORT
-#endif // DGBUILD-NO-EXPORT
-// DGBUILD-EXPORT-ONLY>>#include "NCrystal/NCMatCfg.hh"
+#include "NCrystal/NCMatCfg.hh"
 #include <vector>
 
 namespace NCG4Utils {

@@ -21,7 +21,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "NCrystalRel/NCMatCfg.hh"
+#include "NCrystal/NCMatCfg.hh"
 #include "G4Material.hh"
 
 namespace G4NCrystalRel {

@@ -20,9 +20,9 @@
 
 #include "G4NCrystalRel/G4NCMatHelper.hh"
 #include "G4NCrystalRel/G4NCManager.hh"
-#include "NCrystalRel/NCVersion.hh"
-#include "NCrystalRel/NCFactImpl.hh"
-#include "NCrystalRel/NCCompositionUtils.hh"
+#include "NCrystal/NCVersion.hh"
+#include "NCrystal/NCFactImpl.hh"
+#include "NCrystal/NCCompositionUtils.hh"
 #include "G4NistManager.hh"
 #include "G4ios.hh"
 #include <atomic>

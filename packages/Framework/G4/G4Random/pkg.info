@@ -1,4 +1,4 @@
-package(USEPKG NCrystalRel G4Interfaces)
+package(USEPKG G4Interfaces USEEXT NCrystal)
 
 ######################################################################
 

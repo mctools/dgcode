@@ -1,12 +1,7 @@
 #ifndef RandUtils_Rand_hh
 #define RandUtils_Rand_hh
 
-#ifdef DGCODE_USE_SYSTEM_NCRYSTAL // DGBUILD-NO-EXPORT
-#  include "NCrystal/internal/NCRandUtils.hh" // DGBUILD-NO-EXPORT
-#else // DGBUILD-NO-EXPORT
-#  include "NCrystalBuiltin/internal_NCRandUtils.hh" // DGBUILD-NO-EXPORT
-#endif // DGBUILD-NO-EXPORT
-// DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCRandUtils.hh"
+#include "NCrystal/internal/NCRandUtils.hh"
 
 namespace RandUtils {
 
