@@ -27,19 +27,6 @@ def perform_configuration(cmakeargs=[],
     #Pre-inspect package directories, simply finding the package dirs for now (do it already to detect some errors early):
     all_pkgdirs = loadpkgs.find_pkg_dirs ( dirs.pkgsearchpath )
 
-    #next load packages, also detecting some errors early.
-    special_ncrystal_migration_mode = True                                                                           # DGBUILD-NO-EXPORT
-    #special_ncrystal_migration_mode = ( 'NoSystemNCrystal' in possible_extdeps and 'NCrystal' in possible_extdeps ) # DGBUILD-NO-EXPORT
-    if special_ncrystal_migration_mode:                                                                              # DGBUILD-NO-EXPORT
-        #Special migration feature, making sure that the package 'NCrystalRel'                                       # DGBUILD-NO-EXPORT
-        #dynamically gets either EXTDEP NCrystal or USEPKG NCrystalBuiltin                                           # DGBUILD-NO-EXPORT
-        #depending on whether or not NCrystal is available on the system.                                            # DGBUILD-NO-EXPORT
-        #if envdict['extdeps']['NCrystal']['present']:                                                               # DGBUILD-NO-EXPORT
-        if shutil.which('ncrystal-config'): #Not entirely consistent with ExtDep_NCrystal.cmake and not respecting NCrystal=0 # DGBUILD-NO-EXPORT
-            loadpkgs.add_dynamic_dependency( 'NCrystalRel', extdep_list = ['NCrystal'] )                             # DGBUILD-NO-EXPORT
-        else:                                                                                                        # DGBUILD-NO-EXPORT
-            loadpkgs.add_dynamic_dependency( 'NCrystalRel', usepkg_list = ['NCrystalBuiltin'] )                      # DGBUILD-NO-EXPORT
-
     #Inspect package tree and load the necessary pkg.info files, given the filters:
     pl = loadpkgs.PackageLoader( all_pkgdirs,
                                  select_filter,

@@ -1,8 +1,7 @@
 set(HAS_NCrystal 0)
 
 set(autoreconf_bin_NCrystal "ncrystal-config;nctool")
-# DGBUILD-EXPORT-ONLY>>set(autoreconf_env_NCrystal "NCRYSTALDIR")
-set(autoreconf_env_NCrystal "NCRYSTALDIR;DGCODE_USESYSNCRYSTAL")# DGBUILD-NO-EXPORT
+set(autoreconf_env_NCrystal "NCRYSTALDIR")
 
 function(
     detect_system_ncrystal
@@ -69,10 +68,6 @@ function(
   list( APPEND ncrystal_cxx_cflags "-I${NCrystal_INCDIR}" )
   list( APPEND ncrystal_c_cflags "-I${NCrystal_INCDIR}" )
 
-  #Adding flags, to help with redirection resolution in NCrystalRel headers (FIXME: temporary workaround!):
-  list( APPEND ncrystal_cxx_cflags "-DDGCODE_USE_SYSTEM_NCRYSTAL" )
-  list( APPEND ncrystal_c_cflags "-DDGCODE_USE_SYSTEM_NCRYSTAL" )
-
   #Convert from list to single string:
   string( REPLACE ";" " " ncrystal_cxx_cflags "${ncrystal_cxx_cflags}" )
   string( REPLACE ";" " " ncrystal_c_cflags "${ncrystal_c_cflags}" )
@@ -86,34 +81,8 @@ function(
   set( ${resvar_linkflags} "${ncrystal_c_linkflags}" PARENT_SCOPE )
 endfunction()
 
-# DGBUILD-EXPORT-ONLY>>detect_system_ncrystal( HAS_NCrystal
-# DGBUILD-EXPORT-ONLY>>  ExtDep_NCrystal_VERSION
-# DGBUILD-EXPORT-ONLY>>  ExtDep_NCrystal_COMPILE_FLAGS_CXX
-# DGBUILD-EXPORT-ONLY>>  ExtDep_NCrystal_COMPILE_FLAGS_C
-# DGBUILD-EXPORT-ONLY>>  ExtDep_NCrystal_LINK_FLAGS )
-set( strategy_sysncrystal "$ENV{DGCODE_USESYSNCRYSTAL}" ) # DGBUILD-NO-EXPORT
-string( TOUPPER "${strategy_sysncrystal}" strategy_sysncrystal ) # DGBUILD-NO-EXPORT
-if ( "x${strategy_sysncrystal}" STREQUAL "x" ) # DGBUILD-NO-EXPORT
-  #Default value ( TODO: Change to "auto" at some point in the future ): # DGBUILD-NO-EXPORT
-  set( strategy_sysncrystal NEVER ) # DGBUILD-NO-EXPORT
-  message( STATUS "DGCODE_USESYSNCRYSTAL not set. Using DGCODE_USESYSNCRYSTAL=${strategy_sysncrystal}.") # DGBUILD-NO-EXPORT
-endif() # DGBUILD-NO-EXPORT
-# DGBUILD-NO-EXPORT
-set( strategy_sysncrystal_allowed_values "AUTO" "ALWAYS" "NEVER" ) # DGBUILD-NO-EXPORT
-if ( NOT strategy_sysncrystal IN_LIST strategy_sysncrystal_allowed_values ) # DGBUILD-NO-EXPORT
-  message( FATAL_ERROR "Invalid value of DGCODE_USESYSNCRYSTAL env var." # DGBUILD-NO-EXPORT
-    " Must be unset or one of: ${strategy_sysncrystal_allowed_values}") # DGBUILD-NO-EXPORT
-endif() # DGBUILD-NO-EXPORT
-if ( NOT strategy_sysncrystal STREQUAL "NEVER" )# DGBUILD-NO-EXPORT
-  detect_system_ncrystal( HAS_NCrystal# DGBUILD-NO-EXPORT
-    ExtDep_NCrystal_VERSION# DGBUILD-NO-EXPORT
-    ExtDep_NCrystal_COMPILE_FLAGS_CXX# DGBUILD-NO-EXPORT
-    ExtDep_NCrystal_COMPILE_FLAGS_C# DGBUILD-NO-EXPORT
-    ExtDep_NCrystal_LINK_FLAGS )# DGBUILD-NO-EXPORT
-else()# DGBUILD-NO-EXPORT
-  message( STATUS "Skipping search for system-provided NCrystal due to value of DGCODE_USESYSNCRYSTAL." )# DGBUILD-NO-EXPORT
-endif()# DGBUILD-NO-EXPORT
-# DGBUILD-NO-EXPORT
-if ( NOT HAS_NCrystal AND strategy_sysncrystal STREQUAL "ALWAYS" )# DGBUILD-NO-EXPORT
-  message( FATAL_ERROR "DGCODE_USESYSNCRYSTAL=ALWAYS but could not find a working NCrystal installation." )# DGBUILD-NO-EXPORT
-endif()# DGBUILD-NO-EXPORT
+detect_system_ncrystal( HAS_NCrystal
+  ExtDep_NCrystal_VERSION
+  ExtDep_NCrystal_COMPILE_FLAGS_CXX
+  ExtDep_NCrystal_COMPILE_FLAGS_C
+  ExtDep_NCrystal_LINK_FLAGS )
