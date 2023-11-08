@@ -1,6 +1,6 @@
 import sys
 import os
-# import pickle
+
 import Core.System as Sys
 op=os.path
 
@@ -256,7 +256,7 @@ class stdinstaller:
         print(p)
         print("%s   %s"%(p,Sys.quote(opt.instdir)))
         print(p)
-        print("%sTo use it you can type the command (or put it in $HOME/.bashrc or $HOME/.dgcode_prebootstrap.sh):"%p)
+        print("%sTo use it you can type the command (or put it in $HOME/.bashrc):"%p)
         print(p)
         print("%s   . %s/setup.sh"%(p,Sys.quote(opt.instdir)))
         print(p)

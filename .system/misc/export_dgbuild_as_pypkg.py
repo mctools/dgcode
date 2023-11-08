@@ -279,7 +279,7 @@ def main():
     create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
 
     def dgcode_filefilter( pkgname, f_reltopkg ):
-        if pkgname=='DevTools' and f_reltopkg.name in ('installcmake','wget'):
+        if pkgname=='DevTools' and f_reltopkg.name in ('installcmake','wget','projdepana'):
             return False
         return True
 

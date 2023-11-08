@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
-__metaclass__ = type#py2 backwards compatibility
-
 def set_install_names_to_abs_path(libdir,prefix='',verbose=False):
     import os,sys
 
@@ -131,4 +128,3 @@ def set_install_names_to_abs_path(libdir,prefix='',verbose=False):
 if __name__=='__main__':
     import sys
     set_install_names_to_abs_path(sys.argv[1])
-
