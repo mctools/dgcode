@@ -31,6 +31,11 @@
 //G4Materials, via entries in the G4MaterialPropertiesTable's on the materials.
 
 class G4Material;
+namespace NCrystal {
+  namespace Error {
+    class Exception;
+  }
+}
 
 namespace G4NCrystalRel {
 

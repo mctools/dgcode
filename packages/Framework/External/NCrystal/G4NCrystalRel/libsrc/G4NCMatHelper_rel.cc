@@ -246,7 +246,7 @@ namespace G4NCrystalRel {
       }
       //Must create:
 
-      G4String matnameprefix("NCrystalRel::");
+      G4String matnameprefix("NCrystal::");
       auto matname = matnameprefix + cfg.toStrCfg(true);
 
       ensureCacheClearFctRegistered();//good place to put this

@@ -1,4 +1,4 @@
-package(USEEXT Geant4 NCrystal)
+package(USEEXT NCrystal Geant4)
 
 #################################################################################################
 
