@@ -35,10 +35,10 @@ def parse(parsed_result):
     assert len(procs)==2
     egrid = procs['scatter'][0]
     assert np.array_equal(egrid,procs['absorption'][0])
-    import G4Units.Units
-    egrid /= G4Units.Units.eV
-    xs_scatter = procs['scatter'][1]/G4Units.Units.barn
-    xs_absorption = procs['absorption'][1]/G4Units.Units.barn
+    import Units
+    egrid /= Units.units.eV
+    xs_scatter = procs['scatter'][1]/Units.units.barn
+    xs_absorption = procs['absorption'][1]/Units.units.barn
     return egrid,xs_scatter,xs_absorption
 
 def toASCII(parsed_result,element,nsamples):

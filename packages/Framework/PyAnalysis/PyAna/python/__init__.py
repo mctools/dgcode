@@ -1,5 +1,5 @@
 
-__all__ = ['math','os','sys','pathlib','numpy', 'matplotlib', 'np', 'mpl', 'plt','Units','ColourDashesHelper','lighten_colour','darken_colour','rainbow_colour','dgextras']
+__all__ = ['math','os','sys','pathlib','numpy', 'matplotlib', 'np', 'mpl', 'plt','Units','units','ColourDashesHelper','lighten_colour','darken_colour','rainbow_colour','dgextras']
 
 #1) Fix matplotlib backend:
 import os
@@ -34,8 +34,9 @@ np = numpy
 # sp = scipy
 mpl = matplotlib
 plt = matplotlib.pyplot
-import G4Units.Units
-Units = G4Units.Units
+import Units as _Units
+Units = _Units
+units = _Units.units
 
 #2b) Add plt.show2 as plt.show with extra improvements (not replacing plt.show
 #directly to avoid messing with existing users who might not want the

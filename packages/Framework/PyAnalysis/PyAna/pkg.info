@@ -1,4 +1,4 @@
-package( USEPKG G4Units Units USEEXT Numpy )
+package( USEPKG Units USEEXT Numpy )
 
 ######################################################################
 

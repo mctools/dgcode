@@ -3,7 +3,7 @@
 
 //Utilities for kinematic calculations.
 
-#include "G4Units/Constants.hh"
+#include "Units/Units.hh"
 #include <cmath>
 
 namespace Utils {

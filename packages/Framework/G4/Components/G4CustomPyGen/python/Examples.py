@@ -1,5 +1,5 @@
 import G4CustomPyGen
-import G4Units.Units as Units
+from Units import units as Units
 import math
 
 class CorrelatedBeamGen(G4CustomPyGen.GenBase):

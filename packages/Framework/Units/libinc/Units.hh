@@ -10,7 +10,7 @@
 // used in Geant4 as per Geant4-11.1 (it appears numbers in Geant4 last received
 // an update in Geant4-10.7):
 
-namespace NewConstants {
+namespace Constants {
 
   constexpr double pi = 3.1415926535897932384626433832795028841971694;
   constexpr double c_light  = 2.99792458e2;
@@ -47,7 +47,7 @@ namespace NewConstants {
   constexpr double  proton_mass_c2 = 938.27208816;
 }
 
-namespace NewUnits {
+namespace Units {
 
   //Angles (like in all math code, we obviously always keep angles in radians):
   constexpr double deg = 0.0174532925199432957692369076848861271344287189; // = pi/180
@@ -72,6 +72,7 @@ namespace NewUnits {
   constexpr double second  = 1.0e9;
   constexpr double ms = 1e6;
   constexpr double millisecond = 1e6;
+  constexpr double microsecond = 1e3;
   constexpr double ns = 1.0;
   constexpr double nanosecond = ns;
 
@@ -82,7 +83,7 @@ namespace NewUnits {
   constexpr double MeV = 1.0;
   constexpr double GeV = 1.0e3;
   constexpr double TeV = 1.0e6;
-  constexpr double joule = eV / NewConstants::atomic_unit_of_charge;
+  constexpr double joule = eV / Constants::atomic_unit_of_charge;
 
   //Magnetic field:
   constexpr double tesla     = 1e-3; // [volt*second/meter^2]
@@ -97,7 +98,7 @@ namespace NewUnits {
   constexpr double atm = atmosphere;
 
   //Charge:
-  constexpr double coulomb = 1.0 / NewConstants::atomic_unit_of_charge;
+  constexpr double coulomb = 1.0 / Constants::atomic_unit_of_charge;
 
   //Mass:
   constexpr double kilogram = joule * second * second / ( meter * meter );

@@ -213,7 +213,7 @@ def get_pkg_files( pkgdir ):
 def chmod_x( path ):
     path.chmod( path.stat().st_mode | stat.S_IEXEC )
 
-def create_frameworkpkgs( srcdir, tgtdir, pkgfilter ):
+def create_frameworkpkgs( srcdir, tgtdir, pkgfilter, filefilter = None ):
     tgtdir.mkdir( parents = True )
 
     for pkgcfg in srcdir.glob('**/pkg.info'):
@@ -230,6 +230,10 @@ def create_frameworkpkgs( srcdir, tgtdir, pkgfilter ):
                 continue
             f_reltopkg = f.relative_to(pkgdir)
             print ('    -> ',f)
+
+            if filefilter and not filefilter( pkgname, f_reltopkg ):
+                print('WARNING: Ignoring blocked file: {pkgname}/{f_reltopkg}')
+
             tgtfile = tgtdir / pkgreldir / f_reltopkg
             tgtfile.parent.mkdir(parents=True,exist_ok=True)
             text_data = extract_file_content(f)
@@ -274,13 +278,19 @@ def main():
     create_pymodfiles_dgcode( destdir_mods_dgcode )
     create_cmakefiles( opt.srcdir / 'cmakedetect' , destdir_cmake )
 
+    def dgcode_filefilter( pkgname, f_reltopkg ):
+        if pkgname=='DevTools' and f_reltopkg.name in ('installcmake','wget'):
+            return False
+        return True
+
     create_frameworkpkgs( opt.srcdir_val, destdir_pkgs_coreval,
                           pkgfilter = (lambda pkgname : pkgname=='CoreTests') )
     create_frameworkpkgs( opt.srcdir_val, destdir_pkgs_dgcode_val,
                           pkgfilter = (lambda pkgname : pkgname!='CoreTests') )
 
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs_core,
-                          pkgfilter = (lambda pkgname : pkgname=='Core') )
+                          pkgfilter = (lambda pkgname : pkgname=='Core'),
+                          filefilter = dgcode_filefilter )
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs_dgcode,
                           pkgfilter = (lambda pkgname : pkgname not in ('Core',
                                                                         'DGBoost',

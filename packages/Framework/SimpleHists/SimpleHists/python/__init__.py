@@ -1,4 +1,3 @@
-from __future__ import print_function,absolute_import
 __metaclass__ = type#py2 backwards compatibility
 __doc__='python module for package SimpleHists'
 __all__=['Hist1D','Hist2D','HistBase','HistCollection','histTypeOfData','deserialise']

@@ -1,7 +1,6 @@
 #include "DBMaterialEntry.hh"
 #include "DBElementEntry.hh"
 #include "DCMgr.hh"
-#include "G4Units/Units.hh"//fixme
 
 void G4DataCollectInternals::DBMaterialEntry::write(EvtFile::FileWriter&fw)
 {

@@ -1,5 +1,5 @@
 #include "G4GunWrapper.hh"
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 #include "Utils/NeutronMath.hh"
 #include "G4ParticleTable.hh"
 #include "G4IonTable.hh"
@@ -13,7 +13,7 @@ G4CustomPyGen::G4GunWrapper::G4GunWrapper()
 {
   m_gun = new G4ParticleGun(1);
   set_type("neutron");
-  set_energy(25*Units::millielectronvolt);//fixme: set_wavelength_angstrom(1.8)
+  set_energy(25*Units::meV);//fixme: set_wavelength_angstrom(1.8)
   set_position(0,0,0);
   set_direction(0,0,1);
 }

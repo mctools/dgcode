@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from __future__ import print_function
-import sys# ,os
+
+import sys
 import importlib
 from optparse import OptionParser#NOTE: The optparse module is deprecated - we should stop using it at some point
-import G4Units.Units as Units
+#from Units import units as Units
 import G4Launcher
 
 parser = OptionParser(usage='%prog [options] [par1=val1] [par2=val2] [...]')
@@ -41,7 +41,7 @@ if opt.dump:
     sys.exit(0)
 
 launcher = G4Launcher(geo,gen)
-#launcher.setParticleGun("neutron",0.025*Units.eV,(0,0,0),(0,0,1))
+#launcher.setParticleGun("neutron",0.025*units.eV,(0,0,0),(0,0,1))
 launcher.setOutput("none")
 launcher.setSeed(1118)
 

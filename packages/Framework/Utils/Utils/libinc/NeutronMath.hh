@@ -1,8 +1,7 @@
 #ifndef Utils_NeutronMath_hh
 #define Utils_NeutronMath_hh
 
-#include "G4Units/Units.hh"
-#include "G4Units/Constants.hh"
+#include "Units/Units.hh"
 #include <limits>//for infinity
 #include <cmath>
 
@@ -27,7 +26,7 @@ namespace Utils {
       return std::numeric_limits<double>::infinity();
     double l = l_aangstrom*Units::angstrom;
     double res =  0.5 * Constants::h_Planck * Constants::h_Planck * Constants::c_squared / (l*l*Constants::neutron_mass_c2);
-    return res / Units::millielectronvolt;
+    return res / Units::meV;
   }
 
   inline double neutron_angstrom_to_eV(double l_aangstrom) {
@@ -37,7 +36,7 @@ namespace Utils {
   inline double neutron_meV_to_angstrom(double e_meV) {
     if (e_meV==0)
       return std::numeric_limits<double>::infinity();
-    double e = e_meV*Units::millielectronvolt;
+    double e = e_meV*Units::meV;
     double l = Constants::h_Planck * Constants::c_light * sqrt(0.5/(Constants::neutron_mass_c2*e));
     return l/Units::angstrom;
   }
@@ -49,13 +48,14 @@ namespace Utils {
   inline double neutron_angstrom_to_meters_per_second(double l_aangstrom) {
     if (l_aangstrom==0)
       return std::numeric_limits<double>::infinity();
-    return Constants::h_Planck * Units::s*Constants::c_squared / (Units::m*Units::angstrom * Constants::neutron_mass_c2 * l_aangstrom);
+    return Constants::h_Planck * Units::second*Constants::c_squared / (Units::m*Units::angstrom * Constants::neutron_mass_c2 * l_aangstrom);
   }
 
   inline double neutron_meters_per_second_to_angstrom(double velocity_m_per_s) {
     if (velocity_m_per_s==0)
       return std::numeric_limits<double>::infinity();
-    return Constants::h_Planck * Units::s*Constants::c_squared / (Units::m*Units::angstrom * Constants::neutron_mass_c2 * velocity_m_per_s);
+    constexpr double kkk = Constants::h_Planck * Units::second*Constants::c_squared / (Units::m*Units::angstrom * Constants::neutron_mass_c2);
+    return kkk / velocity_m_per_s;
   }
 
 }

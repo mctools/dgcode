@@ -5,8 +5,7 @@
 #include "GriffDataRead/Material.hh"
 #include "GriffDataRead/Element.hh"
 #include "GriffDataRead/Isotope.hh"
-#include "G4Units/Units.hh"
-#include "G4Units/Constants.hh"
+#include "Units/Units.hh"
 #include <iostream>
 
 void GriffDataRead::dump(const Track*t, bool dumpPDGInfo)
@@ -37,7 +36,8 @@ void GriffDataRead::dump(const Track*t, bool dumpPDGInfo)
     printf(" lifeTime=%f",t->lifeTime()/ut);
     printf(" atomicNumber=%i",t->atomicNumber());
     printf(" atomicMass=%i",t->atomicMass());
-    printf(" magneticMoment[muN]=%f",t->magneticMoment()/Constants::nuclearMagneton);
+    constexpr double nuclearMagneton = (Constants::h_Planck/(4*Constants::pi))/(Constants::proton_mass_c2 /Constants::c_squared);
+    printf(" magneticMoment[muN]=%f",t->magneticMoment()/nuclearMagneton);
     printf(" spin=%f",t->spin());
     printf(" stable=%i",t->stable()?1:0);
     printf(" shortLived=%i",t->shortLived()?1:0);

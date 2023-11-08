@@ -1,7 +1,6 @@
 #include "DCSteppingAction.hh"
 #include "G4Interfaces/FrameworkGlobals.hh"
 #include "EvtFile/Defs.hh"
-#include "G4Units/Units.hh"
 #include "Core/String.hh"
 #include <cassert>
 #include "Utils/Format.hh"

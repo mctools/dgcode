@@ -22,8 +22,7 @@ namespace NC = NCrystalRel; // DGBUILD-NO-EXPORT
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/internal/NCMath.hh"
 // DGBUILD-EXPORT-ONLY>>#include "NCrystal/NCFactImpl.hh"
 #include "IdealGasBuilder/IdealGasBuilder.hh"
-#include "G4Units/Units.hh"
-#include "G4Units/Constants.hh"
+#include "Units/Units.hh"
 #include "Core/FindData.hh"
 #include "Core/String.hh"
 #include "Core/File.hh"
@@ -96,7 +95,7 @@ namespace NamedMaterialProvider {
       if (hasProperty("density_gcm3"))
         return propertyAsDouble("density_gcm3",default_density/(Units::gram/Units::cm3))*(Units::gram/Units::cm3);
       if (hasProperty("density_kgm3"))
-        return propertyAsDouble("density_kgm3",default_density/(Units::kilogram/Units::meter3))*(Units::kilogram/Units::meter3);
+        return propertyAsDouble("density_kgm3",default_density/(Units::kilogram/Units::m3))*(Units::kilogram/Units::m3);
       return default_density;
     }
 
@@ -192,6 +191,9 @@ NamedMaterialProvider::MatInfo::MatInfo(const std::string& ss)
 
 G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
 {
+  constexpr double stp_temp = 273.15 * Units::kelvin;
+  constexpr double stp_pressure = 1.0 * Units::atm;
+
   std::string ss = sss;
 
   //check cache:
@@ -323,7 +325,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     double density = fixedDensity ? matinfo.getDensity(0.0) : 0;
 
     //Decode pressure:
-    double pressure = Constants::STP_Pressure;
+    double pressure = stp_pressure;
     bool fixedPressure = matinfo.hasProperty("pressure_bar") || matinfo.hasProperty("pressure_atm");
     if (fixedPressure) {
       if (matinfo.hasProperty("pressure_bar")) {
@@ -341,12 +343,12 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
 
     //Decode temperature:
     bool fixedTemperature = matinfo.hasProperty("temp_kelvin");
-    double temperature = matinfo.propertyAsDouble("temp_kelvin",Constants::STP_Temperature/Units::kelvin)*Units::kelvin;
+    double temperature = matinfo.propertyAsDouble("temp_kelvin",stp_temp/Units::kelvin)*Units::kelvin;
     unsigned nfixed = (fixedTemperature?1:0)+(fixedPressure?1:0)+(fixedDensity?1:0);
     if (nfixed==0) {
       fixedTemperature = fixedPressure = true;
-      temperature = Constants::STP_Temperature;
-      pressure = Constants::STP_Pressure;
+      temperature = stp_temp;
+      pressure = stp_pressure;
       nfixed += 2;
     }
     if (nfixed==3) {
@@ -357,12 +359,12 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     if (nfixed==1) {
       if (!fixedTemperature) {
         fixedTemperature = true;
-        temperature = Constants::STP_Temperature;
+        temperature = stp_temp;
         nfixed += 1;
       } else {
         assert(!fixedPressure);
         fixedPressure = true;
-        pressure = Constants::STP_Pressure;
+        pressure = stp_pressure;
         nfixed += 1;
       }
     }
@@ -377,7 +379,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     }
   } else if (matinfo.name=="ESS_POLYETHYLENE") {
     G4Material * mat_g4pe = CommonMaterials::getNISTMaterial("G4_POLYETHYLENE",s_prefix.c_str());
-    const double temperature = matinfo.propertyAsDouble("temp_kelvin",CLHEP::STP_Temperature/Units::kelvin)*Units::kelvin;
+    const double temperature = matinfo.propertyAsDouble("temp_kelvin",stp_temp/Units::kelvin)*Units::kelvin;
     const double density = matinfo.getDensity(mat_g4pe->GetDensity());
 
     //Polyethylene (copied from XX's code - this is for temporary testing only!)
@@ -405,7 +407,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     // G4Material * mat_orig = CommonMaterials::getNISTMaterial("G4_POLYETHYLENE",s_prefix.c_str());//base material
     // const double density = matinfo.getDensity(mat_orig->GetDensity());
     // auto state = mat_orig->GetState();
-    // const double pressure = mat_orig->GetPressure();//or CLHEP::STP_Pressure?
+    // const double pressure = mat_orig->GetPressure();//or stp_pressure?
     // auto elemV = mat_orig->GetElementVector();
     // auto atomV = mat_orig->GetAtomsVector();
     // mat = new G4Material(matinfo.fullname.c_str(),density,
@@ -492,7 +494,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     if (fraction_b10>1.0) matinfo.bad("b10_enrichment must be <= 1.0");
 
     const double density = matinfo.getDensity(CommonMaterials::getDensity_BoronCarbide(fraction_b10));
-    const double temperature = matinfo.propertyAsDouble("temp_kelvin",Constants::STP_Temperature)*Units::kelvin;
+    const double temperature = matinfo.propertyAsDouble("temp_kelvin",stp_temp)*Units::kelvin;
     mat = CommonMaterials::getMaterial_BoronCarbide(fraction_b10,density,temperature);
 
   } else if (matinfo.name=="MIX") {//
@@ -543,13 +545,13 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     if (!matinfo.hasNonDefaultDensity()) {
       if (density < 0.1*Units::g/Units::cm3)
         printf("%sINFO: Density of requested material \"%s\" is: %g kg/m3\n",
-               s_prefix.c_str(),matinfo.name.c_str(),density/(Units::kg/Units::m3));
+               s_prefix.c_str(),matinfo.name.c_str(),density/((1000.0*Units::gram)/Units::m3));
       else
         printf("%sINFO: Density of requested material \"%s\" is: %g g/cm3\n",
                s_prefix.c_str(),matinfo.name.c_str(),density/(Units::gram/Units::cm3));
     }
 
-    const double temperature = matinfo.propertyAsDouble("temp_kelvin",CLHEP::STP_Temperature/Units::kelvin)*Units::kelvin;
+    const double temperature = matinfo.propertyAsDouble("temp_kelvin",stp_temp/Units::kelvin)*Units::kelvin;
 
     mat = new G4Material(matinfo.fullname,
                          matinfo.getDensity(density),
@@ -583,7 +585,7 @@ G4Material * NamedMaterialProvider::getMaterial(const std::string& sss)
     }
     if (matinfo.hasNonDefaultDensity()||matinfo.hasProperty("temp_kelvin")) {
       //wrap the pure nist material in a material with changed density and/or temp:
-      const double temperature = matinfo.propertyAsDouble("temp_kelvin",CLHEP::STP_Temperature/Units::kelvin)*Units::kelvin;
+      const double temperature = matinfo.propertyAsDouble("temp_kelvin",stp_temp/Units::kelvin)*Units::kelvin;
       G4Material * mat0 = mat;
       mat = new G4Material(matinfo.fullname.c_str(),
                            matinfo.getDensity(mat0->GetDensity()),

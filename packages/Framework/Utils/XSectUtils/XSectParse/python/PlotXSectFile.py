@@ -1,5 +1,4 @@
 import XSectParse.ParseXSectFile
-import G4Units.Units
 from Utils.NeutronMath import neutron_eV_to_angstrom
 from PyAna import *
 
@@ -8,8 +7,8 @@ def _find_nearest(array,value):
     return idx
 
 def _extract_vals(npa,wl,mfp):
-    energy_ev=npa[:,0]/G4Units.Units.eV
-    yvals = npa[:,2]/G4Units.Units.cm if mfp else npa[:,1]/G4Units.Units.barn
+    energy_ev=npa[:,0]/Units.units.eV
+    yvals = npa[:,2]/Units.units.cm if mfp else npa[:,1]/Units.units.barn
     if wl:
         #convert energy to wl, reverse array direction and limit to 0.1..25Aa
         y=yvals[::-1]
@@ -116,9 +115,16 @@ def plot_file(filename,mfp=False,save_fig=None,show=None,versus_wavelength=False
 
     _plot_end(show,save_fig,versus_wavelength,showMFP,logx,logy,softbrackets=softbrackets)
 
-def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,xsectname='Total',labelstyle_gen=None,
-                  title=None,versus_wavelength=False,logx='auto',logy='auto',extra=None,mfpunit='cm',softbrackets=False):
-    """Plots a given cross-sections (default 'Total') found in given files. Set mfp=True to plot mean free path rather than cross-sections and set save_fig to save output. The parameter 'show' controls display of interactive window (default is to show when no saving a figure). label_gen(ifile,metadata) can be used to customise the label generator. Set extra to a function object to invoke to plot custom curves."""
+def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,
+                  xsectname='Total',labelstyle_gen=None,
+                  title=None,versus_wavelength=False,logx='auto',
+                  logy='auto',extra=None,mfpunit='cm',softbrackets=False):
+    """Plots a given cross-sections (default 'Total') found in given files. Set
+    mfp=True to plot mean free path rather than cross-sections and set save_fig
+    to save output. The parameter 'show' controls display of interactive window
+    (default is to show when no saving a figure). label_gen(ifile,metadata) can
+    be used to customise the label generator. Set extra to a function object to
+    invoke to plot custom curves."""
 
     _plot_begin()
     showMFP=mfp
@@ -135,7 +141,7 @@ def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,xsectname='Total',
             continue
         xvals,yvals = _extract_vals(npa,versus_wavelength,showMFP)
         if mfpunit!='cm':
-            yvals *= (G4Units.Units.cm/getattr(G4Units.Units,mfpunit))
+            yvals *= (Units.units.cm/getattr(Units.units,mfpunit))
 
         label,linestyle,linewidth,col = labelstyle_gen(ifile,p['metadata'])
         if col==None: col=colors[ifile%len(colors)]

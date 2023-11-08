@@ -10,7 +10,7 @@ class G4VPhysicalVolume;
 class G4VSolid;
 class G4Material;
 //For convenience:
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 #include "G4LogicalVolume.hh"
 #include <cmath>
 

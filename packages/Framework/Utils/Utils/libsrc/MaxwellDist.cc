@@ -1,6 +1,6 @@
 #include "Utils/MaxwellDist.hh"
 #include "Utils/NewtonRaphson.hh"
-#include "G4Units/Constants.hh"
+#include "Units/Units.hh"
 #include <cmath>
 #include <cassert>
 

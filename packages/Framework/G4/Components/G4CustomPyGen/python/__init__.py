@@ -52,7 +52,7 @@ class GenBase(_GenBaseCpp):
             print('ERROR:    FILENAME should either be an absolute path to an .shist file,')
             print('ERROR:    or of the form "<pkgname>/<filename>.')
             print('ERROR:    HISTKEY should be the key of the chosen 1D histogram in the file')
-            print('ERROR:    UNIT is optional and should be a number or a name from G4Units.Units')
+            print('ERROR:    UNIT is optional and should be a number or a name from Units.units')
             raise ValueError('create_hist_sampler: bad arguments')
 
         parts=histstr.split(':')
@@ -83,9 +83,9 @@ class GenBase(_GenBaseCpp):
             except ValueError:
                 unit = None
             if unit == None:
-                import G4Units.Units
-                if hasattr(G4Units.Units,parts[2]):
-                    unit = getattr(G4Units.Units,parts[2])
+                import Units
+                if hasattr(Units.units,parts[2]):
+                    unit = getattr(Units.units,parts[2])
                     if not isinstance(unit,float):
                         unit = None
                 if unit == None:

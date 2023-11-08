@@ -4,9 +4,8 @@
 #include "Utils/Format.hh"
 
 #include "Core/FindData.hh"
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 #include "Core/String.hh"
-#include "G4Units/Constants.hh"//STP temp
 
 #include "G4NistManager.hh"
 #include "G4Version.hh"
@@ -248,7 +247,7 @@ G4Material * CommonMaterials::getMaterial_BoronCarbide(double b10_isotope_fracti
   if (density<0.0)
     density = getDensity_BoronCarbide(b10_isotope_fraction);
   if (temperature<0.0)
-    temperature = Constants::STP_Temperature;
+    temperature = 273.15;
 
   //Careful with 64bit vs 80bit precision when using float keys in a map. Thus,
   //round to a large number of decimals and put in integers:
@@ -316,7 +315,7 @@ G4Material * CommonMaterials::getMaterial_Nylon12()
     //based on numbers in http://arxiv.org/abs/physics/0311110. Density there
     //seems incorrect though, so we take it from
     //http://www.stelray.com/density_val.htm:
-    mat = new G4Material("NYLON-12",1.02*Units::gram/Units::centimeter3,4/*ncomps*/);
+    mat = new G4Material("NYLON-12",1.02*Units::gram/Units::cm3,4/*ncomps*/);
     mat->AddElement(getNISTElement("H"),0.11749);
     mat->AddElement(getNISTElement("C"),0.73045);
     mat->AddElement(getNISTElement("N"),0.07098);
@@ -344,7 +343,7 @@ G4Material * CommonMaterials::getMaterial_Gd2O3()
     //
     //http://www.reade.com/products/35-oxides-metallic-powders/227-gadolinium-oxide-powder-gd2o3-gadolinium-oxide-digadolinium-monoxide-digadolinium-trioxide-gadolinia-gadolinium-oxide-gd2o3-gadolinium-sesquioxide-gadolinium-trioxide-gadolinium3-oxide-gadoliniumiii-oxide-astmc888-nuclear-grade-cas-12064-62-9
 
-    mat = new G4Material("Gd2O3",7.407*Units::gram/Units::centimeter3,2);
+    mat = new G4Material("Gd2O3",7.407*Units::gram/Units::cm3,2);
     mat->AddElement(getNISTElement("Gd"),2);
     mat->AddElement(getNISTElement("O"),3);
     mat->SetChemicalFormula("Gd2O3");

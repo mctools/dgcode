@@ -3,7 +3,7 @@
 #include "G4ParticleTable.hh"
 #include "Utils/NeutronMath.hh"
 #include "Utils/MaxwellDist.hh"
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 #include <cassert>
 #include <stdexcept>
 
@@ -84,7 +84,7 @@ struct ProfiledBeamGen::Imp
         m_gun->SetParticleEnergy(Utils::shootThermalNeutronEKin(par_neutron_thermal_spectrum, m_g->rand()));
       } else if (par_neutron_wavelength_spread) {
         double wl = par_neutron_wavelength+m_g->randGauss(par_neutron_wavelength_spread);
-        m_gun->SetParticleEnergy(wl > 0 ? Utils::neutronWavelengthToEKin(wl) : 10*Units::teraelectronvolt);
+        m_gun->SetParticleEnergy(wl > 0 ? Utils::neutronWavelengthToEKin(wl) : 10000.0*Units::GeV);
       }
 
       //Add the particle:
@@ -226,11 +226,11 @@ bool ProfiledBeamGen::validateParameters()
 {
   if (!m_imp) m_imp = new Imp(this);
 
-  m_imp->par_spread_x = getParameterDouble("spread_x_mm")*Units::millimeter;
-  m_imp->par_spread_y = getParameterDouble("spread_y_mm")*Units::millimeter;
-  m_imp->par_offset_x = getParameterDouble("offset_x_mm")*Units::millimeter;
-  m_imp->par_offset_y = getParameterDouble("offset_y_mm")*Units::millimeter;
-  m_imp->par_offset_z = getParameterDouble("offset_z_mm")*Units::millimeter;
+  m_imp->par_spread_x = getParameterDouble("spread_x_mm")*Units::mm;
+  m_imp->par_spread_y = getParameterDouble("spread_y_mm")*Units::mm;
+  m_imp->par_offset_x = getParameterDouble("offset_x_mm")*Units::mm;
+  m_imp->par_offset_y = getParameterDouble("offset_y_mm")*Units::mm;
+  m_imp->par_offset_z = getParameterDouble("offset_z_mm")*Units::mm;
   auto sm = getParameterString("spread_mode");
   if (sm=="GAUSSIAN") m_imp->par_spread_mode = 0;
   else if (sm=="FLATCIRCULAR") m_imp->par_spread_mode = 1;

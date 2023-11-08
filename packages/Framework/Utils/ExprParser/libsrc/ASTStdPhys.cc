@@ -1,6 +1,5 @@
 #include "ExprParser/ASTStdPhys.hh"
-#include "G4Units/Units.hh"
-#include "G4Units/Constants.hh"
+#include "Units/Units.hh"
 
 namespace ExprParser {
 
@@ -12,149 +11,81 @@ namespace ExprParser {
     switch (name[0]) {
 #     define UNIT(u) { if (name==#u) return create_constant(Units::u); };
     case 'A':
-      UNIT(Aa); break;
+      if (name=="Aa") return create_constant(Units::angstrom);
+      break;
     case 'a':
-      UNIT(ampere);
       UNIT(angstrom);
-      UNIT(atmosphere); break;
+      UNIT(atmosphere);
+      break;
     case 'b':
       UNIT(bar);
-      UNIT(barn);
-      UNIT(becquerel); break;
+      if (name=="barn") return create_constant(1e-28 * Units::m2);
+      break;
     case 'c':
-      UNIT(candela);
-      UNIT(centimeter);
-      UNIT(centimeter2);
-      UNIT(centimeter3);
       UNIT(cm);
       UNIT(cm2);
       UNIT(cm3);
       UNIT(coulomb);
-      UNIT(curie); break;
+      break;
     case 'd':
       UNIT(deg);
-      UNIT(degree); break;
+      if (name=="degree") return create_constant(Units::deg);
+      break;
     case 'e':
-      UNIT(electronvolt);
-      UNIT(eplus);
-      UNIT(e_SI);
-      UNIT(eV); break;
-    case 'f':
-      UNIT(farad);
-      UNIT(fermi); break;
+      UNIT(eV);
+      break;
     case 'g':
       UNIT(g);
-      UNIT(gauss);
-      UNIT(gigaelectronvolt);
       UNIT(gram);
-      UNIT(gray); break;
+      break;
     case 'G':
-      UNIT(GeV); break;
-    case 'h':
-      UNIT(henry);
-      UNIT(hertz); break;
+      UNIT(GeV);
+      break;
     case 'j':
-      UNIT(joule); break;
+      UNIT(joule);
+      break;
     case 'k':
       UNIT(kelvin);
       UNIT(keV);
-      UNIT(kg);
-      UNIT(kiloelectronvolt);
-      UNIT(kilogauss);
+      if (name=="kg") return create_constant(1000.0 * Units::gram);
       UNIT(kilogram);
-      UNIT(kilogray);
-      UNIT(kilohertz);
-      UNIT(kilometer);
-      UNIT(kilometer2);
-      UNIT(kilometer3);
-      UNIT(kilovolt);
-      UNIT(km);
-      UNIT(km2);
-      UNIT(km3); break;
-    case 'l':
-      UNIT(lumen);
-      UNIT(lux); break;
+      break;
     case 'm':
       UNIT(m);
       UNIT(m2);
       UNIT(m3);
-      UNIT(megaelectronvolt);
-      UNIT(megahertz);
-      UNIT(megavolt);
       UNIT(meter);
-      UNIT(meter2);
-      UNIT(meter3);
       UNIT(meV);
-      UNIT(mg);
-      UNIT(microampere);
-      UNIT(microbarn);
-      UNIT(microfarad);
-      UNIT(microgray);
-      UNIT(micrometer);
-      UNIT(microsecond);
-      UNIT(milliampere);
-      UNIT(millibarn);
-      UNIT(millielectronvolt);
-      UNIT(millifarad);
-      UNIT(milligram);
-      UNIT(milligray);
-      UNIT(millimeter);
-      UNIT(millimeter2);
-      UNIT(millimeter3);
-      UNIT(milliradian);
       UNIT(millisecond);
       UNIT(mm);
-      UNIT(mm2);
-      UNIT(mm3);
       UNIT(mole);
-      UNIT(mrad);
-      UNIT(ms); break;
+      UNIT(ms);
+      if (name=="microsecond") return create_constant( 1e-6 * Units::second );
+      break;
     case 'M':
-      UNIT(MeV); break;
+      UNIT(MeV);
+      break;
     case 'n':
-      UNIT(nanoampere);
-      UNIT(nanobarn);
-      UNIT(nanofarad);
-      UNIT(nanometer);
       UNIT(nanosecond);
       UNIT(newton);
       UNIT(nm);
-      UNIT(ns); break;
-    case 'o':
-      UNIT(ohm); break;
+      UNIT(ns);
+      break;
     case 'p':
-      UNIT(parsec);
       UNIT(pascal);
-      UNIT(pc);
-      UNIT(perCent);
-      UNIT(perMillion);
-      UNIT(perThousand);
-      UNIT(petaelectronvolt);
-      UNIT(picobarn);
-      UNIT(picofarad);
-      UNIT(picosecond); break;
-    case 'P':
-      UNIT(PeV); break;
-    case 'r':
-      UNIT(rad);
-      UNIT(radian); break;
+      break;
     case 's':
-      UNIT(s);
       UNIT(second);
-      UNIT(sr);
-      UNIT(steradian); break;
+      break;
     case 't':
-      UNIT(teraelectronvolt);
-      UNIT(tesla); break;
+      UNIT(tesla);
+      break;
     case 'T':
-      UNIT(TeV); break;
+      UNIT(TeV);
+      break;
     case 'u':
-      UNIT(um); break;
-    case 'v':
-      UNIT(volt); break;
-    case 'w':
-      UNIT(watt);
-      UNIT(weber); break;
+      UNIT(um);
+      break;
     }
     return ExprEntityPtr();
   }
@@ -166,53 +97,26 @@ namespace ExprParser {
 
     switch (name[0]) {
 #     define CONSTANT(u) { if (name==#u) return create_constant(Constants::u); };
-    case 'a':
-      CONSTANT(alpha_rcl2);
-      CONSTANT(amu);
-      CONSTANT(amu_c2); break;
     case 'A':
-      CONSTANT(Avogadro); break;
-    case 'B':
-      CONSTANT(Bohr_radius); break;
+      CONSTANT(avogadro);
+      break;
     case 'c':
-      CONSTANT(classic_electr_radius);
       CONSTANT(c_light);
-      CONSTANT(c_squared); break;
-    case 'e':
-      CONSTANT(electron_charge);
-      CONSTANT(electron_Compton_length);
-      CONSTANT(electron_mass_c2);
-      CONSTANT(elm_coupling);
-      CONSTANT(epsilon0);
-      CONSTANT(e_squared); break;
-    case 'f':
-      CONSTANT(fine_structure_const); break;
+      CONSTANT(c_squared);
+      break;
     case 'h':
-      CONSTANT(halfpi);
-      CONSTANT(hbarc);
-      CONSTANT(hbarc_squared);
-      CONSTANT(hbar_Planck);
-      CONSTANT(h_Planck); break;
+      CONSTANT(h_Planck);
+      break;
     case 'k':
       CONSTANT(k_Boltzmann);
-      CONSTANT(kGasThreshold); break;
-    case 'm':
-      CONSTANT(mu0); break;
+      break;
     case 'n':
       CONSTANT(neutron_mass_c2);
-      CONSTANT(nuclearMagneton); break;
+      break;
     case 'p':
       CONSTANT(pi);
-      CONSTANT(pi2);
-      CONSTANT(proton_mass_c2); break;
-    case 'S':
-      CONSTANT(STP_Pressure);
-      CONSTANT(STP_Temperature); break;
-    case 't':
-      CONSTANT(twopi);
-      CONSTANT(twopi_mc2_rcl2); break;
-    case 'u':
-      CONSTANT(universe_mean_density); break;
+      CONSTANT(proton_mass_c2);
+      break;
     }
     return ExprEntityPtr();
   }

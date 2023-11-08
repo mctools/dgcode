@@ -1,7 +1,7 @@
 #include "ExprParser/Types.hh"
 #include "MCPL/mcpl.h"
 #include "Utils/NeutronMath.hh"
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 
 namespace MCPLExprParser {
 

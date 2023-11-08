@@ -5,7 +5,7 @@
 #include "MCPLExprParser/MCPLASTBuilder.hh"
 #include "MCPL/mcpl.h"
 #include "Core/FindData.hh"
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 #include "Core/String.hh"
 #include "G4ParticleGun.hh"
 #include "CLHEP/Geometry/Vector3D.h"
@@ -128,9 +128,9 @@ void MCPLGen::init()
   const double dx = getParameterDouble("dx_meter")*Units::meter;
   const double dy = getParameterDouble("dy_meter")*Units::meter;
   const double dz = getParameterDouble("dz_meter")*Units::meter;
-  const double rotx = getParameterDouble("rotx_degree")*Units::degree;
-  const double roty = getParameterDouble("roty_degree")*Units::degree;
-  const double rotz = getParameterDouble("rotz_degree")*Units::degree;
+  const double rotx = getParameterDouble("rotx_degree")*Units::deg;
+  const double roty = getParameterDouble("roty_degree")*Units::deg;
+  const double rotz = getParameterDouble("rotz_degree")*Units::deg;
   m_translation.set( dx,dy,dz);
   m_rotation = HepGeom::RotateZ3D(rotz)* HepGeom::RotateY3D(roty) * HepGeom::RotateX3D(rotx);
 

@@ -23,6 +23,6 @@
 #include "GriffAnaUtils/StepFilter_Time.hh"
 
 #include "GriffDataRead/GriffDataReader.hh"
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 
 #endif

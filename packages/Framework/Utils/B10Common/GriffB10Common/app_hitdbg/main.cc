@@ -1,5 +1,5 @@
 #include "GriffAnaUtils/All.hh"
-#include "G4Units/Units.hh"
+#include "Units/Units.hh"
 #include "Utils/ArrayMath.hh"
 #include "SimpleHistsUtils/AutoBinHistCollection.hh"
 #include "GriffB10Common/DetHitApproxFlex.hh"
@@ -101,7 +101,7 @@ int main(int argc,char**argv) {
 #ifdef DEBUG_TRUETOF
     for (auto seg = trk_neutron->segmentBegin(); seg!=trk_neutron->segmentEnd(); ++seg) {
       if (seg->volumeName()==volname_conv) {
-        h_time_at_conv_vs_expected->fill((seg->firstStep()->preTime() - true_tof)/Units::microsecond);
+        h_time_at_conv_vs_expected->fill((seg->firstStep()->preTime() - true_tof)/Units::ms);
         break;
       }
     }
@@ -115,15 +115,15 @@ int main(int argc,char**argv) {
     double dir_hit[3];
     if (hit_fullhighres.eventHasHit()) {
       Utils::subtract(hit_fullhighres.eventHitPosition(),p0_true,dir_hit);
-      h_angular_res_hitfullhighres->fill(Utils::theta(mom0_true,dir_hit)/Units::degree);
+      h_angular_res_hitfullhighres->fill(Utils::theta(mom0_true,dir_hit)/Units::deg);
       if (has_true_tof)
-        h_time_res_hitfullhighres->fill((hit_fullhighres.eventHitTime()-true_tof)/Units::microsecond);
+        h_time_res_hitfullhighres->fill((hit_fullhighres.eventHitTime()-true_tof)/Units::ms);
     }
     if (hit_red.eventHasHit()) {
       Utils::subtract(hit_red.eventHitPosition(),p0_true,dir_hit);
-      h_angular_res_hitreduced->fill(Utils::theta(mom0_true,dir_hit)/Units::degree);
+      h_angular_res_hitreduced->fill(Utils::theta(mom0_true,dir_hit)/Units::deg);
       if (has_true_tof)
-        h_time_res_hitreduced->fill((hit_red.eventHitTime()-true_tof)/Units::microsecond);
+        h_time_res_hitreduced->fill((hit_red.eventHitTime()-true_tof)/Units::ms);
     }
 
     //decode where neutron reaches converter, if somewhere:
