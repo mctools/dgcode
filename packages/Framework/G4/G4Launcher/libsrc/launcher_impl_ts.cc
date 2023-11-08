@@ -1,8 +1,21 @@
-//We need G4HadronElasticPhysicsHP, but with final->override so use this ugly workaround:
-#define dgcode_workaround_final_keyword
-#ifndef dgcode_workaround_final_keyword
+
+
+//We need to extend G4HadronElasticPhysicsHP, but need to workaround a faulty
+//usage of the "final" keyword (should have been "override"), as discussed on
+//https://bugzilla-geant4.kek.jp/show_bug.cgi?id=2574 . We provide a somewhat
+//nasty (but reliable) workaround:
+
+#if G4VERSION_NUMBER >= 1020
+
+// Untested as per November 2023, but on the bug report it was indicated that we
+// should be able to use this directly with Geant4 11.2.0 and later:
 #  include "G4HadronElasticPhysicsHP.hh"
+
 #else
+//The workaround is essentially to replicate the class, but not marking
+//ConstructProcess as "final". This work, as there is no ABI difference between
+//the two versions (e.g. "final"/"override" have compile-time access control
+//effects only, they don't show up in the mangled symbols):
 #  include "G4HadronElasticPhysics.hh"
 class G4HadronElasticPhysicsHP : public G4HadronElasticPhysics {
 public:
