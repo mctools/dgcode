@@ -1,18 +1,26 @@
-DGCode : A coding framework for detector simulations
+dgcode : A coding framework for detector simulations
 
-Copyright 2012-2022 DGCode developers
+Copyright 2012-2023 DGCode developers
 
 This software was mainly developed at the European Spallation Source ERIC (ESS)
 and the Technical University of Denmark (DTU). This work was supported in part
 by the European Union's Horizon 2020 research and innovation programme under
 grant agreement No 676548 (the BrightnESS project).
 
-With the exception of some third-party code in the packages/Framework/External,
-.system/include/dgboost, and .system/publicmods/dgbuild directories, all DGCode
-files are distributed under the GNU Lesser General Public License v3.0,
-available in the COPYING.LESSER file or at
-https://www.gnu.org/licenses/lgpl-3.0.txt. This license is a set of additional
-permissions on top of the GNU General Public License, available in the COPYING
-file or at https://www.gnu.org/licenses/gpl-3.0.txt. For the licenses of the
-aforementioned third-party code, look in their respective directories under the
-packages/Framework/External and .system/include/dgboost directories.
+All files are distributed under the Apache 2.0 license, available at
+http://www.apache.org/licenses/LICENSE-2.0, as well as in the LICENSE file.
+
+A very substantial effort went into developing this code. If you use it for your
+work, we would appreciate it if you would use the following primary reference in
+your work:
+
+Kittelmann, Thomas, et al. "Geant4 based simulations for novel neutron detector
+development." Journal of Physics: Conference Series. Vol. 513. No. 2. IOP
+Publishing, 2014. https://doi.org/10.1088/1742-6596/513/2/022017
+
+Additionally, the following more recent reference can also be used for a more up
+to date description:
+
+Kanaki, Kalliopi, et al. "Simulation tools for detector and instrument design."
+Physica B: Condensed Matter 551 (2018):
+386-389. https://doi.org/10.1016/j.physb.2018.03.025
