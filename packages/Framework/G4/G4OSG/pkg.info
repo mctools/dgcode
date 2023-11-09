@@ -1,14 +1,23 @@
-#in order to potentially make this viewer exportable, it might be valuable to
-#not depend on other packages here (decision to be revisited)
 package(USEEXT Geant4 OSG USEPKG GriffDataRead)
 
 ######################################################################
 
 OpenSceneGraph based viewer for Geant4
 
+Note that the included font file, data/RobotoMono_wght_.ttf, file is
+deliberately chosen because it has an Apache-2.0 LICENSE like the rest of
+dgcode, hence making it simple to include it here (it also needed to be
+monospace of course). Specifically it was copied from the file
+apache/robotomono/RobotoMono[wght].ttf in the git repo
+https://github.com/google/fonts (commit id
+4b31e06771036d0132bbcf26dccd976f4fce4286). The LICENSE file in the same
+directory of that repo in that commit is the Apache-2.0 license.
+
 Primary author: thomas.kittelmann@ess.eu
 
 todo (random thoughts):
+  - in order to potentially make this viewer exportable, it might be valuable to
+    not depend on other packages here (decision to be revisited)
   - fps counter?
   - hower-text under cursor (with volume name), transparent gray
   - check all includes and general code cleanup

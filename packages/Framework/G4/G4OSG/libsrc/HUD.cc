@@ -3,6 +3,7 @@
 #include <osg/Version>
 #include <cassert>
 #include "Core/FindData.hh"//NB: Is this our only dependency on other packages?
+#include <cstdlib>//getenv
 
 G4OSG::HUD::HUD(osgViewer::View*view ,osgViewer::ViewerBase*viewer, double width, double height)
   : m_view(view), m_viewer(viewer), m_cam(0),
@@ -80,9 +81,12 @@ void G4OSG::HUD::initTexts()
   if (m_hudVisible)
     m_cam->addChild(m_textGeode);
 
-  //NB: If we ever need a font with more than ~300 symbols defined, we could use
-  //DejaVuSansMono.ttf instead of arial.ttf:
-  std::string fontfile = Core::findData("G4OSG","arial.ttf");
+  //For consistency we always use the same TTF file included with our code
+  //RobotoMono_wght_.ttf (an APACHE-2.0 licensed font):
+  std::string fontfile = Core::findData("G4OSG","RobotoMono_wght_.ttf");
+  auto fontfile_override = std::getenv("DGCODE_G4OSG_FONTFILE_OVERRIDE");
+  if ( fontfile_override )
+    fontfile = fontfile_override;
 
   for (unsigned i=0;i<=(unsigned)LAST_TEXTPOS;++i) {
     m_texts[i] = new osgText::Text;
