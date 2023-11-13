@@ -1,7 +1,6 @@
-from __future__ import print_function
+
 __doc__='module for chaining g4 simulation and griff analysis steps'
 import os,sys,pipes
-import Utils.run
 from Core.System import mkdir_p,system
 import G4Utils.hash2seed
 

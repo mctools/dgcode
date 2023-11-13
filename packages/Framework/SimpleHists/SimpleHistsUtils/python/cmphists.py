@@ -1,8 +1,6 @@
 __doc__="Quickly overlay contents of a series of histograms while optionally rebinning, normalising, etc."
 __author__="thomas.kittelmann@ess.eu"
 
-import matplotlib.pyplot as plt
-
 def copyhist(hist,rebin=None,normalise=False):
     h=hist.clone()
     if rebin!=None:

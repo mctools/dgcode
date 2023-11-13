@@ -29,7 +29,7 @@ class VirtualFile:
        directories (for directories content must be None and executable is always False)"""
     def __init__( self, path, content, *, is_exe = False, is_dir = False ):
         if is_dir:
-            assert content is None and is_exe == False
+            assert content is None and is_exe is False
         self.__p = path
         self.__c = content
         self.__x = is_exe

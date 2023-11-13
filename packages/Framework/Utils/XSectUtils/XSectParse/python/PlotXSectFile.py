@@ -153,7 +153,7 @@ def plot_file_cmp(filenames,mfp=False,save_fig=None,show=None,
         plt.title(title)
 
     proctxt=' of the process %s'%xsectname if xsectname!='Total' else ''
-    if title!=False:
+    if title is not False:
         plt.suptitle(r'Comparison of \texttt{Geant4} %s%s'%('Mean Free Path' if showMFP else 'Cross-sections',proctxt))
 
     _plot_end(show,save_fig,versus_wavelength,showMFP,logx,logy,extra,mfpunit=mfpunit,softbrackets=softbrackets)

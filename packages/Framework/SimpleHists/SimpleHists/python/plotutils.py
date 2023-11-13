@@ -937,12 +937,20 @@ def plotcounts(hist,show=True,statbox=False,statbox_exactcorner=False,figure=Non
         plt.show()
     return fig,ax
 
+def _mpl_get_cmap( arg ):
+    if hasattr(matplotlib,'colormaps'):
+        if hasattr(matplotlib.colormaps,'get_cmap'):
+            #Recommended since matplotlib 3.7:
+            return matplotlib.colormaps.get_cmap( arg )
+    #Deprecated in matplotlib 3.7:
+    return matplotlib.cm.get_cmap(cm)
+
 def _has_cmap(cm):
     if cm in plt.cm.datad:
         return True
     try:
-        matplotlib.cm.get_cmap(cm)
-    except:
+        _mpl_get_cmap(cm)
+    except ( AttributeError, ValueError ):
         return False
     return True
 
@@ -1018,7 +1026,7 @@ def plot2d(hist,show=True,cmap=None,statbox=False,statbox_exactcorner=False,figu
         pass
     if not cmap in cmaps:
         #query matplotlib for cmap (will throw ValueError if not present - we let it propagate to the caller)
-        matplotlib.cm.get_cmap(cmap)
+        _mpl_get_cmap(cmap)
         #no exceptions thrown in previous call - add this at front of list:
         cmaps = [cmap] + cmaps
     assert cmap in cmaps

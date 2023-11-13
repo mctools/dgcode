@@ -1,6 +1,7 @@
 import os
 import pathlib
 import subprocess
+import Core.System as Sys
 
 #Duplicated from .githooks/hooks.py:
 def _strbytes2path(strbytes_path):
@@ -44,22 +45,30 @@ def git_status_iter(extra_args=[],staged_only=False,status_filter=''):
         fpath = _strbytes2path(parts.pop(0))
         yield statusflag,fpath
 
-def git_untracked_files_iter( specific_paths = None ):
-    cmd = _safe_git_cmd + 'ls-files --others -z'.split();
-    if specific_paths:
-        cmd += ['--']
-        cmd += [ str(p) for p in specific_paths ]
-    b=subprocess.run(cmd,check=True, stdout=subprocess.PIPE).stdout
-    for p in b.split(b'\x00'):
-        if b:
-            yield _strbytes2path(p)
+def _paths_and_workdirs( specific_paths ):
+    #Handle the fact files might be in different git repos:
+    for p in specific_paths:
+        pp = pathlib.Path(p)
+        yield ( pp if pp.is_dir() else pp.parent ), p
 
-def git_unclean_files_iter( specific_paths = None, allow_untracked = False ):
-    if not allow_untracked:
-        for f in git_untracked_files_iter(specific_paths):
-            yield f
-    for _,f in git_status_iter(specific_paths):
-        yield f
+def git_untracked_files_iter( specific_paths ):
+    cmd = _safe_git_cmd + 'ls-files --others -z -- DUMMY'.split();
+    for workdir, checked_path in _paths_and_workdirs( specific_paths ):
+        with Sys.changedir(workdir):
+            cmd[-1] = str(checked_path)
+            b=subprocess.run(cmd,check=True, stdout=subprocess.PIPE).stdout
+            for p in b.split(b'\x00'):
+                if b:
+                    yield _strbytes2path(p)
+
+def git_unclean_files_iter( specific_paths, allow_untracked = False ):
+    for workdir, checked_path in _paths_and_workdirs( specific_paths ):
+        with Sys.changedir(workdir):
+            if not allow_untracked:
+                for f in git_untracked_files_iter([checked_path]):
+                    yield f
+            for _,f in git_status_iter([checked_path]):
+                yield f
 
 def is_unclean(specific_paths = None):
     return any(True for f in git_unclean_files_iter(specific_paths))
@@ -74,12 +83,13 @@ def abort_if_pkg_unclean( pkg_name ):
         raise SystemExit(f'Aborting since git reports unclean files in the package {pkg_name}')
 
 def git_check_ignore( path ):
-    #NB: _keepcfg here, to not skip our gitignore file for this check!
-    cmd = _safe_git_cmd_keepcfg + ['check-ignore','-q','--',str(path)]
-    ec = subprocess.run(cmd,check=False, stdout=subprocess.PIPE).returncode
-    if not ec in (0,1):
-        raise RuntimeError("Unexpected error in git check-ignore command")
-    return ec==0#ec 0 means "ignored", 1 means "not ignored"
+    with Sys.changedir( path if path.is_dir() else path.parent ):
+        #NB: _keepcfg here, to not skip our gitignore file for this check!
+        cmd = _safe_git_cmd_keepcfg + ['check-ignore','-q','--',str(path)]
+        ec = subprocess.run(cmd,check=False, stdout=subprocess.PIPE).returncode
+        if not ec in (0,1):
+            raise RuntimeError("Unexpected error in git check-ignore command")
+        return ec==0#ec 0 means "ignored", 1 means "not ignored"
 
 def git_not_ignored( path ):
     return not git_check_ignore( path )

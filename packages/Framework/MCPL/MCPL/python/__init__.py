@@ -100,7 +100,7 @@ try:
     from numpy.lib import NumpyVersion
 except ImportError:
     NumpyVersion = None
-if not NumpyVersion is None:
+if NumpyVersion is not None:
     if NumpyVersion(np.__version__) < '1.3.0':
         _numpyok = False
     if NumpyVersion(np.__version__) < '1.5.0':
@@ -630,7 +630,7 @@ class MCPLFile:
             try:
                 import struct
                 read_errors += [struct.error]
-            except:
+            except ( ImportError, AttributeError ):
                 pass
             read_errors = tuple(read_errors)
             def fread_via_buffer(dtype,count):
@@ -1113,7 +1113,7 @@ def app_pymcpltool(argv=None):
             while a:
                 f,a=a[0],a[1:]
                 if f=='b':
-                    if not opt_blobkey is None:
+                    if opt_blobkey is not None:
                         bad("-b specified more than once")
                     if not a:
                         bad("Missing argument for -b")
@@ -1122,12 +1122,12 @@ def app_pymcpltool(argv=None):
                     if not a: bad("Bad option: missing number")
                     if not a.isdigit(): bad("Bad option: expected number")
                     if f=='l':
-                        if not opt_limit is None:
+                        if opt_limit is not None:
                             bad("-l specified more than once")
                         opt_limit = int(a)
                     else:
                         assert f=='s'
-                        if not opt_skip is None:
+                        if opt_skip is not None:
                             bad("-s specified more than once")
                         opt_skip = int(a)
                     a=''
@@ -1449,7 +1449,7 @@ def collect_stats(mcplfile,stats=_str('all'),bin_data=True):
         for pb in mcplfile.particle_blocks:
             weight_sum += pb.weight.sum()
 
-    assert not weight_sum is None
+    assert weight_sum is not None
 
     if cnst_stats:
         if 'pdgcode' in cnst_stats:
