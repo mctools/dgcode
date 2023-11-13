@@ -47,10 +47,8 @@ for f in all_files():
         if hasattr(cfg.dirs,'projdir') and f == cfg.dirs.projdir/'bootstrap.sh':
           continue
         if f.name == 'LICENSE':
-            #must be in pkg directory or in non-pkg dir under a dir named 'External':
+            #must be in pkg directory:
             if f.parent in all_pkgdirs:
-                continue
-            if f.parent.parent.name == 'External':
                 continue
             raise SystemExit(f'ERROR: Unexpected LICENSE file: {f}')
         if f.name == 'pkg.info':

@@ -20,15 +20,8 @@ def dl_with_cache(url,cachedir=None):
     if op.exists(target):
         print('Acquiring file from local cache: %s'%url)
     else:
-        try:
-            #python3
-            import urllib.request
-            urlretrievefct = urllib.request.urlretrieve
-        except ImportError:
-            #python2
-            import urllib
-            urlretrievefct = urllib.urlretrieve
+        import urllib.request
         print('Retrieving remote file to local cache: %s'%url)
-        urlretrievefct(url, target)
+        urllib.request.urlretrieve(url, target)
 
     return target

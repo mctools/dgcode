@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <stdexcept>
+#include <unistd.h>
 
 void G4Launcher::MultiProcessingMgr::scheduleMP(G4Interfaces::ParticleGenBase*gen,unsigned nprocs)
 {

@@ -49,10 +49,10 @@ G4OSG::CoordAxes::CoordAxes(Viewer*viewer,osg::Group* sceneHook)
   //Make sure normals are normalised when axes are scaled:
   model_axes->getOrCreateStateSet()->setMode(GL_NORMALIZE,osg::StateAttribute::ON);
 
-  osg::ref_ptr<osg::Node> ref_model_axes = osgDB::readNodeFile(Core::findData("G4OSG","axes.osgt"));
-  ref_model_axes->getOrCreateStateSet()->setMode(GL_NORMALIZE,osg::StateAttribute::ON);
   m_trf->addChild( model_axes.get() );
+
   updateTrf();
+
 }
 
 G4OSG::CoordAxes::~CoordAxes()
