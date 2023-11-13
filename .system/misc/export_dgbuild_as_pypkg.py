@@ -121,7 +121,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: Unix",
 ]
 dependencies = [
@@ -292,11 +292,7 @@ def main():
                           pkgfilter = (lambda pkgname : pkgname=='Core'),
                           filefilter = dgcode_filefilter )
     create_frameworkpkgs( opt.srcdir.parent / 'packages' / 'Framework', destdir_pkgs_dgcode,
-                          pkgfilter = (lambda pkgname : pkgname not in ('Core',
-                                                                        'DGBoost',
-                                                                        'NCrystalBuiltin',
-                                                                        #'NCrystalRel', <--TODO
-                                                                        ) ) )
+                          pkgfilter = (lambda pkgname : pkgname != 'Core' ) )
 
 #simplebuild.cfg files:
     ( destdir_pkgs_core / 'simplebuild.cfg' ).write_text(
