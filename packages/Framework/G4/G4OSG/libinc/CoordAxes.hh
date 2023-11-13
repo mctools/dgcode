@@ -30,6 +30,7 @@ namespace G4OSG {
     //double m_scale;
     bool m_visible;
     void updateTrf();
+    osg::ref_ptr<osg::Node> createAxesModel();
   };
 }
 
